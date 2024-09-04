@@ -3,7 +3,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "enum": ["api.tenant.update"]
+      "enum": ["api.question.search"]
     },
     "ver": {
       "type": "string"
@@ -24,25 +24,21 @@
     "request": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "must be a string and is required"
+        "filters": {
+          "type": "object",
+          "description": "Object containing search criteria. Can include any fields defined in the Tenant model."
         },
-        "type": {
-          "type": "string",
-          "description": "must be a string and is required"
+        "limit": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 100
         },
-        "board_id": {
-          "type": "array",
-          "items": {
-            "type": "number"
-          },
-          "minItems": 1,
-          "uniqueItems": true,
-          "description": "Array of board IDs"
+        "offset": {
+          "type": "number",
+          "minimum": 0
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     }
   },
   "required": ["id", "ver", "ts", "params", "request"],

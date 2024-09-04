@@ -1,18 +1,18 @@
 import app from '../../../app';
-import { Tenant } from '../../models/tenant';
+import { Question } from '../../models/question';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import spies from 'chai-spies';
 import { describe, it } from 'mocha';
 import { AppDataSource } from '../../config';
-import { insert_tenant_request } from './fixture';
+import { insert_question_request } from './fixture';
 
 chai.use(spies);
 chai.should();
 chai.use(chaiHttp);
 
-describe('TENANT CREATE API', () => {
-  const insertUrl = '/api/v1/tenant/create';
+describe('Question CREATE API', () => {
+  const insertUrl = '/api/v1/question/create';
 
   // Restore spies after each test
   afterEach(() => {
@@ -20,9 +20,9 @@ describe('TENANT CREATE API', () => {
   });
 
   // Test case: Successful tenant creation
-  it('Should insert tenant and tenant board into the database', (done) => {
+  it('Should insert Question into the database', (done) => {
     // Mocking Tenant.findOne to simulate no tenant found
-    chai.spy.on(Tenant, 'findOne', () => {
+    chai.spy.on(Question, 'findOne', () => {
       return Promise.resolve(null);
     });
 
@@ -32,8 +32,8 @@ describe('TENANT CREATE API', () => {
     });
 
     // Mocking Tenant.create to simulate tenant creation
-    chai.spy.on(Tenant, 'create', () => {
-      return Promise.resolve({ dataValues: { id: 1, name: 'tenant' } });
+    chai.spy.on(Question, 'create', () => {
+      return Promise.resolve({ id: 1, name: 'tenant' });
     });
 
     // Mocking transaction methods
@@ -51,7 +51,7 @@ describe('TENANT CREATE API', () => {
     chai
       .request(app)
       .post(insertUrl)
-      .send(insert_tenant_request.tenantCreate)
+      .send(insert_question_request.questionCreate)
       .end((err, res) => {
         if (err) return done(err);
         res.should.have.status(200);
@@ -72,7 +72,7 @@ describe('TENANT CREATE API', () => {
     chai
       .request(app)
       .post(insertUrl)
-      .send(insert_tenant_request.tenantCreate)
+      .send(insert_question_request.questionCreate)
       .end((err, res) => {
         res.should.have.status(500);
         res.body.should.be.a('object');
@@ -87,13 +87,13 @@ describe('TENANT CREATE API', () => {
     chai
       .request(app)
       .post(insertUrl)
-      .send(insert_tenant_request.invalidTenantRequest)
+      .send(insert_question_request.invalidQuestionRequest)
       .end((err, res) => {
         res.should.have.status(400);
         res.body.should.be.a('object');
         res.body.params.status.should.be.eq('failed');
         res.body.responseCode.should.be.eq('CLIENT_ERROR');
-        res.body.err.err.should.be.eq('TENANT_INVALID_INPUT');
+        res.body.err.err.should.be.eq('QUESTION_INVALID_INPUT');
         done();
       });
   });
@@ -104,13 +104,13 @@ describe('TENANT CREATE API', () => {
     chai
       .request(app)
       .post(insertUrl)
-      .send(insert_tenant_request.invalidTenantSchema)
+      .send(insert_question_request.invalidQuestionSchema)
       .end((err, res) => {
         res.should.have.status(400);
         res.body.should.be.a('object');
         res.body.params.status.should.be.eq('failed');
         res.body.responseCode.should.be.eq('CLIENT_ERROR');
-        res.body.err.err.should.be.eq('TENANT_INVALID_INPUT');
+        res.body.err.err.should.be.eq('QUESTION_INVALID_INPUT');
         done();
       });
   });
