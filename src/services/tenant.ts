@@ -1,5 +1,5 @@
 import { Tenant } from '../models/tenant';
-import { Optional } from 'sequelize';
+import { Op, Optional } from 'sequelize';
 import { UpdateTenant } from '../types/tenantModel';
 import _ from 'lodash';
 import { Status } from '../enums/status';
@@ -35,4 +35,20 @@ export const getTenantSearch = async (req: Record<string, any>) => {
   const { filters = {} } = req || {};
   const tenants = await Tenant.findAll({ limit: limit || 100, offset: offset || 0, ...(filters && { where: filters }) });
   return tenants;
+};
+
+//tenant Name check
+export const checkTenantNameExists = async (tenantNames: { [key: string]: string }): Promise<{ exists: boolean; tenant?: any }> => {
+  const conditions = Object.entries(tenantNames).map(([lang, name]) => ({
+    name: { [Op.contains]: { [lang]: name } }, // Dynamic condition for each language
+    is_active: true,
+    status: Status.LIVE,
+  }));
+
+  const tenant = await Tenant.findOne({
+    where: { [Op.or]: conditions },
+    attributes: ['id', 'name'], // Fetch ID and name only
+  });
+
+  return tenant ? { exists: true, tenant: tenant.toJSON() } : { exists: false };
 };

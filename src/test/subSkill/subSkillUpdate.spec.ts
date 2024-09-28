@@ -9,7 +9,7 @@ chai.use(chaiHttp);
 chai.use(chaiSpies);
 
 describe('SUBSKILL UPDATE API', () => {
-  const updateUrl = '/api/v1/subskill/update'; // Updated URL for subskill
+  const updateUrl = '/api/v1/sub-skill/update'; // Updated URL for subskill
 
   afterEach(() => {
     chai.spy.restore();

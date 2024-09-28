@@ -57,6 +57,9 @@
         "skill_taxonomy_id": {
           "type": "string"
         },
+        "board_identifier": {
+          "type": "string"
+        },
         "description": {
           "type": "object",
           "minProperties": 1,

@@ -1,0 +1,58 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "enum": ["api.question.search"]
+    },
+    "ver": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "msgid": {
+          "type": "string"
+        }
+      },
+      "required": ["msgid"],
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "object",
+          "properties": {
+            "question_type": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["Grid-1", "mcq", "fib", "Grid-2"]
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "description": "Object containing search criteria. Can include any fields defined in the Tenant model.",
+          "additionalProperties": false
+        },
+        "limit": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "offset": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["id", "ver", "ts", "params", "request"],
+  "additionalProperties": false
+}

@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { Status } from '../enums/status';
 import { SubSkillMaster } from '../models/subSkillMaster'; // The model file
 import { amlError } from '../types/amlError';
@@ -34,4 +35,23 @@ export const getSubSkill = async (subSkillId: string): Promise<any> => {
   });
 
   return { subSkill };
+};
+
+export const checkSubSkillsExist = async (subSkills: { name: { [key: string]: string } }[]): Promise<{ exists: boolean; foundSkills?: any[] }> => {
+  const conditions = subSkills.map((subSkill) => ({
+    name: { [Op.contains]: subSkill.name },
+    is_active: true,
+  }));
+
+  const foundSkills = await SubSkillMaster.findAll({
+    where: { [Op.or]: conditions },
+    attributes: ['id', 'name'],
+  });
+
+  const foundSkillsList = foundSkills.map((skill) => skill.toJSON());
+
+  // If the number of found skills is less than requested, some are missing
+  const exists = foundSkills.length === subSkills.length;
+
+  return { exists, foundSkills: foundSkillsList };
 };

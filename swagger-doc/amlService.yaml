@@ -1,0 +1,4184 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: AML Service APIs
+  description: API for managing master data like board, class, and subskills.
+
+tags:
+  - name: Master
+    description: APIs for managing master data (board, class, and subskills).
+  - name: Skill Taxonomy
+    description: APIs for managing skill taxonomy.
+  - name: Board
+    description: APIs for managing Boards.
+  - name: Class
+    description: APIs for managing Class.
+  - name: Skill
+    description: APIs for managing Skills.
+  - name: SubSkill
+    description: APIs for managing Subskills.
+  - name: Tenant
+    description: APIs for managing Tenant.
+  - name: Question
+    description: APIs for managing Question.
+paths:
+  /master/create:
+    post:
+      tags:
+        - Master
+      summary: Create master data for board, class, and subskills.
+      operationId: createMasterData
+      requestBody:
+        description: Request body for creating master data.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: "api.master.create"
+                ver:
+                  type: string
+                  example: "1.0"
+                ts:
+                  type: string
+                  format: date-time
+                  example: "2024-09-05T01:51:36Z"
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                      description: Unique message ID.
+                      example: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                request:
+                  type: object
+                  properties:
+                    skillData:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Subtraction"
+                              kn:
+                                type: string
+                                example: "ಹೊರಲಾಗುವುದು"
+                              hi:
+                                type: string
+                                example: "घटाव"
+                          description:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Subtracting one number from another"
+                              kn:
+                                type: string
+                                example: "ಒಂದು ಸಂಖ್ಯೆಯಿಂದ ಇನ್ನೊಂದು ಸಂಖ್ಯೆಯನ್ನು ಹೀರುವುದಾಗಿದೆ"
+                              hi:
+                                type: string
+                                example: "एक संख्या से दूसरी संख्या घटाना"
+                          type:
+                            type: string
+                            example: "l1_skill"
+                    classData:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          class_identifier:
+                            type: string
+                            example: "grade_one"
+                          name:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Class One"
+                              kn:
+                                type: string
+                                example: "ಕ್ಲಾಸ್ ಒನ್"
+                              hi:
+                                type: string
+                                example: "पहली कक्षा"
+                          description:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Description for Class One"
+                              kn:
+                                type: string
+                                example: "ಕ್ಲಾಸ್ ಒನ್ ಗೆ ವಿವರ"
+                              hi:
+                                type: string
+                                example: "पहली कक्षा के लिए विवरण"
+                          prerequisites:
+                            type: array
+                            items:
+                              type: string
+                              example: "Class Zero"
+                    boardData:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          board_identifier:
+                            type: string
+                            example: "cbse"
+                          name:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Central Board of Secondary Education"
+                              kn:
+                                type: string
+                                example: "ಕೇಂದ್ರ ಮಾಧ್ಯಮಿಕ ಶಿಕ್ಷಣ ಮಂಡಳಿ"
+                              hi:
+                                type: string
+                                example: "केंद्रीय माध्यमिक शिक्षा बोर्ड"
+                          description:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Central Board of Secondary Education"
+                              kn:
+                                type: string
+                                example: "ಕೇಂದ್ರ ಮಾಧ್ಯಮಿಕ ಶಿಕ್ಷಣ ಮಂಡಳಿ"
+                              hi:
+                                type: string
+                                example: "केंद्रीय माध्यमिक शिक्षा बोर्ड"
+                          skill_taxonomy_id:
+                            type: string
+                            example: "amltaxonomy"
+                          class_ids:
+                            type: object
+                            properties:
+                              ids:
+                                type: array
+                                items:
+                                  type: integer
+                                example: [1, 2]
+                              l1_skill_ids:
+                                type: array
+                                items:
+                                  type: integer
+                                example: [1]
+                    subskillData:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Advanced Multiplication"
+                              kn:
+                                type: string
+                                example: "ಆಧುನಿಕ ಗುಣಾಕಾರ"
+                              hi:
+                                type: string
+                                example: "आधुनिक गुणन"
+                          description:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Multiplication with larger numbers"
+                              kn:
+                                type: string
+                                example: "ದೊಡ್ಡ ಸಂಖ್ಯೆಗಳೊಂದಿಗೆ ಗುಣಾಕಾರ"
+                              hi:
+                                type: string
+                                example: "बड़ी संख्याओं के साथ गुणा"
+      responses:
+        '200':
+          description: Master data successfully added.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.master.create"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-16T10:16:22+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "SUCCESS"
+                      msgid:
+                        type: string
+                        example: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                      resmsgid:
+                        type: string
+                        example: "d23237b2-3567-42dc-9c62-6fdf2d2ccb3c"
+                  responseCode:
+                    type: string
+                    example: "OK"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Master Data Successfully Added"
+                      totalInserted:
+                        type: integer
+                        example: 0
+                      details:
+                        type: object
+                        properties:
+                          skills:
+                            type: object
+                            properties:
+                              inserted:
+                                type: array
+                                items:
+                                  type: string
+                                example: []
+                              skipped:
+                                type: array
+                                items:
+                                  type: string
+                                example: ["substraction3", "1D without carry", "1D+1D"]
+                          classes:
+                            type: object
+                            properties:
+                              inserted:
+                                type: array
+                                items:
+                                  type: string
+                                example: []
+                              skipped:
+                                type: array
+                                items:
+                                  type: string
+                                example: ["Class One", "Class Two"]
+                          boards:
+                            type: object
+                            properties:
+                              inserted:
+                                type: array
+                                items:
+                                  type: string
+                                example: []
+                              skipped:
+                                type: array
+                                items:
+                                  type: string
+                                example: ["Board 9"]
+                          subSkills:
+                            type: object
+                            properties:
+                              inserted:
+                                type: array
+                                items:
+                                  type: string
+                                example: []
+                              skipped:
+                                type: array
+                                items:
+                                  type: string
+                                example: ["x+0"]
+
+        '400':
+          description: Bad request due to invalid data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.master.create"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-16T10:16:22+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        example: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                      resmsgid:
+                        type: string
+                        example: "d23237b2-3567-42dc-9c62-6fdf2d2ccb3c"
+                  responseCode:
+                    type: string
+                    example: "CLIENT_ERROR"
+                  err:
+                    type: object
+                    properties:
+                      err:
+                        type: string
+                        example: "InvalidRequest"
+                      errmsg:
+                        type: string
+                        example: "Invalid input data provided."
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.master.create"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-16T10:16:22+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        example: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                      resmsgid:
+                        type: string
+                        example: "d23237b2-3567-42dc-9c62-6fdf2d2ccb3c"
+                  responseCode:
+                    type: string
+                    example: "SERVER_ERROR"
+                  err:
+                    type: object
+                    properties:
+                      err:
+                        type: string
+                        example: "InternalServerError"
+                      errmsg:
+                        type: string
+                        example: "An unexpected error occurred."
+  /master/search:
+    post:
+      tags:
+        - Master
+      summary: Search for entity types.
+      operationId: searchMasterEntity
+      requestBody:
+        description: Search criteria for filtering entity types.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: "api.master.search"
+                ver:
+                  type: string
+                  example: "1.0"
+                ts:
+                  type: string
+                  format: date-time
+                  example: "2024-09-04T12:34:56Z"
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                      description: Unique message ID.
+                      example: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                request:
+                  type: object
+                  properties:
+                    entityType:
+                      type: string
+                      example: "subSkill"
+                    filters:
+                      type: object
+                      properties:
+                        name:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "x+0"
+                    limit:
+                      type: integer
+                      example: 10
+                    offset:
+                      type: integer
+                      example: 0
+      responses:
+        '200':
+          description: Successfully retrieved the entity types.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.master.search"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-16T10:16:59+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "SUCCESS"
+                      msgid:
+                        type: string
+                        example: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                      resmsgid:
+                        type: string
+                        example: "7ca26e9f-ac66-4804-b903-56766c39b6a5"
+                  responseCode:
+                    type: string
+                    example: "SUCCESS"
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        identifier:
+                          type: string
+                          example: "8cbef053-a66f-4e72-8797-ce2ac698f9e7"
+                        name:
+                          type: object
+                          properties:
+                            en:
+                              type: string
+                              example: "x+0"
+                        description:
+                          type: object
+                          properties:
+                            en:
+                              type: string
+                              example: "Description for sub class"
+                        status:
+                          type: string
+                          example: "live"
+                        is_active:
+                          type: boolean
+                          example: true
+                        created_by:
+                          type: string
+                          example: "manual"
+                        updated_by:
+                          type: string
+                          nullable: true
+                          example: null
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-09-15T19:42:24.394Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          example: null
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.master.search"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-04T12:34:56Z"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                      resmsgid:
+                        type: string
+                  responseCode:
+                    type: string
+                    example: "CLIENT_ERROR"
+                  err:
+                    type: object
+                    properties:
+                      err:
+                        type: string
+                        example: "InvalidRequest"
+                      errmsg:
+                        type: string
+                        example: "Invalid search filters provided."
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.master.search"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-16T10:16:59+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                      resmsgid:
+                        type: string
+                  responseCode:
+                    type: string
+                    example: "SERVER_ERROR"
+                  err:
+                    type: object
+                    properties:
+                      err:
+                        type: string
+                        example: "InternalServerError"
+                      errmsg:
+                        type: string
+                        example: "An unexpected error occurred."
+  /skillTaxonomy/create/{taxonomy_name}:
+    post:
+      tags:
+        - Skill Taxonomy
+      summary: Create Skill Taxonomy
+      description: >
+        This API creates a new skill taxonomy entry with provided board, class, and skill details.
+      parameters:
+        - name: taxonomy_name
+          in: path
+          required: true
+          description: "The name of the taxonomy to be created."
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                ver:
+                  type: string
+                ts:
+                  type: string
+                  format: date-time
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                request:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      l1_identifier:
+                        type: string
+                        description: "Unique identifier for the level 1 skill"
+                      l1_sequence:
+                        type: integer
+                        description: "Sequence number for the level 1 skill"
+                      l1_skill:
+                        type: object
+                        properties:
+                          en:
+                            type: string
+                            description: "Level 1 skill name in English"
+                      l1_skill_description:
+                        type: object
+                        properties:
+                          en:
+                            type: string
+                            description: "Description of level 1 skill in English"
+                      prerequisites:
+                        type: array
+                        items:
+                          type: string
+                      children:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            l2_identifier:
+                              type: string
+                              description: "Unique identifier for the level 2 skill"
+                            l2_sequence:
+                              type: integer
+                              description: "Sequence number for the level 2 skill"
+                            l2_skill:
+                              type: object
+                              properties:
+                                en:
+                                  type: string
+                                  description: "Level 2 skill name in English"
+                            l2_skill_description:
+                              type: object
+                              properties:
+                                en:
+                                  type: string
+                                  description: "Description of level 2 skill in English"
+                            children:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  l3_identifier:
+                                    type: string
+                                    description: "Unique identifier for the level 3 skill"
+                                  l3_sequence:
+                                    type: integer
+                                    description: "Sequence number for the level 3 skill"
+                                  l3_skill:
+                                    type: object
+                                    properties:
+                                      en:
+                                        type: string
+                                        description: "Level 3 skill name in English"
+                                  l3_skill_description:
+                                    type: object
+                                    properties:
+                                      en:
+                                        type: string
+                                        description: "Description of level 3 skill in English"
+              required:
+                - id
+                - ver
+                - ts
+                - params
+                - request
+              example:
+                id: api.skillTaxonomy.create
+                ver: "1.0"
+                ts: "2024-09-05T15:00:00Z"
+                params:
+                  msgid: "770e8600-g49b-43e6-c818-667877660003"
+                request:
+                  - l1_identifier: "11_addition"
+                    l1_sequence: 1
+                    l1_skill:
+                      en: "addition"
+                    l1_skill_description:
+                      en: "This is L1 addition"
+                    prerequisites: ["subtraction"]
+                    children:
+                      - l2_identifier: "1digit_addition"
+                        l2_sequence: 1
+                        l2_skill:
+                          en: "1-digit addition"
+                        l2_skill_description:
+                          en: "Addition of single-digit numbers"
+                        children:
+                          - l3_identifier: "horizontal_addition"
+                            l3_sequence: 4
+                            l3_skill:
+                              en: "2D + 1, 2, 3, 4, 5 - using finger schema - sum up to 20"
+                            l3_skill_description:
+                              en: "Horizontal addition by counting objects - sum up to 9"
+                  - l1_identifier: "12_subtraction"
+                    l1_sequence: 2
+                    l1_skill:
+                      en: "subtraction"
+                    l1_skill_description:
+                      en: "This is L1 subtraction"
+                    prerequisites: ["addition"]
+                    children:
+                      - l2_identifier: "1digit_subtraction"
+                        l2_sequence: 1
+                        l2_skill:
+                          en: "1-digit subtraction"
+                        l2_skill_description:
+                          en: "Subtraction of single-digit numbers"
+                        children:
+                          - l3_identifier: "horizontal_addition"
+                            l3_sequence: 4
+                            l3_skill:
+                              en: "2D - 1D = 2D without borrowing"
+                            l3_skill_description:
+                              en: "Horizontal addition by counting objects - sum up to 9"
+                  - l1_identifier: "13_multiplication"
+                    l1_sequence: 3
+                    l1_skill:
+                      en: "multiplication"
+                    l1_skill_description:
+                      en: "This is L1 multiplication"
+                    prerequisites: ["multiplication"]
+                    children:
+                      - l2_identifier: "1digit_multiplication"
+                        l2_sequence: 1
+                        l2_skill:
+                          en: "1-digit multiplication"
+                        l2_skill_description:
+                          en: "Multiplication of single-digit numbers"
+                  - l1_identifier: "14_division"
+                    l1_sequence: 4
+                    l1_skill:
+                      en: "division"
+                    l1_skill_description:
+                      en: "This is L1 division"
+                    prerequisites: ["division"]
+                    children:
+                      - l2_identifier: "1digit_division"
+                        l2_sequence: 1
+                        l2_skill:
+                          en: "1-digit division"
+                        l2_skill_description:
+                          en: "Division of single-digit numbers"
+      responses:
+        '201':
+          description: Skill taxonomy successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: "Confirmation message of successful creation"
+              example:
+                id: api.skillTaxonomy.create
+                ver: "1.0"
+                ts: "2024-09-05T15:00:00Z"
+                params:
+                  msgid: "770e8600-g49b-43e6-c818-667877660003"
+                responseCode: "SUCCESS"
+                result:
+                  message: "Skill taxonomy successfully created"
+                  identifier:
+                    - "11040f1a-d7fe-4462-81a7-161921f19f5f"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.skillTaxonomy.create
+                ver: "1.0"
+                ts: "2024-09-05T15:00:00Z"
+                params:
+                  msgid: "770e8600-g49b-43e6-c818-667877660003"
+                  errmsg: "Invalid data"
+                responseCode: "CLIENT_ERROR"
+                result:
+                  messages: "The provided data is invalid"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.skillTaxonomy.create
+                ver: "1.0"
+                ts: "2024-09-05T15:00:00Z"
+                params:
+                  msgid: "770e8600-g49b-43e6-c818-667877660003"
+                  errmsg: "Internal server error"
+                responseCode: "SERVER_ERROR"
+                result:
+                  messages: "Unexpected error occurred"
+  /skillTaxonomy/search:
+    post:
+      tags:
+        - Skill Taxonomy
+      summary: Search Skill Taxonomy
+      description: >
+        This API searches for skill taxonomy entries based on the provided filters for level 1, level 2, and level 3 skills.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                ver:
+                  type: string
+                ts:
+                  type: string
+                  format: date-time
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                request:
+                  type: object
+                  properties:
+                    filters:
+                      type: object
+                      properties:
+                        taxonomy_id:
+                          type: array
+                          items:
+                            type: string
+                          description: "Array of taxonomy IDs to filter the search"
+                        l1_skill:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                description: "Level 1 skill name in English"
+                        l2_skill:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                description: "Level 2 skill name in English"
+                        l3_skill:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                description: "Level 3 skill name in English"
+                    limit:
+                      type: integer
+                      description: "Number of results to return"
+                    offset:
+                      type: integer
+                      description: "Number of results to skip"
+              required:
+                - id
+                - ver
+                - ts
+                - params
+                - request
+              example:
+                id: api.skillTaxonomy.search
+                ver: "1.0"
+                ts: "2024-09-04T12:34:56Z"
+                params:
+                  msgid: "6d029822-adcd-4572-a7b6-788da8e653dc"
+                request:
+                  filters:
+                    taxonomy_id: ["karnatakataxonomy"]
+                    l1_skill:
+                      - en: "addition"
+                    l2_skill:
+                      - en: "1-digit addition"
+                    l3_skill:
+                      - en: "2D + 1, 2, 3, 4, 5 - using finger schema - sum up to 20"
+                  limit: 10
+                  offset: 0
+      responses:
+        '200':
+          description: Skill taxonomy search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      resmsgid:
+                        type: string
+                      status:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        identifier:
+                          type: string
+                        taxonomy_name:
+                          type: string
+                        taxonomy_id:
+                          type: string
+                        l1_id:
+                          type: integer
+                        l1_identifier:
+                          type: string
+                        l1_sequence:
+                          type: integer
+                        l1_skill:
+                          type: object
+                          properties:
+                            en:
+                              type: string
+                        l1_skill_description:
+                          type: object
+                          properties:
+                            en:
+                              type: string
+                        prerequisites:
+                          type: array
+                          items: {}
+                        children:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              l2_id:
+                                type: integer
+                              children:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    l3_id:
+                                      type: integer
+                                    l3_skill:
+                                      type: object
+                                      properties:
+                                        en:
+                                          type: string
+                                    l3_sequence:
+                                      type: integer
+                                    l3_identifier:
+                                      type: string
+                                    l3_skill_description:
+                                      type: object
+                                      properties:
+                                        en:
+                                          type: string
+                              l2_skill:
+                                type: object
+                                properties:
+                                  en:
+                                    type: string
+                              l2_sequence:
+                                type: integer
+                              l2_identifier:
+                                type: string
+                              l2_skill_description:
+                                type: object
+                                properties:
+                                  en:
+                                    type: string
+                        status:
+                          type: string
+                        is_active:
+                          type: boolean
+                        created_by:
+                          type: string
+                        updated_by:
+                          type: string
+                          nullable: true
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+              example:
+                id: api.skillTaxonomy.search
+                ver: "1.0"
+                ts: "2024-09-19T15:07:02+05:30"
+                params:
+                  status: "SUCCESS"
+                  msgid: "6d029822-adcd-4572-a7b6-788da8e653dc"
+                  resmsgid: "952e9345-1e61-4593-9a9d-850371ee9863"
+                responseCode: "OK"
+                result:
+                  - identifier: "f9cb4692-34f1-4180-97fc-5ab90ff753ca"
+                    taxonomy_name: "karnatakaTaxoonmy2"
+                    taxonomy_id: "karnatakataxoonmy2"
+                    l1_id: 1
+                    l1_identifier: "11_addition"
+                    l1_sequence: 1
+                    l1_skill:
+                      en: "addition"
+                    l1_skill_description:
+                      en: "This is L1 addition"
+                    prerequisites: []
+                    children:
+                      - l2_id: 5
+                        children:
+                          - l3_id: 29
+                            l3_skill:
+                              en: "2D + 1, 2, 3, 4, 5 - using finger schema - sum up to 20"
+                            l3_sequence: 4
+                            l3_identifier: "horizontal_addition"
+                            l3_skill_description:
+                              en: "Horizontal addition by counting objects - sum up to 9"
+                        l2_skill:
+                          en: "1-digit addition"
+                        l2_sequence: 1
+                        l2_identifier: "1digit_addition"
+                        l2_skill_description:
+                          en: "Addition of single-digit numbers"
+                    status: "live"
+                    is_active: true
+                    created_by: "system"
+                    updated_by: null
+                    created_at: "2024-09-27T02:52:11.346Z"
+                    updated_at: "2024-09-27T02:52:11.346Z"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.skillTaxonomy.search
+                ver: "1.0"
+                ts: "2024-09-04T12:34:56Z"
+                params:
+                  msgid: "6d029822-adcd-4572-a7b6-788da8e653dc"
+                  errmsg: "Invalid filters"
+                responseCode: "CLIENT_ERROR"
+                result:
+                  messages: "The provided filters are invalid"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.skillTaxonomy.search
+                ver: "1.0"
+                ts: "2024-09-04T12:34:56Z"
+                params:
+                  msgid: "6d029822-adcd-4572-a7b6-788da8e653dc"
+                  errmsg: "Internal server error"
+                responseCode: "SERVER_ERROR"
+                result:
+                  messages: "An error occurred while processing the request"
+  /board/update/{board_id}:
+    post:
+      tags:
+        - Board
+      summary: Update Board
+      description: >
+        This API updates the board information for the specified board ID.
+      parameters:
+        - name: board_id
+          in: path
+          required: true
+          description: "The unique identifier of the board to be updated."
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                ver:
+                  type: string
+                ts:
+                  type: string
+                  format: date-time
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                request:
+                  type: object
+                  properties:
+                    description:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+              required:
+                - id
+                - ver
+                - ts
+                - params
+                - request
+              example:
+                id: api.board.update
+                ver: "1.0"
+                ts: "2024-09-19T12:00:00Z"
+                params:
+                  msgid: "unique-message-id"
+                request:
+                  description:
+                    en: "this is cbse"
+      responses:
+        '200':
+          description: Board successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      msgid:
+                        type: string
+                      resmsgid:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+              example:
+                id: api.board.update
+                ver: "1.0"
+                ts: "2024-09-28T10:59:07+05:30"
+                params:
+                  status: "SUCCESS"
+                  msgid: "unique-message-id"
+                  resmsgid: "38474f98-ae3a-49d7-990e-85cabdef903e"
+                responseCode: "OK"
+                result:
+                  message: "Board Successfully Updated"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.board.update
+                ver: "1.0"
+                ts: "2024-09-28T10:59:07+05:30"
+                params:
+                  msgid: "unique-message-id"
+                  errmsg: "Invalid data"
+                responseCode: "CLIENT_ERROR"
+                result:
+                  messages: "The provided data is invalid"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.board.update
+                ver: "1.0"
+                ts: "2024-09-28T10:59:07+05:30"
+                params:
+                  msgid: "unique-message-id"
+                  errmsg: "An unexpected error occurred"
+                responseCode: "SERVER_ERROR"
+                result:
+                  messages: "An unexpected error occurred"
+  /class/update/{class_id}:
+    post:
+      tags:
+        - Class
+      summary: Update Class
+      description: >
+        This API updates the class information for the specified class ID.
+      parameters:
+        - name: class_id
+          in: path
+          required: true
+          description: "The unique identifier of the class to be updated."
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                ver:
+                  type: string
+                ts:
+                  type: string
+                  format: date-time
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                request:
+                  type: object
+                  properties:
+                    description:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+              required:
+                - id
+                - ver
+                - ts
+                - params
+                - request
+              example:
+                id: api.class.update
+                ver: "1.0"
+                ts: "2024-09-05T01:51:36Z"
+                params:
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                request:
+                  description:
+                    en: "this is grade one"
+      responses:
+        '200':
+          description: Class successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      msgid:
+                        type: string
+                      resmsgid:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+              example:
+                id: api.class.update
+                ver: "1.0"
+                ts: "2024-09-28T11:01:06+05:30"
+                params:
+                  status: "SUCCESS"
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                  resmsgid: "d5d91d13-04fa-45f3-be94-95c92920060b"
+                responseCode: "OK"
+                result:
+                  message: "Class Successfully Updated"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.class.update
+                ver: "1.0"
+                ts: "2024-09-28T11:01:06+05:30"
+                params:
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                  errmsg: "Invalid data"
+                responseCode: "CLIENT_ERROR"
+                result:
+                  messages: "The provided data is invalid"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.class.update
+                ver: "1.0"
+                ts: "2024-09-28T11:01:06+05:30"
+                params:
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                  errmsg: "An unexpected error occurred"
+                responseCode: "SERVER_ERROR"
+                result:
+                  messages: "An unexpected error occurred"
+  /skill/update/{skill_id}:
+    post:
+      tags:
+        - Skill
+      summary: Update Skill
+      description: >
+        This API updates the skill information for the specified skill ID.
+      parameters:
+        - name: skill_id
+          in: path
+          required: true
+          description: "The unique identifier of the skill to be updated."
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                ver:
+                  type: string
+                ts:
+                  type: string
+                  format: date-time
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                request:
+                  type: object
+                  properties:
+                    name:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+              required:
+                - id
+                - ver
+                - ts
+                - params
+                - request
+              example:
+                id: api.skill.update
+                ver: "1.0"
+                ts: "2024-09-05T01:51:36Z"
+                params:
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                request:
+                  name:
+                    en: "Substractions"
+      responses:
+        '200':
+          description: Skill successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      msgid:
+                        type: string
+                      resmsgid:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+              example:
+                id: api.skill.update
+                ver: "1.0"
+                ts: "2024-09-28T11:08:23+05:30"
+                params:
+                  status: "SUCCESS"
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                  resmsgid: "447d35c8-20a1-475e-b830-6087c645a578"
+                responseCode: "OK"
+                result:
+                  message: "Skill Successfully Updated"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.skill.update
+                ver: "1.0"
+                ts: "2024-09-28T11:08:23+05:30"
+                params:
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                  errmsg: "Invalid data"
+                responseCode: "CLIENT_ERROR"
+                result:
+                  messages: "The provided data is invalid"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.skill.update
+                ver: "1.0"
+                ts: "2024-09-28T11:08:23+05:30"
+                params:
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                  errmsg: "An unexpected error occurred"
+                responseCode: "SERVER_ERROR"
+                result:
+                  messages: "An unexpected error occurred"
+  /sub-skill/update/{sub_skill_id}:
+    post:
+      tags:
+        - SubSkill
+      summary: Update Sub-Skill
+      description: >
+        This API updates the sub-skill information for the specified sub-skill ID.
+      parameters:
+        - name: sub_skill_id
+          in: path
+          required: true
+          description: "The unique identifier of the sub-skill to be updated."
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                ver:
+                  type: string
+                ts:
+                  type: string
+                  format: date-time
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                request:
+                  type: object
+                  properties:
+                    name:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+                    description:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+              required:
+                - id
+                - ver
+                - ts
+                - params
+                - request
+              example:
+                id: api.subskill.update
+                ver: "1.0"
+                ts: "2024-09-05T01:51:36Z"
+                params:
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                request:
+                  name:
+                    en: "Procedurals"
+                  description:
+                    en: "Description for procedural"
+      responses:
+        '200':
+          description: Sub-skill successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      msgid:
+                        type: string
+                      resmsgid:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+              example:
+                id: api.subskill.update
+                ver: "1.0"
+                ts: "2024-09-28T11:11:31+05:30"
+                params:
+                  status: "SUCCESS"
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                  resmsgid: "efb9a194-75a6-433d-91fa-20542fb781a7"
+                responseCode: "OK"
+                result:
+                  message: "Sub-skill successfully updated"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.subskill.update
+                ver: "1.0"
+                ts: "2024-09-28T11:11:31+05:30"
+                params:
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                  errmsg: "Invalid data"
+                responseCode: "CLIENT_ERROR"
+                result:
+                  messages: "The provided data is invalid"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      msgid:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      messages:
+                        type: string
+              example:
+                id: api.subskill.update
+                ver: "1.0"
+                ts: "2024-09-28T11:11:31+05:30"
+                params:
+                  msgid: "c43785c4-d02a-411d-8466-466ad8ae6fba"
+                  errmsg: "An unexpected error occurred"
+                responseCode: "SERVER_ERROR"
+                result:
+                  messages: "An unexpected error occurred"
+  /tenant/create:
+    post:
+      tags:
+        - Tenant
+      summary: Tenant Create
+      description: >
+        This API allows to create a tenant along with the tenant board. 
+        At least one tenant board is mandatory for creating a new tenant.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                ver:
+                  type: string
+                ts:
+                  type: string
+                  format: date-time
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                request:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                    board_id:
+                      type: array
+                      items:
+                        type: integer
+              required:
+                - id
+                - ver
+                - ts
+                - params
+                - request
+              example:
+                id: api.tenant.create
+                ver: "1.0"
+                ts: "2024-09-03T12:34:56Z"
+                params:
+                  msgid: "123e4567-e89b-12d3-a456-426614174000"
+                request:
+                  name: "Karnataka"
+                  type: "Education"
+                  board_id: [1]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      resmsgid:
+                        type: string
+                      msgid:
+                        type: string
+                      status:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      identifier:
+                        type: string
+              example:
+                id: api.tenant.create
+                ver: "1.0"
+                ts: "2024-09-28T10:19:20+05:30"
+                params:
+                  resmsgid: "a22fd73f-3252-48b7-a36c-8be03b990592"
+                  msgid: "123e4567-e89b-12d3-a456-426614174000"
+                  status: "SUCCESS"
+                responseCode: "OK"
+                result:
+                  message: "Tenant Successfully Created"
+                  identifier: "34e674d5-466e-4996-9b03-06efa57382aa"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      resmsgid:
+                        type: string
+                      msgid:
+                        type: string
+                      err:
+                        type: string
+                      status:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      err:
+                        type: string
+                      errmsg:
+                        type: string
+              example:
+                id: api.tenant.create
+                ver: "1.0"
+                ts: "2024-08-20T08:32:26.094Z"
+                params:
+                  resmsgid: "a8480f2d-c273-4dcd-9344-8948acab8ef4"
+                  msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                  err: "CLIENT_ERROR"
+                  status: "failed"
+                  errmsg: "Metadata mimeType should be one of image/png"
+                responseCode: "CLIENT_ERROR"
+                result: {}
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  ver:
+                    type: string
+                  ts:
+                    type: string
+                    format: date-time
+                  params:
+                    type: object
+                    properties:
+                      resmsgid:
+                        type: string
+                      msgid:
+                        type: string
+                      status:
+                        type: string
+                      err:
+                        type: string
+                      errmsg:
+                        type: string
+                  responseCode:
+                    type: string
+                  result:
+                    type: object
+                    properties:
+                      err:
+                        type: string
+                      errmsg:
+                        type: string
+              example:
+                id: api.tenant.create
+                ver: "1.0"
+                ts: "2024-08-20T08:32:26.094Z"
+                params:
+                  resmsgid: "a8480f2d-c273-4dcd-9344-8948acab8ef4"
+                  msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                  status: "failed"
+                  err: "SERVER_ERROR"
+                  errmsg: "server error"
+                responseCode: "SERVER_ERROR"
+                result: {}
+  /tenant/update/{tenant_id}:
+    post:
+      tags:
+        - Tenant
+      summary: Tenant Update
+      description: >
+        This API allows you to update a tenant or tenant baord ,or else insert a tenant boards for particular tenant only when the status is in "draft".
+      parameters:
+        - in: path
+          name: tenant_id
+          required: true
+          description: The ID of the tenant
+          schema:
+            type: string
+      requestBody:
+         required: true
+         content:
+          application/json:
+            schema:
+              type: object
+              example:
+                id: api.tenant.update
+                ver: "1.0"
+                ts: "2024-08-20T08:32:26.094Z"
+                params:
+                  msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                request:
+                    name: "kerala"
+                    type: "education"
+                    board_id: [1,2,3]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: "api.tenant.udpate"
+                ver: "1.0"
+                ts: "2024-08-20T08:32:26.094Z"
+                params:
+                  resmsgid: "a8480f2d-c273-4dcd-9344-8948acab8ef4"
+                  msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                  status: "successful"
+                responseCode: "OK"
+                result:
+                    message: "Tenant updated"
+                err:
+                  err: null
+                  errmsg: null
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: "api.tenant.udpate"
+                ver: "1.0"
+                ts: "2024-08-20T08:32:26.094Z"
+                params:
+                  resmsgid: "a8480f2d-c273-4dcd-9344-8948acab8ef4"
+                  msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                  err: "CLIENT_ERROR"
+                  status: "failed"
+                  errmsg: "Metadata mimeType should be one of image/png"
+                responseCode: "CLIENT_ERROR"
+                result: {}
+                err:
+                  err: "TENANT_INVALID_INPUT"
+                  errmsg: " request/name must be string"
+        '409':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: "api.tenant.update"
+                ver: "1.0"
+                ts: "2024-08-20T08:32:26.094Z"
+                params:
+                  resmsgid: "a8480f2d-c273-4dcd-9344-8948acab8ef4"
+                  msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                  status: "failed"
+                responseCode: "TENANT_NOT_EXISTS"
+                result: {}
+                err:
+                  err: "TENANT_NOT_EXISTS"
+                  errmsg: "tenant  does not exist"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: "api.tenant.udpate"
+                ver: "1.0"
+                ts: "2024-08-20T08:32:26.094Z"
+                params:
+                  resmsgid: "a8480f2d-c273-4dcd-9344-8948acab8ef4"
+                  msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                  status: "failed"
+                  err: "SERVER_ERROR"
+                  errmsg: "server error"
+                responseCode: "SERVER_ERROR"
+                result: {}
+                err:
+                  err: "TENANT_UPDATE_FAILURE"
+                  errmsg: "error in tenant updattion"
+  /tenant/read/{tenant_id}:
+    get:
+      tags:
+        - Tenant
+      summary: Get Tenant
+      description: >-
+        Api to get the tenant details along with their tenant board and classes mapped to the board.
+      parameters:
+        - in: path
+          name: tenant_id
+          required: true
+          description: The ID of the tenant
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: api.tenant.read
+                ver: '1.0'
+                ts: '2024-08-23T06:19:12.939Z'
+                params:
+                  resmsgid: 8f9e5066-30c4-458e-a64d-627f08003068
+                  msgid: b6030465-78f7-4f54-a85e-3eb96586e192
+                  status: successful
+                responseCode: OK
+                result:
+                 -  
+                    tenant_name: karnataka
+                    tenant_type: government
+                    board_id: [1,2,3]
+                    is_active: true
+                    status: live
+                    created_by: 1
+                    updated_by: 1
+                    created_at: '2024-08-22T10:21:52.287Z'
+                    updated_at: '2024-08-23T06:11:34.267Z'
+  
+                err:
+                  err: 
+                  errmsg: 
+        '409':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: "api.tenant.read"
+                ver: "1.0"
+                ts: "2024-08-20T08:32:26.094Z"
+                params:
+                  resmsgid: "a8480f2d-c273-4dcd-9344-8948acab8ef4"
+                  msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                  status: "failed"
+                responseCode: "CONFLICT"
+                result: {}
+                err:
+                  err: "CONFLICT"
+                  errmsg: "tenant id  does not exist"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: "api.tenant.read"
+                ver: "1.0"
+                ts: "2024-08-20T08:32:26.094Z"
+                params:
+                  resmsgid: "a8480f2d-c273-4dcd-9344-8948acab8ef4"
+                  msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                  status: "failed"
+                responseCode: "SERVER_ERROR"
+                result: {}
+                err:
+                  err: "TENANT_READ_FAILURE"
+                  errmsg: "error in tenant read"
+  /tenant/search:
+    post:
+      tags:
+        - Tenant
+      summary: Search Tenant
+      description: >-
+       using this api we can filtre through tenant and tenant board whatever we expecting .
+      requestBody:
+         required: true
+         content:
+          application/json:
+            schema:
+              type: object
+              example:
+                id: api.tenant.search
+                ver: "1.0"
+                ts: "2024-08-20T08:32:26.094Z"
+                params:
+                  msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                  filters:
+                    type: government
+                    name: ['tamilnadu', 'karnataka']
+                    board_id: [1, 2]
+                  offset: 10
+      responses:
+         '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                example:
+                  id: api.tenant.search
+                  ver: '1.0'
+                  ts: '2024-08-21T06:09:50.306Z'
+                  params:
+                    resmsgid: b68f984f-f59f-44dd-9661-e78224c0141a
+                    msgid: 141e0321-7702-4c1d-9c3b-6be7937111c3
+                    status: successful
+                  responseCode: OK
+                  result:
+                        - id: 1
+                          tenant_name: karnataka
+                          tenant_type: government
+                          board_id: [1,2]
+                          is_active: true
+                          status: live
+                          created_by: 1
+                          updated_by: 1
+                          created_at: '2024-08-21T06:27:40.822Z'
+                          updated_at: '2024-08-21T08:28:46.435Z'
+                        - id: 1
+                          tenant_name: tamilnadu
+                          tenant_type: government
+                          board_id: [1,2]
+                          is_active: true
+                          status: live
+                          created_by: 1
+                          updated_by: 1
+                          created_at: '2024-08-21T06:27:40.822Z'
+                          updated_at: '2024-08-21T08:28:46.435Z'
+                  err:
+                    err: null
+                    errmsg: null
+         '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                example:
+                  id: "api.tenant.search"
+                  ver: "1.0"
+                  ts: "2024-08-20T08:32:26.094Z"
+                  params:
+                    resmsgid: "a8480f2d-c273-4dcd-9344-8948acab8ef4"
+                    msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                    status: "failed"
+                  responseCode: "CLIENT_ERROR"
+                  result: {}
+                  err:
+                    err: "TENANT_INVALID_INPUT"
+                    errmsg: " must have required property 'key'"
+         '409':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                example:
+                  id: "api.tenant.search"
+                  ver: "1.0"
+                  ts: "2024-08-20T08:32:26.094Z"
+                  params:
+                    resmsgid: "a8480f2d-c273-4dcd-9344-8948acab8ef4"
+                    msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                    status: "failed"
+                  responseCode: "CONFLICT"
+                  result: {}
+                  err:
+                    err: "CONFLICT"
+                    errmsg: "tenant does not exist"
+         '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                example:
+                  id: "api.tenant.search"
+                  ver: "1.0"
+                  ts: "2024-08-20T08:32:26.094Z"
+                  params:
+                    resmsgid: "a8480f2d-c273-4dcd-9344-8948acab8ef4"
+                    msgid: "ff32a333-2898-49e4-9653-47f986cf4db7"
+                    status: "failed"
+                    err: "SERVER_ERROR"
+                    errmsg: "server error"
+                  responseCode: "SERVER_ERROR"
+                  result: {}
+                  err:
+                    err: "TENANT_UPDATE_FAILURE"
+                    errmsg: "error in tenant updation"
+  /question/create:
+    post:
+      tags:
+        - Question
+      summary: Create a new question
+      description: This API allows you to create a question with specific parameters.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: "api.question.create"
+                ver:
+                  type: string
+                  example: "1.0"
+                ts:
+                  type: string
+                  format: date-time
+                  example: "2024-09-13T12:00:00Z"
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                      format: uuid
+                      example: "aa083e25-09a6-4e52-95d5-1e780906d886"
+                request:
+                  type: object
+                  properties:
+                    question_id:
+                      type: integer
+                      example: 1
+                    question_set_id:
+                      type: string
+                      example: "set001"
+                    question_type:
+                      type: string
+                      example: "mcq"
+                    operation:
+                      type: string
+                      example: "add"
+                    name:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+                          example: "This is a question for Division"
+                        ka:
+                          type: string
+                          example: "ಇದು ವಿಭಜನೆಯ ಪ್ರಶ್ನೆ"
+                        hi:
+                          type: string
+                          example: "यह विभाजन के लिए प्रश्न है"
+                    description:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+                          example: "This is the description for the question"
+                    sequence_no:
+                      type: integer
+                      example: 1
+                    hints:
+                      type: object
+                      properties:
+                        en:
+                          type: array
+                          items:
+                            type: string
+                            example: "This is a hint for the question"
+                    tenant:
+                      type: object
+                      properties:
+                        name:
+                          type: object
+                          properties:
+                            en:
+                              type: string
+                              example: "Karnataka"
+                    repository:
+                      type: object
+                      properties:
+                        name:
+                          type: object
+                          properties:
+                            en:
+                              type: string
+                              example: "Question Repository"
+                    taxonomy:
+                      type: object
+                      properties:
+                        board:
+                          type: object
+                          properties:
+                            name:
+                              type: object
+                              properties:
+                                en:
+                                  type: string
+                                  example: "Central Board of Secondary Education"
+                        class:
+                          type: object
+                          properties:
+                            name:
+                              type: object
+                              properties:
+                                en:
+                                  type: string
+                                  example: "Class One"
+                        l1_skill:
+                          type: object
+                          properties:
+                            name:
+                              type: object
+                              properties:
+                                en:
+                                  type: string
+                                  example: "Addition"
+                        l2_skill:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: object
+                                properties:
+                                  en:
+                                    type: string
+                                    example: "1D without carry"
+                        l3_skill:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: object
+                                properties:
+                                  en:
+                                    type: string
+                                    example: "2Dx1D with carry (non-zero digits)"
+                    gradient:
+                      type: string
+                      example: "g4"
+                    benchmark_time:
+                      type: integer
+                      example: 40
+                    sub_skills:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Procedural"
+                    media:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          fileName:
+                            type: string
+                            example: "Mcq_upload_image.png"
+                          mediaType:
+                            type: string
+                            example: "Image"
+                          mimeType:
+                            type: string
+                            example: "image/png"
+                          src:
+                            type: string
+                            example: "media/content"
+                    question_body:
+                      type: object
+                      properties:
+                        numbers:
+                          type: array
+                          items:
+                            type: string
+                          example: ["8012", "12"]
+                        showCarry:
+                          type: boolean
+                          example: false
+                        prefill:
+                          type: array
+                          items:
+                            type: string
+                          example: ["BB", "FBB"]
+                        division_intermediate_steps_preFill:
+                          type: array
+                          items:
+                            type: string
+                          example: ["BB", "BF", "BB", "BB"]
+                        wrongAnswers:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              option:
+                                type: string
+                                example: "650,0"
+                              subskill:
+                                type: array
+                                items:
+                                  type: string
+                                example: ["x+0", "carry"]
+
+      responses:
+        "200":
+          description: Question Successfully Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.create"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    example: "2024-09-28T11:28:04+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "SUCCESS"
+                      msgid:
+                        type: string
+                        example: "aa083e25-09a6-4e52-95d5-1e780906d886"
+                      resmsgid:
+                        type: string
+                        example: "adee1d2f-23e6-4762-baa4-805d9ba1edb4"
+                  responseCode:
+                    type: string
+                    example: "OK"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Question Successfully Created"
+                      identifier:
+                        type: string
+                        example: "4e6f685f-6368-45e3-b62f-3ef3895e6b73"
+        "400":
+          description: Bad Request - Invalid or missing data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.create"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    example: "2024-09-28T11:28:04+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        example: "aa083e25-09a6-4e52-95d5-1e780906d886"
+                      resmsgid:
+                        type: string
+                        example: "adee1d2f-23e6-4762-baa4-805d9ba1edb4"
+                  responseCode:
+                    type: string
+                    example: "CLIENT_ERROR"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Invalid input data"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.create"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    example: "2024-09-28T11:28:04+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        example: "aa083e25-09a6-4e52-95d5-1e780906d886"
+                      resmsgid:
+                        type: string
+                        example: "adee1d2f-23e6-4762-baa4-805d9ba1edb4"
+                  responseCode:
+                    type: string
+                    example: "SERVER_ERROR"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Internal server error"
+  /question/publish/{question_id}:
+    post:
+      tags:
+        - Question
+      summary: Publish a question
+      description: This API allows you to publish a question by setting its status to 'live'.
+      parameters:
+        - name: question_id
+          in: path
+          required: true
+          description: The unique identifier of the question to be published
+          schema:
+            type: string
+            format: uuid
+            example: "4e6f685f-6368-45e3-b62f-3ef3895e6b73"
+      responses:
+        "200":
+          description: Question Successfully Published
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.publish"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:40:32+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "SUCCESS"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "4a7f14c3-d61e-4d4f-be78-181834eeff6d"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "7114dceb-1d7e-4abb-ae75-e9f4bb52ebe0"
+                  responseCode:
+                    type: string
+                    example: "OK"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Question Successfully Published"
+        "400":
+          description: Bad Request - Invalid question ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.publish"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:40:32+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "4a7f14c3-d61e-4d4f-be78-181834eeff6d"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "7114dceb-1d7e-4abb-ae75-e9f4bb52ebe0"
+                  responseCode:
+                    type: string
+                    example: "CLIENT_ERROR"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Invalid Question ID"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.publish"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:40:32+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "4a7f14c3-d61e-4d4f-be78-181834eeff6d"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "7114dceb-1d7e-4abb-ae75-e9f4bb52ebe0"
+                  responseCode:
+                    type: string
+                    example: "SERVER_ERROR"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Internal Server Error"
+  /question/read/{question_id}:
+    get:
+      tags:
+        - Question
+      summary: Read question details
+      description: This API allows you to fetch details of a question by its unique identifier.
+      parameters:
+        - name: question_id
+          in: path
+          required: true
+          description: The unique identifier of the question
+          schema:
+            type: string
+            format: uuid
+            example: "4e6f685f-6368-45e3-b62f-3ef3895e6b73"
+      responses:
+        "200":
+          description: Successfully retrieved question details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.read"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:41:54+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "SUCCESS"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "2b1ca781-beb1-42f3-bcf3-e214b084233d"
+                  responseCode:
+                    type: string
+                    example: "OK"
+                  result:
+                    type: object
+                    properties:
+                      identifier:
+                        type: string
+                        example: "4e6f685f-6368-45e3-b62f-3ef3895e6b73"
+                      question_id:
+                        type: string
+                        example: "1"
+                      question_set_id:
+                        type: string
+                        example: "set001"
+                      question_type:
+                        type: string
+                        example: "mcq"
+                      operation:
+                        type: string
+                        example: "add"
+                      sequence_no:
+                        type: integer
+                        example: 1
+                      name:
+                        type: object
+                        properties:
+                          en:
+                            type: string
+                            example: "This is a question for Division"
+                          hi:
+                            type: string
+                            example: "यह विभाजन के लिए प्रश्न है"
+                          ka:
+                            type: string
+                            example: "ಇದು ವಿಭಜನೆಯ ಪ್ರಶ್ನೆ"
+                      description:
+                        type: object
+                        properties:
+                          en:
+                            type: string
+                            example: "This is the description for the question"
+                      tenant:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Karnataka"
+                              hi:
+                                type: string
+                                example: "कर्नाटका"
+                      repository:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: object
+                            properties:
+                              en:
+                                type: string
+                                example: "Question Repository"
+                              ta:
+                                type: string
+                                example: "கேள்வி நூலகம்"
+                              te:
+                                type: string
+                                example: "ప్రశ్న రిపోజిటరీ"
+                      taxonomy:
+                        type: object
+                        properties:
+                          board:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              name:
+                                type: object
+                                properties:
+                                  en:
+                                    type: string
+                                    example: "Central Board of Secondary Education"
+                                  hi:
+                                    type: string
+                                    example: "केंद्रीय माध्यमिक शिक्षा बोर्ड"
+                                  kn:
+                                    type: string
+                                    example: "ಕೇಂದ್ರ ಮಾಧ್ಯಮಿಕ ಶಿಕ್ಷಣ ಮಂಡಳಿ"
+                          class:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 6
+                              name:
+                                type: object
+                                properties:
+                                  en:
+                                    type: string
+                                    example: "Class One"
+                                  ka:
+                                    type: string
+                                    example: "ಕ್ಲಾಸ್ ಒನ್"
+                          l1_skill:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              name:
+                                type: object
+                                properties:
+                                  en:
+                                    type: string
+                                    example: "Addition"
+                                  hi:
+                                    type: string
+                                    example: "जोड़"
+                                  kn:
+                                    type: string
+                                    example: "ಜೋಡಣೆ"
+                          l2_skill:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 175
+                                name:
+                                  type: object
+                                  properties:
+                                    en:
+                                      type: string
+                                      example: "1D without carry"
+                                    ka:
+                                      type: string
+                                      example: "ತುಂಬಿಕೆ ಇಲ್ಲದೆ 1D"
+                          l3_skill:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 120
+                                name:
+                                  type: object
+                                  properties:
+                                    en:
+                                      type: string
+                                      example: "2Dx1D with carry (non-zero digits)"
+                                    hi:
+                                      type: string
+                                      example: "2D x 1D कैरी के साथ (गैर-शून्य अंकों के साथ)"
+                      sub_skills:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            name:
+                              type: object
+                              properties:
+                                en:
+                                  type: string
+                                  example: "Procedural"
+                                hi:
+                                  type: string
+                                  example: "प्रक्रियात्मक"
+                                kn:
+                                  type: string
+                                  example: "ಕ್ರಮಬದ್ಧ"
+                      gradient:
+                        type: string
+                        example: "g4"
+                      hints:
+                        type: object
+                        properties:
+                          en:
+                            type: array
+                            items:
+                              type: string
+                              example: "This is a hint for the question"
+                      benchmark_time:
+                        type: integer
+                        example: 40
+                      media:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            src:
+                              type: string
+                              example: "media/content"
+                            fileName:
+                              type: string
+                              example: "Mcq_uplaod_image.png"
+                            mimeType:
+                              type: string
+                              example: "image/png"
+                            mediaType:
+                              type: string
+                              example: "Image"
+                      question_body:
+                        type: object
+                        properties:
+                          numbers:
+                            type: array
+                            items:
+                              type: string
+                              example: "8012"
+                          prefill:
+                            type: array
+                            items:
+                              type: string
+                              example: "BB"
+                          showCarry:
+                            type: boolean
+                            example: false
+                          wrongAnswers:
+                            type: array
+                            items:
+                              type: object
+                              example:
+                                "650,0":
+                                  - "carry"
+                                "510,10":
+                                  - "pvp"
+                                option: "650,0"
+                                subskill:
+                                  - "x+0"
+                                  - "carry"
+                      status:
+                        type: string
+                        example: "live"
+                      is_active:
+                        type: boolean
+                        example: true
+                      created_by:
+                        type: string
+                        example: "manual"
+                      updated_by:
+                        type: string
+                        nullable: true
+                        example: null
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2024-09-28T00:28:04.269Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2024-09-28T00:40:32.419Z"
+        "400":
+          description: Bad Request - Invalid question ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.read"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:41:54+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "2b1ca781-beb1-42f3-bcf3-e214b084233d"
+                  responseCode:
+                    type: string
+                    example: "CLIENT_ERROR"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Invalid Question ID"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.read"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:41:54+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "2b1ca781-beb1-42f3-bcf3-e214b084233d"
+                  responseCode:
+                    type: string
+                    example: "SERVER_ERROR"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Internal server error"
+  /api/v1/question/search:
+    post:
+      tags:
+        - Question
+      summary: Search Questions
+      operationId: api.question.search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: "api.question.search"
+                ver:
+                  type: string
+                  example: "1.0"
+                ts:
+                  type: string
+                  format: date-time
+                  example: "2024-09-03T12:34:56Z"
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                      format: uuid
+                      example: "123e4567-e89b-12d3-a456-426614174000"
+                request:
+                  type: object
+                  properties:
+                    filters:
+                      type: object
+                      properties:
+                        question_type:
+                          type: array
+                          items:
+                            type: string
+                          example: ["mcq"]
+                    limit:
+                      type: integer
+                      example: 10
+                    offset:
+                      type: integer
+                      example: 0
+      responses:
+        '200':
+          description: Successful search of questions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.search"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:44:52+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "SUCCESS"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "123e4567-e89b-12d3-a456-426614174000"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "8a83ecae-b0f9-4499-82e7-23fe8c12cf1c"
+                  responseCode:
+                    type: string
+                    example: "OK"
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        identifier:
+                          type: string
+                          example: "332e1111-2cea-45be-a90e-0eb2a9e936d0"
+                        question_id:
+                          type: string
+                          example: "1"
+                        question_set_id:
+                          type: string
+                          example: "set001"
+                        question_type:
+                          type: string
+                          example: "mcq"
+                        operation:
+                          type: string
+                          example: "add"
+                        sequence_no:
+                          type: integer
+                          example: 1
+                        name:
+                          type: object
+                          properties:
+                            en:
+                              type: string
+                              example: "This is a question for Division"
+                            hi:
+                              type: string
+                              example: "यह विभाजन के लिए प्रश्न है"
+                            ka:
+                              type: string
+                              example: "ಇದು ವಿಭಜನೆಯ ಪ್ರಶ್ನೆ"
+                        description:
+                          type: object
+                          properties:
+                            en:
+                              type: string
+                              example: "This is the description for the question"
+                        tenant:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            name:
+                              type: object
+                              properties:
+                                en:
+                                  type: string
+                                  example: "Karnataka"
+                                hi:
+                                  type: string
+                                  example: "कर्नाटका"
+                        repository:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            name:
+                              type: object
+                              properties:
+                                en:
+                                  type: string
+                                  example: "Question Repository"
+                                ta:
+                                  type: string
+                                  example: "கேள்வி நூலகம்"
+                                te:
+                                  type: string
+                                  example: "ప్రశ్న రిపోజిటరీ"
+                        taxonomy:
+                          type: object
+                          properties:
+                            board:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 2
+                                name:
+                                  type: object
+                                  properties:
+                                    en:
+                                      type: string
+                                      example: "Board 9"
+                                    ka:
+                                      type: string
+                                      example: "ಬೋರ್ಡ್ 9"
+                            class:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 6
+                                name:
+                                  type: object
+                                  properties:
+                                    en:
+                                      type: string
+                                      example: "Class One"
+                                    ka:
+                                      type: string
+                                      example: "ಕ್ಲಾಸ್ ಒನ್"
+                            l1_skill:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                name:
+                                  type: object
+                                  properties:
+                                    en:
+                                      type: string
+                                      example: "Addition"
+                                    hi:
+                                      type: string
+                                      example: "जोड़"
+                                    kn:
+                                      type: string
+                                      example: "ಜೋಡಣೆ"
+                            l2_skill:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 175
+                                  name:
+                                    type: object
+                                    properties:
+                                      en:
+                                        type: string
+                                        example: "1D without carry"
+                                      ka:
+                                        type: string
+                                        example: "ತುಂಬಿಕೆ ಇಲ್ಲದೆ 1D"
+                            l3_skill:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 120
+                                  name:
+                                    type: object
+                                    properties:
+                                      en:
+                                        type: string
+                                        example: "2Dx1D with carry (non-zero digits)"
+                                      hi:
+                                        type: string
+                                        example: "2D x 1D कैरी के साथ (गैर-शून्य अंकों के साथ)"
+                        sub_skills:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              name:
+                                type: object
+                                properties:
+                                  en:
+                                    type: string
+                                    example: "Procedural"
+                                  hi:
+                                    type: string
+                                    example: "प्रक्रियात्मक"
+                                  kn:
+                                    type: string
+                                    example: "ಕ್ರಮಬದ್ಧ"
+                        gradient:
+                          type: string
+                          example: "g4"
+                        hints:
+                          type: object
+                          properties:
+                            en:
+                              type: array
+                              items:
+                                type: string
+                              example: ["This is a hint for the question"]
+                        benchmark_time:
+                          type: integer
+                          example: 40
+                        media:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              src:
+                                type: string
+                                example: "media/content"
+                              fileName:
+                                type: string
+                                example: "Mcq_uplaod_image.png"
+                              mimeType:
+                                type: string
+                                example: "image/png"
+                              mediaType:
+                                type: string
+                                example: "Image"
+                        question_body:
+                          type: object
+                          properties:
+                            numbers:
+                              type: array
+                              items:
+                                type: string
+                              example: ["8012", "12"]
+                            prefill:
+                              type: array
+                              items:
+                                type: string
+                              example: ["BB", "FBB"]
+                            showCarry:
+                              type: boolean
+                              example: false
+                            wrongAnswers:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  option:
+                                    type: string
+                                    example: "650,0"
+                                  subskill:
+                                    type: array
+                                    items:
+                                      type: string
+                                      example: ["x+0", "carry"]
+                            division_intermediate_steps_preFill:
+                              type: array
+                              items:
+                                type: string
+                              example: ["BB", "BF", "BB", "BB"]
+                        status:
+                          type: string
+                          example: "draft"
+                        is_active:
+                          type: boolean
+                          example: true
+                        created_by:
+                          type: string
+                          example: "manual"
+                        updated_by:
+                          type: string
+                          nullable: true
+                          example: null
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-09-28T00:27:29.091Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-09-28T00:27:29.091Z"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.search"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:44:52+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "123e4567-e89b-12d3-a456-426614174000"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "8a83ecae-b0f9-4499-82e7-23fe8c12cf1c"
+                  responseCode:
+                    type: string
+                    example: "ERROR"
+                  result:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "VALIDATION_ERROR"
+                      message:
+                        type: string
+                        example: "Invalid filters"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.search"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:44:52+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "123e4567-e89b-12d3-a456-426614174000"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "8a83ecae-b0f9-4499-82e7-23fe8c12cf1c"
+                  responseCode:
+                    type: string
+                    example: "ERROR"
+                  result:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "INTERNAL_SERVER_ERROR"
+                      message:
+                        type: string
+                        example: "Something went wrong"
+  /question/update/{question_id}:
+    post:
+      tags:
+        - Question
+      summary: Update Question
+      operationId: api.question.update
+      parameters:
+        - name: question_id
+          in: path
+          required: true
+          description: The ID of the question to be updated
+          schema:
+            type: string
+            example: "4e6f685f-6368-45e3-b62f-3ef3895e6b73"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: "api.question.update"
+                ver:
+                  type: string
+                  example: "1.0"
+                ts:
+                  type: string
+                  format: date-time
+                  example: "2024-09-13T12:00:00Z"
+                params:
+                  type: object
+                  properties:
+                    msgid:
+                      type: string
+                      format: uuid
+                      example: "aa083e25-09a6-4e52-95d5-1e780906d886"
+                request:
+                  type: object
+                  properties:
+                    question_id:
+                      type: integer
+                      example: 1
+                    question_set_id:
+                      type: string
+                      example: "set001"
+                    question_type:
+                      type: string
+                      example: "mcq"
+                    operation:
+                      type: string
+                      example: "add"
+                    name:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+                          example: "This is a question for Division1"
+                        ka:
+                          type: string
+                          example: "ಇದು ವಿಭಜನೆಯ ಪ್ರಶ್ನೆ"
+                        hi:
+                          type: string
+                          example: "यह विभाजन के लिए प्रश्न है"
+      responses:
+        '200':
+          description: Successful update of the question
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.update"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:46:40+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "SUCCESS"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "aa083e25-09a6-4e52-95d5-1e780906d886"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "11470459-4693-4149-ac61-60caac051b84"
+                  responseCode:
+                    type: string
+                    example: "OK"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Question Successfully Updated"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.update"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:46:40+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "aa083e25-09a6-4e52-95d5-1e780906d886"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "11470459-4693-4149-ac61-60caac051b84"
+                  responseCode:
+                    type: string
+                    example: "ERROR"
+                  result:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "VALIDATION_ERROR"
+                      message:
+                        type: string
+                        example: "Invalid question details"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.update"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:46:40+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "aa083e25-09a6-4e52-95d5-1e780906d886"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "11470459-4693-4149-ac61-60caac051b84"
+                  responseCode:
+                    type: string
+                    example: "ERROR"
+                  result:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "INTERNAL_SERVER_ERROR"
+                      message:
+                        type: string
+                        example: "Something went wrong"
+  /question/delete/{question_id}:
+    post:
+      tags:
+        - Question
+      summary: Delete Question
+      operationId: api.question.delete
+      parameters:
+        - name: question_id
+          in: path
+          required: true
+          description: The ID of the question to be deleted
+          schema:
+            type: string
+            example: "4e6f685f-6368-45e3-b62f-3ef3895e6b73"
+      responses:
+        '200':
+          description: Successful deletion of the question
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.delete"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:53:22+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "SUCCESS"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "4a7f14c3-d61e-4d4f-be78-181834eeff6d"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "a348caec-188a-41ee-9155-b58079bba676"
+                  responseCode:
+                    type: string
+                    example: "OK"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Question Deleted successfully"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.delete"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:53:22+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "4a7f14c3-d61e-4d4f-be78-181834eeff6d"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "a348caec-188a-41ee-9155-b58079bba676"
+                  responseCode:
+                    type: string
+                    example: "ERROR"
+                  result:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "VALIDATION_ERROR"
+                      message:
+                        type: string
+                        example: "Invalid question ID"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.delete"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T11:53:22+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "4a7f14c3-d61e-4d4f-be78-181834eeff6d"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "a348caec-188a-41ee-9155-b58079bba676"
+                  responseCode:
+                    type: string
+                    example: "ERROR"
+                  result:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "INTERNAL_SERVER_ERROR"
+                      message:
+                        type: string
+                        example: "Something went wrong"
+  /question/discard/{question_id}:
+    post:
+      tags:
+        - Question
+      summary: Discard Question
+      operationId: api.question.discard
+      parameters:
+        - name: question_id
+          in: path
+          required: true
+          description: The ID of the question to be discarded
+          schema:
+            type: string
+            example: "4e6f685f-6368-45e3-b62f-3ef3895e6b73"
+      responses:
+        '200':
+          description: Successful discarding of the question
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.discard"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T12:00:00+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "SUCCESS"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "4a7f14c3-d61e-4d4f-be78-181834eeff6d"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "a348caec-188a-41ee-9155-b58079bba676"
+                  responseCode:
+                    type: string
+                    example: "OK"
+                  result:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Question Discarded successfully"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.discard"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T12:00:00+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "4a7f14c3-d61e-4d4f-be78-181834eeff6d"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "a348caec-188a-41ee-9155-b58079bba676"
+                  responseCode:
+                    type: string
+                    example: "ERROR"
+                  result:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "VALIDATION_ERROR"
+                      message:
+                        type: string
+                        example: "Invalid question ID"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "api.question.discard"
+                  ver:
+                    type: string
+                    example: "1.0"
+                  ts:
+                    type: string
+                    format: date-time
+                    example: "2024-09-28T12:00:00+05:30"
+                  params:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "FAILED"
+                      msgid:
+                        type: string
+                        format: uuid
+                        example: "4a7f14c3-d61e-4d4f-be78-181834eeff6d"
+                      resmsgid:
+                        type: string
+                        format: uuid
+                        example: "a348caec-188a-41ee-9155-b58079bba676"
+                  responseCode:
+                    type: string
+                    example: "ERROR"
+                  result:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "INTERNAL_SERVER_ERROR"
+                      message:
+                        type: string
+                        example: "Something went wrong"

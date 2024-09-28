@@ -12,7 +12,7 @@ chai.should();
 chai.use(chaiHttp);
 
 describe('Bulk Search API', () => {
-  const searchUrl = '/api/v1/skillTaxonomy/search';
+  const searchUrl = '/api/v1/skill-taxonomy/search';
 
   afterEach(() => {
     chai.spy.restore();

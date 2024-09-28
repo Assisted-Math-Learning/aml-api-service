@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { SkillType } from '../enums/skillType';
 import { Status } from '../enums/status';
 import { SkillMaster } from '../models/skill';
@@ -71,4 +72,23 @@ export const updateSkillData = async (skillId: string, req: any): Promise<any> =
   });
 
   return updatedData;
+};
+
+export const checkSkillExists = async (
+  skillNameObj: { [key: string]: string }, // Multilingual names object
+  skillType: SkillType, // Enum for skill type
+): Promise<{ exists: boolean; skill?: any }> => {
+  // Query to check if the entire JSONB `name` field matches the provided multilingual names
+  const skill = await SkillMaster.findOne({
+    where: {
+      type: skillType, // Match type (l1_skill, l2_skill, l3_skill)
+      name: { [Op.contains]: skillNameObj }, // Match the full multilingual name object
+      is_active: true, // Only active skills
+      status: 'live', // Only live skills
+    },
+    attributes: ['id', 'name', 'type'], // Select the necessary fields
+  });
+
+  // Return the result, handling both found and not found cases
+  return skill ? { exists: true, skill: skill.toJSON() } : { exists: false };
 };

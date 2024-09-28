@@ -15,6 +15,13 @@ import createSkillTaxonomy from '../controllers/skillTaxonomyCreate/skillTaxonom
 import searchSkillTaxonomies from '../controllers/skillTaxonomySearch/skillTaxonomySearch';
 import updateClass from '../controllers/classUpdate/classUpdate';
 import updateSubSkill from '../controllers/subSkillUpdate/subSkillUpdate';
+import createQuestion from '../controllers/questionCreate/questionCreate';
+import publishQuestion from '../controllers/questionPublish/publishQuestion';
+import readQuestionById from '../controllers/questionRead/questionRead';
+import deleteQuestionById from '../controllers/questionDelete/deleteQuestion';
+import discardQuestionById from '../controllers/questionDiscard/discardQuestion';
+import { searchQuestions } from '../controllers/questionSearch/searchQuestion';
+import updateQuestionById from '../controllers/questionUpdate/questionUpdate';
 
 export const router = express.Router();
 
@@ -47,3 +54,17 @@ router.post('/sub-skill/update/:sub_skill_id', setDataToRequestObject('api.subsk
 router.post('/skill-taxonomy/create/:taxonomy_name', setDataToRequestObject('api.skillTaxonomy.create'), createSkillTaxonomy);
 
 router.post('/skill-taxonomy/search', setDataToRequestObject('api.skillTaxonomy.search'), searchSkillTaxonomies);
+
+router.post('/question/create', setDataToRequestObject('api.question.create'), createQuestion);
+
+router.post('/question/publish/:question_id', setDataToRequestObject('api.question.publish'), publishQuestion);
+
+router.get('/question/read/:question_id', setDataToRequestObject('api.question.read'), readQuestionById);
+
+router.post('/question/update/:question_id', setDataToRequestObject('api.question.update'), updateQuestionById);
+
+router.post('/question/delete/:question_id', setDataToRequestObject('api.question.delete'), deleteQuestionById);
+
+router.post('/question/discard/:question_id', setDataToRequestObject('api.question.discard'), discardQuestionById);
+
+router.post('/question/search', setDataToRequestObject('api.question.search'), searchQuestions);
