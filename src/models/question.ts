@@ -15,7 +15,7 @@ export const Question = AppDataSource.define(
     },
     question_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
     },
     question_set_id: {
       type: DataTypes.STRING,
@@ -27,15 +27,11 @@ export const Question = AppDataSource.define(
     },
     operation: {
       type: DataTypes.ENUM('add', 'sub', 'multiple', 'division'),
-      allowNull: true,
-    },
-    sequence_no: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
     },
     name: {
       type: DataTypes.JSONB,
-      allowNull: true,
+      allowNull: false,
     },
     description: {
       type: DataTypes.JSONB,
@@ -67,7 +63,7 @@ export const Question = AppDataSource.define(
     },
     benchmark_time: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
     },
     media: {
       type: DataTypes.ARRAY(DataTypes.JSONB),

@@ -32,19 +32,11 @@ export const getQuestionByName = async (Question_name: string): Promise<any> => 
 };
 
 //update single Question
-export const updateQuestionData = async (questionIdentifier: string, data: any): Promise<any> => {
-  // Retrieve the existing question using a helper function
-  const existingQuestion = await getQuestionById(questionIdentifier, { status: Status.LIVE });
-
-  // Check if the question exists; if not, throw an error
-  if (!existingQuestion) {
-    throw new Error('Question not found'); // Handle question not found scenario
-  }
-
+export const updateQuestionData = async (questionIdentifier: string, updatedata: any, oldData: any): Promise<any> => {
   // Prepare updated data, preserving existing fields and updating with new data
   const updatedData = {
-    ...existingQuestion,
-    ...data,
+    ...updatedata,
+    ...oldData,
   };
 
   // Update the question in the database

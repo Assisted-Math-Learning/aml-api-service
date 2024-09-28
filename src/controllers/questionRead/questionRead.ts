@@ -5,7 +5,6 @@ import httpStatus from 'http-status';
 import { getQuestionById } from '../../services/question';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
-import { Status } from '../../enums/status';
 
 export const apiId = 'api.question.read';
 
@@ -14,7 +13,7 @@ const readQuestionById = async (req: Request, res: Response) => {
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const resmsgid = _.get(res, 'resmsgid');
 
-  const questionDetails = await getQuestionById(question_id, { status: Status.LIVE });
+  const questionDetails = await getQuestionById(question_id);
 
   //validating Question is exist
   if (_.isEmpty(questionDetails)) {

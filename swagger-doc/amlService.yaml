@@ -2494,9 +2494,6 @@ paths:
                         en:
                           type: string
                           example: 'This is the description for the question'
-                    sequence_no:
-                      type: integer
-                      example: 1
                     hints:
                       type: object
                       properties:
@@ -2959,9 +2956,6 @@ paths:
                       operation:
                         type: string
                         example: 'add'
-                      sequence_no:
-                        type: integer
-                        example: 1
                       name:
                         type: object
                         properties:
@@ -3376,9 +3370,6 @@ paths:
                         operation:
                           type: string
                           example: 'add'
-                        sequence_no:
-                          type: integer
-                          example: 1
                         name:
                           type: object
                           properties:

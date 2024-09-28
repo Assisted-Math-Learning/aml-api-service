@@ -7,7 +7,6 @@ import logger from '../../utils/logger';
 import questionUpdateSchema from './questionUpdateValidationSchema.json';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
-import { Status } from '../../enums/status';
 import { checkTenantNameExists } from '../../services/tenant';
 import { checkRepositoryNameExists } from '../../services/repository';
 import { checkBoardNamesExists } from '../../services/board';
@@ -34,7 +33,7 @@ const updateQuestionById = async (req: Request, res: Response) => {
   }
 
   // Validate question existence
-  const question = await getQuestionById(question_id, { status: Status.LIVE });
+  const question = await getQuestionById(question_id);
 
   if (_.isEmpty(question)) {
     const code = 'QUESTION_NOT_EXISTS';
@@ -146,7 +145,7 @@ const updateQuestionById = async (req: Request, res: Response) => {
   }
 
   // Update Question
-  await updateQuestionData(question_id, updatedDataBody);
+  await updateQuestionData(question_id, updatedDataBody, question);
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Updated' } });
 };
 
