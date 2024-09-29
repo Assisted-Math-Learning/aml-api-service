@@ -32,20 +32,11 @@ export const getQuestionByName = async (Question_name: string): Promise<any> => 
 };
 
 //update single Question
-export const updateQuestionData = async (questionIdentifier: string, updatedata: any, oldData: any): Promise<any> => {
-  // Prepare updated data, preserving existing fields and updating with new data
-  const updatedData = {
-    ...updatedata,
-    ...oldData,
-  };
-
+export const updateQuestionData = async (questionIdentifier: string, updatedata: any): Promise<any> => {
   // Update the question in the database
-  await Question.update(updatedData, {
+  return await Question.update(updatedata, {
     where: { identifier: questionIdentifier },
   });
-
-  // Return the updated question data
-  return updatedData;
 };
 
 //publish question

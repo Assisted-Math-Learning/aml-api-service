@@ -144,8 +144,10 @@ const updateQuestionById = async (req: Request, res: Response) => {
     updatedDataBody.sub_skills = subSkillsExistence.foundSkills; // Add found sub-skills
   }
 
+  const mergedData = _.merge({}, question, dataBody, updatedDataBody);
+
   // Update Question
-  await updateQuestionData(question_id, updatedDataBody, question);
+  await updateQuestionData(question_id, mergedData);
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Updated' } });
 };
 

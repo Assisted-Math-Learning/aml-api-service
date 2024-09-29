@@ -27,15 +27,16 @@ const updateClass = async (req: Request, res: Response) => {
   }
 
   // Check if the class id exists
-  const { classData } = await getClassById(class_id);
+  const classData = await getClassById(class_id);
   if (_.isEmpty(classData)) {
     const code = 'CLASS_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: 'Class does not exist' });
     throw amlError(code, 'Class does not exist', 'NOT_FOUND', 404);
   }
+  const mergedData = _.merge({}, classData, dataBody);
 
   const updatedData = {
-    ...dataBody,
+    ...mergedData,
     updated_by: 'system',
   };
 

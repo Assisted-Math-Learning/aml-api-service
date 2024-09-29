@@ -26,7 +26,7 @@ const updateTenant = async (req: Request, res: Response) => {
   }
 
   // Validate tenant existence
-  const { tenant } = await getTenant(tenant_id);
+  const tenant = await getTenant(tenant_id);
   if (_.isEmpty(tenant)) {
     const code = 'TENANT_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: 'Tenant does not exist' });
@@ -34,16 +34,19 @@ const updateTenant = async (req: Request, res: Response) => {
   }
 
   // Validate boards
-  const { boards } = await getBoards(dataBody.board_id);
+  if (dataBody.board_id) {
+    const boards = await getBoards(dataBody.board_id);
 
-  if (boards.length !== dataBody.board_id.length) {
-    const code = 'BOARD_NOT_EXISTS';
-    logger.error({ code, apiId, msgid, resmsgid, requestBody, message: 'Some boards does not exist' });
-    throw amlError(code, 'Board do not exists', 'NOT_FOUND', 404);
+    if (boards.length !== dataBody.board_id.length) {
+      const code = 'BOARD_NOT_EXISTS';
+      logger.error({ code, apiId, msgid, resmsgid, requestBody, message: 'Some boards does not exist' });
+      throw amlError(code, 'Board do not exists', 'NOT_FOUND', 404);
+    }
   }
+  const mergedData = _.merge({}, tenant, dataBody);
 
   // Update the tenant
-  await updateTenantData(tenant_id, dataBody);
+  await updateTenantData(tenant_id, mergedData);
 
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Tenant Successfully Updated' } });
 };

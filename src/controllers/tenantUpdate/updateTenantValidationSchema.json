@@ -15,7 +15,8 @@
       "type": "object",
       "properties": {
         "msgid": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique message ID for the request"
         }
       },
       "required": ["msgid"],
@@ -25,12 +26,18 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string",
-          "description": "must be a string and is required"
+          "type": "object",
+          "description": "The name of the tenant in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
         },
         "type": {
-          "type": "string",
-          "description": "must be a string and is required"
+          "type": "object",
+          "description": "The type of the tenant in multiple languages",
+          "additionalProperties": {
+            "type": "string"
+          }
         },
         "board_id": {
           "type": "array",

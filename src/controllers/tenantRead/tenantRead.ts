@@ -13,24 +13,17 @@ const readTeantById = async (req: Request, res: Response) => {
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const resmsgid = _.get(res, 'resmsgid');
 
-  const getTenantInfo = await getTenant(tenant_id);
-
-  //handle databse error
-  if (getTenantInfo.error) {
-    throw new Error(getTenantInfo.message);
-  }
-
-  const tenantDetails = getTenantInfo.tenant;
+  const tenant = await getTenant(tenant_id);
 
   //validating tenant is exist
-  if (_.isEmpty(tenantDetails)) {
+  if (_.isEmpty(tenant)) {
     const code = 'TENANT_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: `Tenant not exists` });
     throw amlError(code, 'Tenant not exists', 'NOT_FOUND', 404);
   }
 
   logger.info({ apiId, msgid, resmsgid, message: `Tenant Read Successfully` });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: tenantDetails });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: tenant });
 };
 
 export default readTeantById;

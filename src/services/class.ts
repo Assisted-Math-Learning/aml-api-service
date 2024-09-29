@@ -34,7 +34,7 @@ export const getClassById = async (class_id: string): Promise<any> => {
     where: { identifier: class_id, is_active: true, status: Status.LIVE },
     attributes: { exclude: ['id'] },
   });
-  return { classData };
+  return classData?.dataValues;
 };
 
 // check class by id

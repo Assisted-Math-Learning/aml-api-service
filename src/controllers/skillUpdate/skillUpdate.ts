@@ -34,8 +34,9 @@ const updateSkill = async (req: Request, res: Response) => {
     throw amlError(code, 'Skill does not exist', 'NOT_FOUND', 404);
   }
 
+  const mergedData = _.merge({}, skill, dataBody);
   // Update the skill
-  await updateSkillData(skillId, dataBody);
+  await updateSkillData(skillId, mergedData);
 
   // Return a success response
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Skill Successfully Updated' } });

@@ -27,12 +27,7 @@ const createTenant = async (req: Request, res: Response) => {
     throw amlError(code, isRequestValid.message, 'BAD_REQUEST', 400);
   }
 
-  const { boards } = await getBoards(dataBody.board_id);
-
-  //handle databse error
-  if (boards.error) {
-    throw new Error(boards.message);
-  }
+  const boards = await getBoards(dataBody.board_id);
 
   if (boards.length !== dataBody.board_id.length) {
     const code = 'BOARD_NOT_EXISTS';

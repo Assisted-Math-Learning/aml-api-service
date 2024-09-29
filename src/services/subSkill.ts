@@ -34,7 +34,7 @@ export const getSubSkill = async (subSkillId: string): Promise<any> => {
     attributes: { exclude: ['id'] },
   });
 
-  return { subSkill };
+  return subSkill?.dataValues;
 };
 
 export const checkSubSkillsExist = async (subSkills: { name: { [key: string]: string } }[]): Promise<{ exists: boolean; foundSkills?: any[] }> => {

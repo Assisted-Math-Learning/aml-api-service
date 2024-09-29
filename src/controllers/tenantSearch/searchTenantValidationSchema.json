@@ -30,29 +30,12 @@
             "name": {
               "type": "array",
               "items": {
-                "type": "string",
-                "description": "Name of the tenant"
-              },
-              "description": "Name of the tenant"
-            },
-            "is_active": {
-              "type": "array",
-              "items": {
-                "type": "boolean",
-                "description": "Name of the tenant"
-              },
-              "description": "Status of the tenant"
-            },
-            "status": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "description": "Name of the tenant",
-                "enum": ["draft", "live"]
-              },
-              "description": "Current status of the tenant"
+                "type": "object",
+                "description": "Title of the question set in different languages."
+              }
             }
           },
+          "description": "Object containing search criteria. Can include any fields defined in the Tenant model.",
           "additionalProperties": false
         },
         "limit": {

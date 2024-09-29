@@ -24,8 +24,7 @@ export const getTenant = async (tenant_id: string): Promise<any> => {
     where: { identifier: tenant_id, is_active: true, status: Status.LIVE },
     attributes: { exclude: ['id'] },
   });
-
-  return { tenant };
+  return tenant?.dataValues;
 };
 
 //filter tenants
@@ -33,7 +32,24 @@ export const getTenantSearch = async (req: Record<string, any>) => {
   const limit: any = _.get(req, 'limit');
   const offset: any = _.get(req, 'offset');
   const { filters = {} } = req || {};
-  const tenants = await Tenant.findAll({ limit: limit || 100, offset: offset || 0, ...(filters && { where: filters }) });
+
+  const whereClause: any = {};
+
+  whereClause.status = Status.LIVE;
+  whereClause.is_active = true;
+
+  if (filters.name) {
+    whereClause.name = {
+      [Op.or]: filters.name.map((termObj: any) => {
+        const [key, value] = Object.entries(termObj)[0];
+        return {
+          [key]: { [Op.iLike]: `%${String(value)}%` },
+        };
+      }),
+    };
+  }
+
+  const tenants = await Tenant.findAll({ limit: limit || 100, offset: offset || 0, ...(whereClause && { where: whereClause }), attributes: { exclude: ['id'] } });
   return tenants;
 };
 

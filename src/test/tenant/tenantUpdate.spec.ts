@@ -18,11 +18,11 @@ describe('Tenant update API', () => {
 
   it('should return 200 and update the tenant successfully', (done) => {
     chai.spy.on(Tenant, 'findOne', () => {
-      return Promise.resolve({ id: 1, is_active: true });
+      return Promise.resolve({ dataValues: { id: 1, is_active: true } });
     });
 
     chai.spy.on(boardMaster, 'findAll', () => {
-      return Promise.resolve([{ id: 1, name: 'Board 1', is_active: true }]);
+      return Promise.resolve({ dataValues: [{ id: 1, name: 'Board 1', is_active: true }] });
     });
 
     chai.spy.on(Tenant, 'update', () => {
@@ -63,7 +63,7 @@ describe('Tenant update API', () => {
     chai
       .request(app)
       .post(`${updateUrl}/10`)
-      .send(updateTenatTenantBoard.tenantNotExistsRequest)
+      .send(updateTenatTenantBoard.validTenantUpdateRequest)
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a('object');

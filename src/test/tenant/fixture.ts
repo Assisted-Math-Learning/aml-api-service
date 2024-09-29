@@ -57,8 +57,7 @@ export const updateTenatTenantBoard = {
       msgid: '123e4567-e89b-12d3-a456-426614174000',
     },
     request: {
-      name: 'Mumbai',
-      board_id: [1],
+      name: { en: 'name1' },
     },
   },
 
@@ -67,14 +66,9 @@ export const updateTenatTenantBoard = {
     id: 'api.tenant.update',
     ver: '1.0',
     ts: '2024-09-03T12:34:56Z',
-    params: {
-      msgid: '123e4567-e89b-12d3-a456-426614174000',
-    },
     request: {
-      // Missing required fields
-      updated_by: 'some_user_id',
-      // Missing 'name' and 'type' which are required
-    },
+      name: { en: 'name1' },
+    }, // Missing the `name` field
   },
 
   // Tenant does not exist
@@ -103,7 +97,9 @@ export const tenantSearch = {
       msgid: '123e4567-e89b-12d3-a456-426614174000',
     },
     request: {
-      filters: { name: ['kerala'] },
+      filters: {
+        name: [{ en: 'Karnataka' }],
+      },
       limit: 10,
       offset: 0,
     },

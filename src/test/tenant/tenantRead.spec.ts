@@ -15,22 +15,20 @@ describe('Tenant read API', () => {
   });
 
   it('should return 200 and get all the tenant details along board and class', (done) => {
-    const tenantReadMockData = [
-      {
-        dataValues: {
-          id: 3,
-          tenant_name: 'karnataka',
-          tenant_type: 'government',
-          board_id: [1, 2],
-          is_active: true,
-          status: 'draft',
-          created_by: 1,
-          updated_by: null,
-          created_at: '2024-08-23T04:11:30.062Z',
-          updated_at: '2024-08-23T04:11:30.062Z',
-        },
+    const tenantReadMockData = {
+      dataValues: {
+        id: 3,
+        tenant_name: 'karnataka',
+        tenant_type: 'government',
+        board_id: [1, 2],
+        is_active: true,
+        status: 'draft',
+        created_by: 1,
+        updated_by: null,
+        created_at: '2024-08-23T04:11:30.062Z',
+        updated_at: '2024-08-23T04:11:30.062Z',
       },
-    ];
+    };
 
     chai.spy.on(Tenant, 'findAll', () => {
       return Promise.resolve(tenantReadMockData);

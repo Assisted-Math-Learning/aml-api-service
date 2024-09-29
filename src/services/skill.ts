@@ -32,10 +32,10 @@ export async function fetchSkillIdsByName(): Promise<Map<string, { id: number; n
 export const getSkillById = async (skillId: string): Promise<any> => {
   const skill = await SkillMaster.findOne({
     where: { identifier: skillId, is_active: true, status: 'live' },
-    attributes: { exclude: ['created_at', 'updated_at'] },
+    attributes: { exclude: ['id'] },
   });
 
-  return skill;
+  return skill?.dataValues;
 };
 
 // Modify the function to check both ID and type (l1_skill)

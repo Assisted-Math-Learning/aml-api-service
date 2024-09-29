@@ -27,15 +27,16 @@ const updateSubSkill = async (req: Request, res: Response) => {
   }
 
   // Validate sub-skill existence
-  const { subSkill } = await getSubSkill(sub_skill_id);
+  const subSkill = await getSubSkill(sub_skill_id);
   if (_.isEmpty(subSkill)) {
     const code = 'SUBSKILL_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: 'Sub-skill does not exist' });
     throw amlError(code, 'Sub-skill does not exist', 'NOT_FOUND', 404);
   }
 
+  const mergedData = _.merge({}, subSkill, dataBody);
   // Update the sub-skill
-  await updateSubSkillData(sub_skill_id, dataBody);
+  await updateSubSkillData(sub_skill_id, mergedData);
 
   ResponseHandler.successResponse(req, res, {
     status: httpStatus.OK,

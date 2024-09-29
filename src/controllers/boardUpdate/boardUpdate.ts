@@ -30,7 +30,8 @@ const updateBoard = async (req: Request, res: Response) => {
   }
 
   // Validate board existence
-  const { board } = await getBoard(board_id);
+  const board = await getBoard(board_id);
+
   if (_.isEmpty(board)) {
     const code = 'BOARD_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: 'Board does not exist' });
@@ -47,7 +48,7 @@ const updateBoard = async (req: Request, res: Response) => {
   }
 
   // Validate class existence if present
-  if (dataBody.class_ids) {
+  if (dataBody.class_ids.ids) {
     const isExists = await checkClassIdsExists(dataBody.class_ids.ids);
     if (!isExists) {
       const code = 'CLASS_ID_NOT_EXISTS';
@@ -68,7 +69,8 @@ const updateBoard = async (req: Request, res: Response) => {
   }
 
   // Update the board
-  await updateBoardData(board_id, dataBody);
+  const mergedData = _.merge({}, board, dataBody);
+  await updateBoardData(board_id, mergedData);
 
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Board Successfully Updated' } });
 };
