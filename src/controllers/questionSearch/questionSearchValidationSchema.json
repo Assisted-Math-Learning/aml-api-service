@@ -3,7 +3,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "enum": ["api.tenant.search"]
+      "enum": ["api.question.search"]
     },
     "ver": {
       "type": "string"
@@ -27,30 +27,14 @@
         "filters": {
           "type": "object",
           "properties": {
-            "name": {
+            "question_type": {
               "type": "array",
               "items": {
                 "type": "string",
-                "description": "Name of the tenant"
+                "enum": ["Grid-1", "mcq", "fib", "Grid-2"]
               },
-              "description": "Name of the tenant"
-            },
-            "is_active": {
-              "type": "array",
-              "items": {
-                "type": "boolean",
-                "description": "Name of the tenant"
-              },
-              "description": "Status of the tenant"
-            },
-            "status": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "description": "Name of the tenant",
-                "enum": ["draft", "live"]
-              },
-              "description": "Current status of the tenant"
+              "minItems": 1,
+              "uniqueItems": true
             }
           },
           "description": "Object containing search criteria. Can include any fields defined in the Tenant model.",
@@ -66,7 +50,7 @@
           "minimum": 0
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     }
   },
   "required": ["id", "ver", "ts", "params", "request"],

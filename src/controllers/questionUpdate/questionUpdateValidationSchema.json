@@ -1,0 +1,264 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "enum": ["api.question.update"]
+    },
+    "ver": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "msgid": {
+          "type": "string"
+        }
+      },
+      "required": ["msgid"],
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "question_id": {
+          "type": "integer",
+          "description": "The question identifier."
+        },
+        "question_set_id": {
+          "type": "string",
+          "description": "The ID of the question set."
+        },
+        "question_type": {
+          "type": "string",
+          "enum": ["Grid-1", "mcq", "fib", "Grid-2"],
+          "description": "The type of the question."
+        },
+        "operation": {
+          "type": "string",
+          "enum": ["add", "sub", "multiply", "division"],
+          "description": "The operation type for the question."
+        },
+        "name": {
+          "type": "object",
+          "description": "The name of the question in multiple languages.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "object",
+          "description": "The description of the question in multiple languages.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "sequence_no": {
+          "type": "integer",
+          "description": "The sequence order of the question."
+        },
+        "hints": {
+          "type": "object",
+          "description": "Hints for the question in multiple languages.",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "tenant": {
+          "type": "object",
+          "description": "The tenant information.",
+          "properties": {
+            "name": {
+              "type": "object",
+              "description": "The name of the tenant in multiple languages.",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "repository": {
+          "type": "object",
+          "description": "The repository information.",
+          "properties": {
+            "name": {
+              "type": "object",
+              "description": "The name of the repository in multiple languages.",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "taxonomy": {
+          "type": "object",
+          "properties": {
+            "board": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "class": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "l1_skill": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "l2_skill": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "uniqueItems": true
+            },
+            "l3_skill": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "uniqueItems": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "gradient": {
+          "type": "string",
+          "description": "The difficulty gradient of the question."
+        },
+        "media": {
+          "type": "array",
+          "description": "A list of media assets associated with the question.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fileName": {
+                "type": "string",
+                "description": "The file name of the media."
+              },
+              "mediaType": {
+                "type": "string",
+                "description": "The type of media, such as Image, Audio, etc."
+              },
+              "mimeType": {
+                "type": "string",
+                "description": "The MIME type of the media, e.g., image/png."
+              },
+              "src": {
+                "type": "string",
+                "description": "The source URL or path for the media."
+              }
+            },
+            "required": ["fileName", "mediaType", "mimeType", "src"],
+            "additionalProperties": false
+          },
+          "uniqueItems": true
+        },
+        "sub_skills": {
+          "type": "array",
+          "description": "A list of sub-skills associated with the question.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["name"],
+            "additionalProperties": false
+          },
+          "uniqueItems": true
+        },
+        "question_body": {
+          "type": "object",
+          "description": "The body of the question, containing any additional data.",
+          "properties": {
+            "numbers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "showCarry": {
+              "type": "boolean"
+            },
+            "prefill": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "division_intermediate_steps_preFill": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "wrongAnswers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "benchmark_time": {
+          "type": "integer",
+          "description": "The benchmark time to complete the question."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["id", "ver", "ts", "params", "request"],
+  "additionalProperties": false
+}

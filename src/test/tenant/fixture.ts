@@ -7,9 +7,15 @@ export const tenant_request = {
       msgid: '123e4567-e89b-12d3-a456-426614174000',
     },
     request: {
-      name: 'mumbai',
-      type: 'Government',
-      board_id: [1],
+      name: {
+        en: 'Karnataka',
+        hi: 'कर्नाटक',
+      },
+      type: {
+        en: 'education',
+        hi: 'शिक्षा',
+      },
+      board_id: [2],
     },
   },
 

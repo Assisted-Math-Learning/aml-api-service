@@ -17,6 +17,13 @@ import updateClass from '../controllers/classUpdate/classUpdate';
 import updateSubSkill from '../controllers/subSkillUpdate/subSkillUpdate';
 import getMediaUploadURL from '../controllers/mediaUpload/mediaUpload';
 import getMediaReadURL from '../controllers/mediaUpload/mediaRead';
+import createQuestion from '../controllers/questionCreate/questionCreate';
+import publishQuestion from '../controllers/questionPublish/publishQuestion';
+import readQuestionById from '../controllers/questionRead/questionRead';
+import updateQuestionById from '../controllers/questionUpdate/questionUpdate';
+import deleteQuestionById from '../controllers/questionDelete/deleteQuestion';
+import discardQuestionById from '../controllers/questionDiscard/discardQuestion';
+import { searchQuestions } from '../controllers/questionSearch/searchQuestion';
 
 export const router = express.Router();
 
@@ -53,3 +60,17 @@ router.post('/skill-taxonomy/search', setDataToRequestObject('api.skillTaxonomy.
 router.post('/media/upload/presignedUrl', setDataToRequestObject('api.media.upload'), getMediaUploadURL);
 
 router.post('/media/read/presignedUrl', setDataToRequestObject('api.media.read'), getMediaReadURL);
+
+router.post('/question/create', setDataToRequestObject('api.question.create'), createQuestion);
+
+router.post('/question/publish/:question_id', setDataToRequestObject('api.question.publish'), publishQuestion);
+
+router.get('/question/read/:question_id', setDataToRequestObject('api.question.read'), readQuestionById);
+
+router.post('/question/update/:question_id', setDataToRequestObject('api.question.update'), updateQuestionById);
+
+router.post('/question/delete/:question_id', setDataToRequestObject('api.question.delete'), deleteQuestionById);
+
+router.post('/question/discard/:question_id', setDataToRequestObject('api.question.discard'), discardQuestionById);
+
+router.post('/question/search', setDataToRequestObject('api.question.search'), searchQuestions);

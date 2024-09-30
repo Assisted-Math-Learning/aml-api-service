@@ -22,6 +22,23 @@ export const checkBoardNameExists = async (boardName: string): Promise<boolean> 
   });
   return !!board;
 };
+export const checkBoardNamesExists = async (boardNames: { [key: string]: string }): Promise<{ exists: boolean; board?: any }> => {
+  // Map over boardNames to create dynamic conditions
+  const conditions = Object.entries(boardNames).map(([lang, name]) => ({
+    name: { [Op.contains]: { [lang]: name } },
+    is_active: true,
+    status: Status.LIVE,
+  }));
+
+  // Query the boardMaster model
+  const board = await boardMaster.findOne({
+    where: { [Op.or]: conditions },
+    attributes: ['id', 'name'],
+  });
+
+  // Return result with simpler logic
+  return board ? { exists: true, board: board.toJSON() } : { exists: false };
+};
 
 //get board by id
 export const getBoard = async (board_identifier: string): Promise<any> => {
