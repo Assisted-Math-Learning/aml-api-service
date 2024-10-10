@@ -14,11 +14,10 @@ export const createSkillTaxonomyData = async (req: { [key: string]: any }[]): Pr
 
 // Get skill taxonomy by id
 export const getSkillTaxonomyId = async (skill_taxonomy_id: number): Promise<any> => {
-  const skillTaxonomy = await SkillTaxonomy.findOne({
+  return SkillTaxonomy.findOne({
     where: { id: skill_taxonomy_id, status: Status.LIVE, is_active: true },
     raw: true,
   });
-  return { skillTaxonomy };
 };
 
 // Function to validate skill_taxonomy_id
@@ -122,7 +121,7 @@ export const processSkillTaxonomy = async (dataBody: any[], taxonomy_name: strin
 };
 
 //filter taxonomy
-export const getSkillTaxonomySearch = async (req: Record<string, any>) => {
+export const getSkillTaxonomySearch = async (req: Record<string, any>, order?: any) => {
   const limit: any = _.get(req, 'limit');
   const offset: any = _.get(req, 'offset');
   const { filters = {} } = req || {};
@@ -190,11 +189,16 @@ export const getSkillTaxonomySearch = async (req: Record<string, any>) => {
     });
   }
 
-  const skillTaxonomies = await SkillTaxonomy.findAll({
+  const options = {
     limit: limit || 100,
     offset: offset || 0,
     where: whereClause,
     attributes: { exclude: ['id'] },
-  });
-  return skillTaxonomies;
+  };
+
+  if (order) {
+    _.set(options, 'order', order);
+  }
+
+  return SkillTaxonomy.findAll(options);
 };

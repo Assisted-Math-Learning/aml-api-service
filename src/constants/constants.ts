@@ -1,0 +1,1 @@
+export const PASSING_MARKS = 0.8; // 80% IN PERCENTAGE

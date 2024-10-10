@@ -33,8 +33,13 @@ const learnerJourneyCreate = async (req: Request, res: Response) => {
 
   let { learnerJourney } = await readLearnerJourneyByLearnerIdAndQuestionSetId(dataBody.learner_id, dataBody.question_set_id);
 
-  if (learnerJourney && learnerJourney.status === LearnerJourneyStatus.COMPLETE) {
-    await updateLearnerJourney(learnerJourney.identifier, { attempts_count: learnerJourney.attempts_count + 1, start_time: dataBody.start_time, end_time: null, status: LearnerJourneyStatus.NOOP });
+  if (learnerJourney && learnerJourney.status === LearnerJourneyStatus.COMPLETED) {
+    await updateLearnerJourney(learnerJourney.identifier, {
+      attempts_count: learnerJourney.attempts_count + 1,
+      start_time: dataBody.start_time,
+      end_time: null,
+      status: LearnerJourneyStatus.IN_PROGRESS,
+    });
   } else {
     const learnerJourneyInsertData = {
       ...dataBody,

@@ -3,6 +3,7 @@ import { Status } from '../enums/status';
 import { Question } from '../models/question';
 import { QuestionSet } from '../models/questionSet';
 import _ from 'lodash';
+import { QuestionSetPurposeType } from '../enums/questionSetPurposeType';
 
 // Get a single question by ID
 export const getQuestionSetById = async (id: string): Promise<any> => {
@@ -139,5 +140,124 @@ export const getQuestionSetsByIdentifiers = async (identifiers: string[]): Promi
     },
     attributes: { exclude: ['id'] },
     raw: true,
+  });
+};
+
+export const getMainDiagnosticQuestionSet = async (filters: { board?: string; class?: string; l1Skill?: string }): Promise<any> => {
+  let whereClause: any = {
+    purpose: QuestionSetPurposeType.MAIN_DIAGNOSTIC,
+  };
+
+  if (filters.board) {
+    whereClause = {
+      ...whereClause,
+      taxonomy: {
+        ...(whereClause.taxonomy || {}),
+        board: {
+          name: {
+            en: filters.board,
+          },
+        },
+      },
+    };
+  }
+
+  if (filters.class) {
+    whereClause = {
+      ...whereClause,
+      taxonomy: {
+        ...(whereClause.taxonomy || {}),
+        class: {
+          name: {
+            en: filters.class,
+          },
+        },
+      },
+    };
+  }
+
+  if (filters.l1Skill) {
+    whereClause = {
+      ...whereClause,
+      taxonomy: {
+        ...(whereClause.taxonomy || {}),
+        l1_skill: {
+          name: {
+            en: filters.l1Skill,
+          },
+        },
+      },
+    };
+  }
+
+  return QuestionSet.findOne({
+    where: whereClause,
+    attributes: { exclude: ['id'] },
+    raw: true,
+  });
+};
+
+export const getPracticeQuestionSet = (filters: { board: string; class: string; l1Skill: string }): Promise<any> => {
+  const whereClause: any = {
+    purpose: {
+      [Op.ne]: QuestionSetPurposeType.MAIN_DIAGNOSTIC,
+    },
+    taxonomy: {
+      board: {
+        name: {
+          en: filters.board,
+        },
+      },
+      class: {
+        name: {
+          en: filters.class,
+        },
+      },
+      l1_skill: {
+        name: {
+          en: filters.l1Skill,
+        },
+      },
+    },
+  };
+
+  return QuestionSet.findOne({
+    where: whereClause,
+    order: [['sequence', 'ASC']],
+  });
+};
+
+export const getNextPracticeQuestionSetInSequence = (filters: { board: string; classes: string[]; l1Skill: string; lastSetSequence: number }): Promise<any> => {
+  const whereClause: any = {
+    sequence: {
+      [Op.gt]: filters.lastSetSequence,
+    },
+    purpose: {
+      [Op.ne]: QuestionSetPurposeType.MAIN_DIAGNOSTIC,
+    },
+    taxonomy: {
+      board: {
+        name: {
+          en: filters.board,
+        },
+      },
+      class: {
+        name: {
+          en: {
+            [Op.in]: filters.classes,
+          },
+        },
+      },
+      l1_skill: {
+        name: {
+          en: filters.l1Skill,
+        },
+      },
+    },
+  };
+
+  return QuestionSet.findOne({
+    where: whereClause,
+    order: [['sequence', 'ASC']],
   });
 };

@@ -43,7 +43,7 @@ LearnerJourney.init(
     status: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: LearnerJourneyStatus.NOOP,
+      defaultValue: LearnerJourneyStatus.IN_PROGRESS,
     },
     start_time: {
       type: DataTypes.DATE,

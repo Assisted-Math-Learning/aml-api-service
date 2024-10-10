@@ -92,3 +92,11 @@ export const checkSkillExists = async (
   // Return the result, handling both found and not found cases
   return skill ? { exists: true, skill: skill.toJSON() } : { exists: false };
 };
+
+export const fetchSkillsByIds = async (skillIds: string[]): Promise<SkillMaster[]> => {
+  return SkillMaster.findAll({
+    where: {
+      identifier: skillIds,
+    },
+  });
+};

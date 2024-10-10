@@ -1,6 +1,6 @@
 import { LearnerProficiencyAggregateData } from '../models/learnerProficiencyAggregateData';
 
-export const findAggregateData = async (filters: { learner_id?: string; l1_skill?: string; l2_skill?: string; l3_skill?: string }): Promise<any> => {
+export const findAggregateData = async (filters: { learner_id?: string; class?: string; l1_skill?: string; l2_skill?: string; l3_skill?: string }): Promise<LearnerProficiencyAggregateData | null> => {
   return LearnerProficiencyAggregateData.findOne({
     where: { ...filters },
     attributes: { exclude: ['id'] },
