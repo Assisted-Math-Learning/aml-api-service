@@ -15,7 +15,6 @@ import { checkClassNameExists } from '../../services/class';
 import { checkSkillExists } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
 import { checkSubSkillsExist } from '../../services/subSkill';
-import { getQuestionSetById } from '../../services/questionSet';
 
 export const apiId = 'api.question.create';
 
@@ -23,7 +22,6 @@ const createQuestion = async (req: Request, res: Response) => {
   const requestBody = _.get(req, 'body');
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const dataBody = _.get(req, 'body.request');
-  const questionSetId = _.get(dataBody, 'question_set_id');
   const resmsgid = _.get(res, 'resmsgid');
 
   // Validating the schema
@@ -32,14 +30,6 @@ const createQuestion = async (req: Request, res: Response) => {
     const code = 'QUESTION_INVALID_INPUT';
     logger.error({ code, apiId, msgid, resmsgid, requestBody, message: isRequestValid.message });
     throw amlError(code, isRequestValid.message, 'BAD_REQUEST', 400);
-  }
-
-  //checking question id if it exists
-  const questionSet = await getQuestionSetById(questionSetId);
-  if (_.isEmpty(questionSet)) {
-    const code = 'QUESTION_SET_NOT_EXISTS';
-    logger.error({ code, apiId, msgid, resmsgid, message: `Question set id not exists` });
-    throw amlError(code, 'Question set id not exists', 'NOT_FOUND', 404);
   }
 
   // Extracting tenant names and checking if it exists

@@ -1844,78 +1844,6 @@ CREATE TABLE tenant (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);
 
-CREATE TABLE IF NOT EXISTS question_set (
-    id SERIAL PRIMARY KEY,
-    question_set_id VARCHAR,
-    identifier VARCHAR NOT NULL,
-    process_id UUID,
-    title JSONB NOT NULL,
-    description JSONB,
-    repository JSONB,
-    sequence INTEGER NOT NULL,
-    tenant JSONB,
-    taxonomy JSONB NOT NULL,
-    sub_skills JSONB,
-    purpose VARCHAR,
-    is_atomic BOOLEAN NOT NULL DEFAULT FALSE,
-    gradient VARCHAR,
-    group_name INTEGER,
-    content_id VARCHAR[],
-    instruction_text VARCHAR,
-    status VARCHAR(10) NOT NULL CHECK (status IN ('draft', 'live')), 
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_by VARCHAR NOT NULL,
-    updated_by VARCHAR,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-INSERT INTO question_set (
-    identifier,
-    title,
-	process_id,
-    description,
-    repository,
-    sequence,
-    tenant,
-    taxonomy,
-    sub_skills,
-    content_id,
-    purpose,
-    is_atomic,
-    gradient,
-    group_name,
-    instruction_text,
-    status,
-    is_active,
-    created_by
-) VALUES (
-    'b68dc3a5-f37f-4d69-b4f3-555408c2fab2',  -- identifier
-    '{"en": "Question Set 1"}'::jsonb,        -- title
-	NULL,
-    '{"en": "This is a question description"}'::jsonb,  -- description
-    '{"name": {"en": "Content Repository"}}'::jsonb,    -- repository
-    1,                -- sequence
-    '{"name": {"en": "Karnataka"}}'::jsonb,   -- tenant
-    '{
-        "board": {"name": {"en": "Central Board of Secondary Education"}},
-        "class": {"name": {"en": "Class One"}},
-        "l1_skill": {"name": {"en": "Addition"}},
-        "l2_skill": [{"name": {"en": "1-digit Addition"}}],
-        "l3_skill": [{"name": {"en": "2Dx1D with carry (non-zero digits)"}}]
-    }'::jsonb,  -- taxonomy
-    '[{"name": {"en": "Procedural"}}, {"name": {"en": "Geometry Basics"}}]'::jsonb,  -- sub_skills
-    ARRAY['uuid1', 'uuid2', 'uuid3'],  -- content_id (Array of UUIDs)
-    'Practice',       -- purpose
-    FALSE,            -- is_atomic
-    'g1',             -- gradient
-    1,                -- group_name
-    'text',           -- instruction_text
-    'live',           -- status
-    TRUE,             -- is_active
-    'admin'           -- created_by
-);
-
 CREATE TABLE repository (
   id SERIAL PRIMARY KEY,
   name JSONB NOT NULL,
@@ -1968,8 +1896,6 @@ CREATE TABLE IF NOT EXISTS process (
 CREATE TABLE IF NOT EXISTS content (
     id SERIAL PRIMARY KEY,
     identifier VARCHAR NOT NULL,
-    content_id VARCHAR,
-    process_id UUID,
     name JSONB NOT NULL,
     description JSONB,
     tenant JSONB,
@@ -1977,7 +1903,7 @@ CREATE TABLE IF NOT EXISTS content (
     taxonomy JSONB NOT NULL,
     sub_skills JSONB,
     gradient VARCHAR,
-    status VARCHAR(10) NOT NULL CHECK (status IN ('draft', 'live')), 
+    status VARCHAR(10) NOT NULL CHECK (status IN ('draft', 'live')),
     media JSONB,
     created_by VARCHAR NOT NULL,
     updated_by VARCHAR,
@@ -1986,9 +1912,9 @@ CREATE TABLE IF NOT EXISTS content (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-
 CREATE TABLE IF NOT EXISTS content_stage (
     id SERIAL PRIMARY KEY,
+    identifier VARCHAR NOT NULL,
     process_id UUID NOT NULL,
     content_id VARCHAR NOT NULL,
     title VARCHAR NOT NULL,
@@ -2002,7 +1928,7 @@ CREATE TABLE IF NOT EXISTS content_stage (
     sub_skills VARCHAR[],
     gradient VARCHAR,
     media_files JSONB,
-	status VARCHAR(10) CHECK (status IN ('progress', 'errored', 'success')), 
+    status VARCHAR(10) CHECK (status IN ('progress', 'errored', 'success')),
     error_info JSON,
     created_by VARCHAR NOT NULL,
     updated_by VARCHAR,
@@ -2010,64 +1936,89 @@ CREATE TABLE IF NOT EXISTS content_stage (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-
-
-CREATE TABLE IF NOT EXISTS question_set_stage (
+CREATE TABLE IF NOT EXISTS question_set (
     id SERIAL PRIMARY KEY,
-    process_id UUID NOT NULL,
-    question_set_id VARCHAR NOT NULL,
-    title VARCHAR NOT NULL,
-    description VARCHAR,
-    repository_name VARCHAR NOT NULL,
-    board VARCHAR NOT NULL,
-    class VARCHAR NOT NULL,
-    l1_skill VARCHAR NOT NULL,
-    l2_skill VARCHAR[] NOT NULL,
-    l3_skill VARCHAR[],
+    identifier VARCHAR NOT NULL,
+    title JSONB NOT NULL,
+    description JSONB,
+    repository JSONB,
+    questions JSONB,
     sequence INTEGER NOT NULL,
-    sub_skills VARCHAR[],
+    tenant JSONB,
+    taxonomy JSONB NOT NULL,
+    sub_skills JSONB,
     purpose VARCHAR,
     is_atomic BOOLEAN NOT NULL DEFAULT FALSE,
     gradient VARCHAR,
-    group_name VARCHAR,
-    instruction_media VARCHAR[],
+    group_name INTEGER,
+    content_ids VARCHAR[],
     instruction_text VARCHAR,
-	status VARCHAR(10) CHECK (status IN ('progress', 'errored', 'success')), 
-    error_info JSON,
+    status VARCHAR(10) NOT NULL CHECK (status IN ('draft', 'live')),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_by VARCHAR NOT NULL,
     updated_by VARCHAR,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS question (
-    id SERIAL PRIMARY KEY,
-    identifier VARCHAR NOT NULL,
-    process_id UUID,
-    question_set_id VARCHAR,
-    benchmark_time INTEGER NOT NULL,
-    question_type VARCHAR NOT NULL,
-    operation VARCHAR NOT NULL,
-    name JSONB,
-    description JSONB,
-    tenant JSONB,
-    repository JSONB,
-    taxonomy JSONB NOT NULL,
-    gradient VARCHAR,
-    hints JSONB,
-    status VARCHAR(10) NOT NULL CHECK (status IN ('draft', 'live')), 
-    media JSONB,
-    question_body JSONB NOT NULL,
-    sub_skills JSONB,
-    created_by VARCHAR NOT NULL,
-    updated_by VARCHAR,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+CREATE TABLE question_set_stage (
+    id SERIAL PRIMARY KEY,                    -- Auto-incrementing ID
+    identifier VARCHAR NOT NULL,              -- Unique identifier for the question set stage
+    process_id UUID NOT NULL,
+    question_set_id VARCHAR NOT NULL,         -- Foreign key for the associated question set
+    title VARCHAR NOT NULL,                    -- Title of the question set stage
+    description VARCHAR,                       -- Optional description
+    repository_name VARCHAR NOT NULL,         -- Name of the repository
+    board VARCHAR NOT NULL,                    -- Name of the board
+    class VARCHAR NOT NULL,                    -- Class name
+    l1_skill VARCHAR NOT NULL,                -- Level 1 skill
+    l2_skill TEXT[] NOT NULL,                 -- Level 2 skills (array of strings)
+    l3_skill TEXT[],                          -- Level 3 skills (optional array of strings)
+    sequence INTEGER NOT NULL,                 -- Sequence number for ordering
+    sub_skills TEXT[],                        -- Sub-skills (optional array of strings)
+    purpose VARCHAR,                           -- Purpose (optional)
+    is_atomic BOOLEAN NOT NULL DEFAULT FALSE, -- Atomic flag
+    gradient VARCHAR,                          -- Gradient (optional)
+    group_name VARCHAR,                        -- Group name (optional)
+    instruction_media TEXT[],                 -- Instruction media (optional array of strings)
+    instruction_text VARCHAR,                  -- Instruction text (optional)
+    status VARCHAR CHECK (status IN ('progress', 'errored', 'success')), -- Status enum
+    error_info JSON,                          -- Error information (optional)
+    created_by VARCHAR NOT NULL,              -- User who created the entry
+    updated_by VARCHAR,                        -- User who last updated the entry (optional)
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE question (
+    id SERIAL PRIMARY KEY,                    -- Auto-incrementing ID
+    identifier VARCHAR NOT NULL,              -- Unique identifier for the question
+    benchmark_time INTEGER NOT NULL,          -- Time benchmark for the question
+    question_type VARCHAR NOT NULL,           -- Type of the question
+    operation VARCHAR NOT NULL,                -- Operation associated with the question
+    name JSONB,                               -- Name (optional, as JSONB)
+    description JSONB,                        -- Description (optional, as JSONB)
+    tenant JSONB,                             -- Tenant information (optional, as JSONB)
+    repository JSONB,                         -- Repository information (optional, as JSONB)
+    taxonomy JSONB NOT NULL,                  -- Taxonomy (required, as JSONB)
+    gradient VARCHAR,                          -- Gradient information (optional)
+    hints JSONB,                              -- Hints (optional, as JSONB)
+    status VARCHAR CHECK (status IN ('draft', 'live')) NOT NULL, -- Status of the question
+    media JSONB,                              -- Media related to the question (optional, as JSONB)
+    question_body JSONB NOT NULL,             -- Main content of the question (required, as JSONB)
+    sub_skills JSONB,                         -- Sub-skills (optional, as JSONB)
+    created_by VARCHAR NOT NULL,               -- User who created the question
+    updated_by VARCHAR,                        -- User who last updated the question (optional)
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,  -- Active status of the question
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp for when the question was created
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp for when the question was last updated
+);
+
+
 
 CREATE TABLE IF NOT EXISTS question_stage (
     id SERIAL PRIMARY KEY,
+	identifier VARCHAR NOT NULL, 
     process_id UUID NOT NULL,
     question_id VARCHAR,
     question_text VARCHAR,

@@ -25,13 +25,20 @@ interface Taxonomy {
   l3_skill: Skill[];
 }
 
+// Define the structure for individual questions
+interface Question {
+  id: number;
+  identifier: string;
+  sequence: number;
+}
+
 export class QuestionSet extends Model {
   declare id: number;
   declare identifier: string;
-  declare process_id?: string | null;
   declare title: { [key: string]: string };
   declare description?: { [key: string]: string } | null;
   declare repository?: { id: number; name: { [key: string]: string } } | null;
+  declare questions: Question[]; // Updated to array of Question objects
   declare sequence: number;
   declare tenant?: { id: number; name: { [key: string]: string } } | null;
   declare taxonomy: Taxonomy; // Using the detailed Taxonomy interface
@@ -40,7 +47,7 @@ export class QuestionSet extends Model {
   declare is_atomic: boolean;
   declare gradient?: string | null;
   declare group_name?: number | null;
-  declare content_id?: string[] | null;
+  declare content_ids?: string[] | null;
   declare instruction_text?: string | null;
   declare status: 'draft' | 'live';
   declare is_active: boolean;
@@ -60,10 +67,6 @@ QuestionSet.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    process_id: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
     title: {
       type: DataTypes.JSONB,
       allowNull: false,
@@ -74,6 +77,10 @@ QuestionSet.init(
     },
     repository: {
       type: DataTypes.JSONB,
+      allowNull: true,
+    },
+    questions: {
+      type: DataTypes.JSONB, // Store questions as a JSONB array
       allowNull: true,
     },
     sequence: {
@@ -110,7 +117,7 @@ QuestionSet.init(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    content_id: {
+    content_ids: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
     },

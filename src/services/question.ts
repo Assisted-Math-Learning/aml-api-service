@@ -81,6 +81,17 @@ export const getQuestionsByIdentifiers = async (identifiers: string[]): Promise<
   });
 };
 
+export const getAllQuestionsById = async (is: string[]): Promise<any> => {
+  return Question.findAll({
+    where: {
+      id: {
+        [Op.in]: is,
+      },
+    },
+    attributes: { exclude: ['id'] },
+    raw: true,
+  });
+};
 export const getQuestionsCountForQuestionSet = async (questionSetId: string): Promise<number> => {
   return Question.count({
     where: {
@@ -88,4 +99,21 @@ export const getQuestionsCountForQuestionSet = async (questionSetId: string): Pr
       status: Status.LIVE,
     },
   });
+};
+
+export const checkQuestionsExist = async (questionIdentifiers: string[]): Promise<{ exists: boolean; foundQuestions?: any[] }> => {
+  const foundQuestions = await Question.findAll({
+    where: {
+      identifier: { [Op.in]: questionIdentifiers },
+      is_active: true,
+    },
+    attributes: ['id', 'identifier'],
+  });
+
+  const foundQuestionsList = foundQuestions.map((question) => question.toJSON());
+
+  // Check if all requested questions are found
+  const exists = foundQuestions.length === questionIdentifiers.length;
+
+  return { exists, foundQuestions: foundQuestionsList };
 };

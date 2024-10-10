@@ -205,7 +205,6 @@ export const update_content_request = {
       msgid: '123e4567-e89b-12d3-a456-426614174000',
     },
     request: {
-      content_id: 'c001',
       name: {
         en: 'content 2',
         ta: 'உள்ளடக்கம் 1',

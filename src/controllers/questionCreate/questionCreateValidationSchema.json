@@ -24,9 +24,6 @@
     "request": {
       "type": "object",
       "properties": {
-        "question_set_id": {
-          "type": "string"
-        },
         "question_type": {
           "type": "string",
           "enum": ["Grid-1", "Mcq", "Fib", "Grid-2"]
@@ -46,9 +43,6 @@
           "additionalProperties": {
             "type": "string"
           }
-        },
-        "sequence_no": {
-          "type": "integer"
         },
         "hints": {
           "type": "object",
@@ -223,7 +217,7 @@
           "type": "integer"
         }
       },
-      "required": ["question_set_id", "question_type", "taxonomy", "question_body", "benchmark_time"],
+      "required": ["question_type", "taxonomy", "question_body", "benchmark_time"],
       "if": {
         "properties": {
           "question_type": { "const": "Mcq" }

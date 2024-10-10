@@ -4399,7 +4399,7 @@ paths:
                       properties:
                         en:
                           type: string
-                          example: 'This is a question set description'
+                          example: 'This is a question description'
                     tenant:
                       type: object
                       properties:
@@ -4417,7 +4417,19 @@ paths:
                           properties:
                             en:
                               type: string
-                              example: 'Content Repository'
+                              example: 'Question Repository'
+                    questions:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          identifier:
+                            type: string
+                            format: uuid
+                            example: 'a6d437ce-85b3-4880-9481-4f5e588c0d56'
+                          sequence:
+                            type: integer
+                            example: 1
                     sequence:
                       type: integer
                       example: 1
@@ -4432,7 +4444,7 @@ paths:
                               properties:
                                 en:
                                   type: string
-                                  example: 'Central Board of Secondary Education'
+                                  example: 'Karnataka'
                         class:
                           type: object
                           properties:
@@ -4441,7 +4453,7 @@ paths:
                               properties:
                                 en:
                                   type: string
-                                  example: 'Class One'
+                                  example: 'one'
                         l1_skill:
                           type: object
                           properties:
@@ -4483,8 +4495,8 @@ paths:
                             properties:
                               en:
                                 type: string
-                                example: 'Procedural'
-                    content_id:
+                                example: 'Geometry Basics'
+                    content_ids:
                       type: array
                       items:
                         type: string
@@ -4611,6 +4623,7 @@ paths:
                       message:
                         type: string
                         example: 'Internal server error'
+
   /question-set/publish/{question_set_id}:
     post:
       tags:

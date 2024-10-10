@@ -23,6 +23,10 @@ export const insert_questionset_request = {
           en: 'Question Repository',
         },
       },
+      questions: [
+        { identifier: 'a6d437ce-85b3-4880-9481-4f5e588c0d56', sequence: 1 },
+        { identifier: '8603bdec-1df7-4911-b5e1-28a333e59027', sequence: 2 },
+      ],
       sequence: 1,
       taxonomy: {
         board: {

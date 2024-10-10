@@ -15,6 +15,7 @@ import { checkClassNameExists } from '../../services/class';
 import { checkSkillExists } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
 import { checkSubSkillsExist } from '../../services/subSkill';
+import { checkQuestionsExist } from '../../services/question';
 
 export const apiId = 'api.questionSet.create';
 
@@ -61,6 +62,33 @@ const createQuestionSet = async (req: Request, res: Response) => {
     id: repositoryExists.repository.id,
     name: repositoryExists.repository.name,
   };
+
+  // Extract question identifiers and sequences
+  const questions = dataBody.questions.map((q: { identifier: any; sequence: any }) => ({
+    identifier: q.identifier,
+    sequence: q.sequence,
+  }));
+
+  const questionIdentifiers: string[] = questions.map((q: { identifier: any }) => q.identifier);
+
+  // Check if the questions exist
+  const { exists: questionsExist, foundQuestions } = await checkQuestionsExist(questionIdentifiers);
+
+  if (!questionsExist) {
+    const code = 'QUESTIONS_NOT_FOUND';
+    logger.error({ code, apiId, msgid, resmsgid, message: 'Some questions were not found' });
+    throw amlError(code, 'Some questions were not found', 'NOT_FOUND', 404);
+  }
+
+  // Map the found questions with their sequence
+  const mappedQuestions = foundQuestions?.map((foundQuestion: any) => {
+    const matchingRequestQuestion = questions.find((q: { identifier: any }) => q.identifier === foundQuestion.identifier);
+    return {
+      id: foundQuestion.id,
+      identifier: foundQuestion.identifier,
+      sequence: matchingRequestQuestion?.sequence, // Add the sequence from the request
+    };
+  });
 
   // Check board
   const boardName = dataBody.taxonomy.board.name;
@@ -149,6 +177,7 @@ const createQuestionSet = async (req: Request, res: Response) => {
     created_by: 'manual',
     tenant: tenantObject,
     repository: repositoryObject,
+    questions: mappedQuestions,
     taxonomy: {
       board: boardObject,
       class: classObject,

@@ -14,6 +14,7 @@ import { checkClassNameExists } from '../../services/class';
 import { checkSkillExists } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
 import { checkSubSkillsExist } from '../../services/subSkill';
+import { checkQuestionsExist } from '../../services/question';
 
 export const apiId = 'api.questionSet.update';
 
@@ -66,6 +67,31 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
       throw amlError(code, 'Repository not exists', 'NOT_FOUND', 404);
     }
     updatedDataBody.repository = { id: repositoryExists.repository.id, name: repositoryExists.repository.name }; // Create repository object
+  }
+
+  if (dataBody.questions) {
+    const questions = dataBody.questions.map((q: { identifier: string; sequence: number }) => ({
+      identifier: q.identifier,
+      sequence: q.sequence,
+    }));
+
+    const questionIdentifiers = questions.map((q: { identifier: any }) => q.identifier);
+    const { exists: questionsExist, foundQuestions } = await checkQuestionsExist(questionIdentifiers);
+
+    if (!questionsExist) {
+      const code = 'QUESTIONS_NOT_FOUND';
+      logger.error({ code, apiId, msgid, resmsgid, message: 'Some questions were not found' });
+      throw amlError(code, 'Some questions were not found', 'NOT_FOUND', 404);
+    }
+
+    updatedDataBody.questions = foundQuestions?.map((foundQuestion: any) => {
+      const matchingRequestQuestion = questions.find((q: { identifier: any }) => q.identifier === foundQuestion.identifier);
+      return {
+        id: foundQuestion.id,
+        identifier: foundQuestion.identifier,
+        sequence: matchingRequestQuestion?.sequence,
+      };
+    });
   }
 
   // Check board

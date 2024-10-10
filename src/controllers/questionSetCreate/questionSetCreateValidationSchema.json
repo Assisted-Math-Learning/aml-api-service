@@ -72,6 +72,25 @@
           "required": ["name"],
           "additionalProperties": false
         },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "identifier": {
+                "type": "string",
+                "description": "A unique identifier for the question."
+              },
+              "sequence": {
+                "type": "integer",
+                "description": "The sequence order of the question."
+              }
+            },
+            "required": ["identifier", "sequence"],
+            "additionalProperties": false
+          },
+          "uniqueItems": true
+        },
         "sequence": {
           "type": "integer",
           "description": "The sequence order of the question set."
@@ -182,7 +201,7 @@
           "type": "string",
           "description": "The difficulty gradient of the question set."
         },
-        "content_id": {
+        "content_ids": {
           "type": "array",
           "items": {
             "type": "string"

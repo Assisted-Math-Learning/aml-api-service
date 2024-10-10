@@ -27,7 +27,6 @@ interface Taxonomy {
 export class Content extends Model {
   declare id: number;
   declare identifier: string;
-  declare process_id?: string | null;
   declare name: { [key: string]: string };
   declare description?: { [key: string]: string } | null;
   declare tenant?: { id: number; name: { [key: string]: string } } | null;
@@ -37,7 +36,6 @@ export class Content extends Model {
   declare gradient?: string | null;
   declare status: 'draft' | 'live';
   declare media?: Array<{ src: string; fileName: string; mimeType: string; mediaType: string }> | null;
-  declare content_id?: string | null;
   declare created_by: string;
   declare updated_by?: string | null;
   declare is_active: boolean;
@@ -53,10 +51,6 @@ Content.init(
     identifier: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    process_id: {
-      type: DataTypes.UUID,
-      allowNull: true,
     },
     name: {
       type: DataTypes.JSONB,
@@ -93,10 +87,6 @@ Content.init(
     },
     media: {
       type: DataTypes.JSONB,
-      allowNull: true,
-    },
-    content_id: {
-      type: DataTypes.STRING,
       allowNull: true,
     },
     created_by: {

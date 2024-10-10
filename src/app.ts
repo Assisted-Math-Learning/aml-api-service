@@ -5,7 +5,6 @@ import { appConfiguration } from './config';
 import logger from './utils/logger';
 import { router } from './routes/router';
 import { amlErrorHandler } from './middlewares/errorhandler';
-import './models/associations';
 
 const { envPort } = appConfiguration;
 

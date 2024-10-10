@@ -26,8 +26,6 @@ interface QuestionBody {
 export class Question extends Model {
   declare id: number;
   declare identifier: string;
-  declare process_id?: string | null;
-  declare question_set_id?: string | null;
   declare benchmark_time: number;
   declare question_type: string;
   declare operation: string;
@@ -58,14 +56,6 @@ Question.init(
     identifier: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    process_id: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-    question_set_id: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     benchmark_time: {
       type: DataTypes.INTEGER,

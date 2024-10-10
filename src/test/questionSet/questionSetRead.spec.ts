@@ -17,26 +17,47 @@ describe('Read Question Set API', () => {
   it('should return 200 and successfully retrieve the question set details', (done) => {
     // Mocking the findOne method to return a valid question set
     const mockQuestionSetData = {
-      identifier: 'a598133a-df9e-4e26-8281-86d148899c04',
-      qid: 'set0004',
-      name: {
-        en: 'This is a question set for Division',
-        hi: 'यह विभाजन के लिए प्रश्न सेट है',
-        ka: 'ಇದು ವಿಭಜನೆಯ ಪ್ರಶ್ನೆ ಸೆಟ್ನಾಗುತ್ತದೆ',
+      identifier: 'ea467d5b-2256-4036-8a36-346fd6192353',
+      title: { en: 'Question Set 2' },
+      description: { en: 'This is a question description1' },
+      repository: { id: 2, name: { en: 'Question Repository' } },
+      questions: [
+        {
+          id: 1,
+          sequence: 3,
+          identifier: 'a6d437ce-85b3-4880-9481-4f5e588c0d56',
+        },
+        {
+          id: 2,
+          sequence: 2,
+          identifier: '8603bdec-1df7-4911-b5e1-28a333e59027',
+        },
+        {
+          id: 3,
+          sequence: 1,
+          identifier: '2e90f1d6-ea0b-4f9d-aaba-dc16b56e9ad3',
+        },
+      ],
+      sequence: 1,
+      tenant: { id: 2, name: { en: 'Karnataka', hi: 'कर्नाटका' } },
+      taxonomy: {
+        board: { id: 11, name: [Object] },
+        class: { id: 13, name: [Object] },
+        l1_skill: { id: 1, name: [Object] },
+        l2_skill: [[Object]],
+        l3_skill: [[Object]],
       },
-      description: {
-        en: 'This is the description for the question set',
-      },
-      tenant: {
-        name: 'EkStep',
-      },
-      repository: {
-        name: 'AML',
-      },
-      created_at: '2024-09-12T20:17:05.601Z',
-      updated_at: '2024-09-12T20:17:05.602Z',
+      sub_skills: [{ id: 4, name: [Object] }],
+      purpose: 'Practice',
+      is_atomic: false,
+      gradient: 'g2',
+      group_name: 1,
+      content_ids: ['b68dc3a5-f37f-4d69-b4f3-555408c2fab8'],
+      instruction_text: 'text',
+      status: 'draft',
       is_active: true,
-      // Add other relevant fields for the QuestionSet model here
+      created_by: 'manual',
+      updated_by: null,
     };
 
     // Mocking findOne to return mockQuestionSetData
