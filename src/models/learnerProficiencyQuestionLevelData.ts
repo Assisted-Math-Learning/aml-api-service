@@ -13,6 +13,8 @@ export class LearnerProficiencyQuestionLevelData extends Model {
   declare attempts_count: number;
   declare created_by: string;
   declare updated_by: string;
+  declare created_at: Date;
+  declare updated_at: Date;
 }
 
 LearnerProficiencyQuestionLevelData.init(

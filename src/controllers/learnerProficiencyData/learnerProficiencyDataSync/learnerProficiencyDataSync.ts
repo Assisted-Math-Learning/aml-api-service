@@ -7,14 +7,14 @@ import logger from '../../../utils/logger';
 import { ResponseHandler } from '../../../utils/responseHandler';
 import { amlError } from '../../../types/amlError';
 import {
-  getQuestionLevelDataByLearnerIdAndQuestionId,
   createLearnerProficiencyQuestionLevelData,
-  updateLearnerProficiencyQuestionLevelData,
-  getRecordsForLearnerByQuestionSetId,
   createLearnerProficiencyQuestionSetLevelData,
-  getQuestionSetLevelDataByLearnerIdAndQuestionSetId,
-  updateLearnerProficiencyQuestionSetLevelData,
+  getQuestionLevelDataByLearnerIdAndQuestionId,
   getQuestionLevelDataRecordsForLearner,
+  getQuestionSetLevelDataByLearnerIdAndQuestionSetId,
+  getRecordsForLearnerByQuestionSetId,
+  updateLearnerProficiencyQuestionLevelData,
+  updateLearnerProficiencyQuestionSetLevelData,
 } from '../../../services/learnerProficiencyData';
 import { getQuestionSetsByIdentifiers } from '../../../services/questionSet';
 import { getQuestionsByIdentifiers, getQuestionsCountForQuestionSet } from '../../../services/question';
@@ -26,6 +26,8 @@ import {
   calculateSubSkillScoresForQuestionSet,
   getAggregateDataForGivenTaxonomyKey,
 } from './aggregation.helper';
+import { createLearnerJourney, readLearnerJourneyByLearnerIdAndQuestionSetId, updateLearnerJourney } from '../../../services/learnerJourney';
+import { LearnerJourneyStatus } from '../../../enums/learnerJourneyStatus';
 
 const aggregateLearnerDataOnClassAndSkillLevel = async (learnerId: string, questionLevelData: any[]) => {
   const classMap = getAggregateDataForGivenTaxonomyKey(questionLevelData, 'class');
@@ -153,6 +155,30 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
         sub_skills: subSkillScores,
         score: avgScore,
         created_by: uuid.v4(), // TODO: replace with valid user id
+      });
+    }
+
+    /**
+     * Updating learner journey
+     */
+    const { learnerJourney } = await readLearnerJourneyByLearnerIdAndQuestionSetId(learner_id, questionSet.identifier);
+    const completedQuestionIds = attemptedQuestions.map((data) => data.question_id);
+    if (_.isEmpty(learnerJourney)) {
+      await createLearnerJourney({
+        learner_id,
+        question_set_id: questionSet.identifier,
+        status: allQuestionsHaveEqualNumberOfAttempts ? LearnerJourneyStatus.COMPLETE : LearnerJourneyStatus.IN_PROGRESS,
+        completed_question_ids: completedQuestionIds,
+        start_time: attemptedQuestions?.[0]?.created_at.toString(),
+        end_time: allQuestionsHaveEqualNumberOfAttempts ? attemptedQuestions?.pop()?.created_at.toString() : null,
+      });
+    } else {
+      await updateLearnerJourney(learnerJourney.identifier, {
+        status: allQuestionsHaveEqualNumberOfAttempts ? LearnerJourneyStatus.COMPLETE : LearnerJourneyStatus.IN_PROGRESS,
+        completed_question_ids: completedQuestionIds,
+        start_time: attemptedQuestions?.[0]?.created_at?.toString(),
+        end_time: allQuestionsHaveEqualNumberOfAttempts ? attemptedQuestions?.pop()?.created_at?.toString() : null,
+        attempts_count: allQuestionsHaveEqualNumberOfAttempts ? learnerJourney?.attempts_count + 1 : learnerJourney.attempts_count,
       });
     }
   }

@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import { schemaValidation } from '../../services/validationService';
+import { schemaValidation } from '../../../services/validationService';
 import learnerUpdateJSON from './updateLearnerJourneyValidationSchema.json';
-import logger from '../../utils/logger';
-import { ResponseHandler } from '../../utils/responseHandler';
-import { amlError } from '../../types/amlError';
-import { readLearnerJourney, updateLearnerJourney } from '../../services/learnerJourney';
+import logger from '../../../utils/logger';
+import { ResponseHandler } from '../../../utils/responseHandler';
+import { amlError } from '../../../types/amlError';
+import { readLearnerJourney, updateLearnerJourney } from '../../../services/learnerJourney';
 import moment from 'moment/moment';
 
 export const apiId = 'api.learner.journey.update';

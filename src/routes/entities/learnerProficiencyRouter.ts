@@ -1,7 +1,7 @@
 import express from 'express';
 import { setDataToRequestObject } from '../../middlewares/setDataToReqObj';
-import learnerProficiencyDataSync from '../../controllers/LearnerProficiencyData/LearnerProficiencyDataSync/LearnerProficiencyDataSync';
-import learnerProficiencyDataRead from '../../controllers/LearnerProficiencyData/LearnerProficiencyDataRead/LearnerProficiencyDataRead';
+import learnerProficiencyDataSync from '../../controllers/learnerProficiencyData/learnerProficiencyDataSync/learnerProficiencyDataSync';
+import learnerProficiencyDataRead from '../../controllers/learnerProficiencyData/learnerProficiencyDataRead/learnerProficiencyDataRead';
 
 const learnerProficiencyRouter = express.Router();
 

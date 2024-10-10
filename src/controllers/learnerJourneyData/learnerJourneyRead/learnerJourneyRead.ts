@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import logger from '../../utils/logger';
-import { ResponseHandler } from '../../utils/responseHandler';
-import { amlError } from '../../types/amlError';
-import { readLearnerJourney } from '../../services/learnerJourney';
+import logger from '../../../utils/logger';
+import { ResponseHandler } from '../../../utils/responseHandler';
+import { amlError } from '../../../types/amlError';
+import { readLearnerJourney } from '../../../services/learnerJourney';
 
 export const apiId = 'api.learner.journey.read';
 

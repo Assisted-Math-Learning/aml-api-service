@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import { schemaValidation } from '../../services/validationService';
+import { schemaValidation } from '../../../services/validationService';
 import learnerCreateJSON from './createLearnerJourneyValidationSchema.json';
-import logger from '../../utils/logger';
-import { ResponseHandler } from '../../utils/responseHandler';
-import { amlError } from '../../types/amlError';
-import { createLearnerJourney, readLearnerJourneyByLearnerIdAndQuestionSetId, updateLearnerJourney } from '../../services/learnerJourney';
+import logger from '../../../utils/logger';
+import { ResponseHandler } from '../../../utils/responseHandler';
+import { amlError } from '../../../types/amlError';
+import { createLearnerJourney, readLearnerJourneyByLearnerIdAndQuestionSetId, updateLearnerJourney } from '../../../services/learnerJourney';
 import * as uuid from 'uuid';
 import moment from 'moment';
-import { LearnerJourneyStatus } from '../../enums/learnerJourneyStatus';
+import { LearnerJourneyStatus } from '../../../enums/learnerJourneyStatus';
 
 export const apiId = 'api.learner.journey.create';
 

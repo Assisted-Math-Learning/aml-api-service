@@ -40,10 +40,19 @@
                 "type": "string"
               },
               "learner_response": {
-                "type": "number"
+                "type": "object",
+                "properties": {
+                  "result": {
+                    "type": "string"
+                  },
+                  "answer_top": {
+                    "type": "string"
+                  }
+                },
+                "required": ["result"]
               }
             },
-            "required": ["question_id", "learner_response"],
+            "required": ["question_id", "learner_response", "question_set_id"],
             "additionalProperties": false
           }
         }
