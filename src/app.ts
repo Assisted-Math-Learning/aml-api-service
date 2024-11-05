@@ -12,6 +12,7 @@ import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import RateLimit from 'express-rate-limit';
+import _ from 'lodash';
 
 const { envPort } = appConfiguration;
 
@@ -57,11 +58,14 @@ const initializeServer = (): void => {
     app.use(express.urlencoded({ extended: true }));
 
     // Middleware to enable CORS
-    app.use(
-      cors({
-        credentials: true,
-      }),
-    );
+    const corsConfig = {
+      credentials: true,
+    };
+
+    if (appConfiguration.applicationEnv === 'development') {
+      _.set(corsConfig, 'origin', /.*/);
+    }
+    app.use(cors(corsConfig));
 
     // Enable CORS preflight for all routes
     app.options(/.*/, cors());

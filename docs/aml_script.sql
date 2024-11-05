@@ -2139,3 +2139,18 @@ create table if not exists learner_proficiency_aggregate_data (
   created_at timestamp with time zone not null,
   updated_at timestamp with time zone not null
 );
+
+alter table question add unique(identifier);
+alter table question_set add unique(identifier);
+alter table content add unique(identifier);
+alter table question_stage add unique(identifier);
+alter table question_set_stage add unique(identifier);
+alter table content_stage add unique(identifier);
+
+alter table question add column x_id varchar not null unique;
+alter table question_set add column x_id varchar not null unique;
+alter table content add column x_id varchar not null unique;
+alter table question_stage add column x_id varchar not null;
+alter table question_stage add unique(x_id, question_set_id);
+alter table question_set_stage add column x_id varchar not null unique;
+alter table content_stage add column x_id varchar not null unique;
