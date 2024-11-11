@@ -52,7 +52,9 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
   const resmsgid = _.get(res, 'resmsgid');
   const learner = (req as any).learner;
 
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: validating request body`);
   const isRequestValid: Record<string, any> = schemaValidation(requestBody, learnerProficiencyDataSyncJSON);
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: request body validated`);
 
   if (!isRequestValid.isValid) {
     const code = 'LEARNER_PROFICIENCY_DATA_INVALID_INPUT';
@@ -75,10 +77,14 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
    * DB QUERIES
    */
   const questionIds = questions_data.map((datum: any) => datum.question_id);
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: reading questions`);
   const questions = await getQuestionsByIdentifiers(questionIds);
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: questions read`);
 
   const questionSetIds = _.uniq(questions_data.map((datum: any) => datum.question_set_id));
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: reading question sets`);
   const questionSets = await getQuestionSetsByIdentifiers(questionSetIds as string[]);
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question sets read`);
 
   for (const question of questions) {
     _.set(questionMap, question.identifier, question);
@@ -87,6 +93,7 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
   /**
    * Updating question level data in the following block
    */
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: updating question level data`);
   for (const datum of questions_data) {
     const { question_id, question_set_id, start_time, end_time } = datum;
     const learner_response = datum.learner_response as { result: string; answerTop?: string };
@@ -141,10 +148,12 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
       created_by: learner_id,
     });
   }
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question level data updated`);
 
   /**
    * Updating question set level data in the following block
    */
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: updating question set level data`);
   for (const questionSet of questionSets) {
     const totalQuestionsCount = (questionSet.questions || []).length;
     const attemptedQuestions = await getRecordsForLearnerByQuestionSetId(learner_id, questionSet.identifier);
@@ -221,13 +230,18 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
       await updateLearnerJourney(learnerJourney.identifier, payload);
     }
   }
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question set level data updated`);
 
   /**
    * Updating grade/skill level data in the following block
    */
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: reading learner attempts`);
   const learnerAttempts = await getQuestionLevelDataRecordsForLearner(learner_id);
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: learner attempts read`);
 
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: aggregating learner data`);
   await aggregateLearnerDataOnClassAndSkillLevel(learner, learnerAttempts);
+  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: learner data aggregated`);
 
   ResponseHandler.successResponse(req, res, {
     status: httpStatus.OK,
