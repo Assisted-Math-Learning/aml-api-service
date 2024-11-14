@@ -125,11 +125,10 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
     const learnerDataExists = await getQuestionLevelDataByLearnerIdQuestionIdAndQuestionSetId(learner_id, question_id, question_set_id);
     if (!_.isEmpty(learnerDataExists)) {
       const updateData = {
-        ...datum,
-        score,
-        sub_skills: subSkillScores,
-        attempts_count: learnerDataExists.attempts_count + 1,
         learner_response,
+        sub_skills: subSkillScores,
+        score,
+        attempts_count: learnerDataExists.attempts_count + 1,
         updated_by: learner_id,
       };
       await updateLearnerProficiencyQuestionLevelData(learnerDataExists.identifier, updateData);
@@ -137,14 +136,14 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
     }
 
     await createLearnerProficiencyQuestionLevelData({
-      ...datum,
       identifier: uuid.v4(),
       learner_id,
-      score,
-      question_set_id: question_set_id,
+      question_id,
+      question_set_id,
       taxonomy: question.taxonomy,
-      learner_response,
       sub_skills: subSkillScores,
+      learner_response,
+      score,
       created_by: learner_id,
     });
   }
