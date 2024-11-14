@@ -14,12 +14,13 @@ export const findAggregateData = async (filters: {
   });
 };
 
-export const createAggregateData = async (req: any): Promise<any> => {
-  return LearnerProficiencyAggregateData.create(req);
+export const createAggregateData = async (transaction: any, req: any): Promise<any> => {
+  return LearnerProficiencyAggregateData.create(req, { transaction });
 };
 
-export const updateAggregateData = async (identifier: string, req: any): Promise<any> => {
+export const updateAggregateData = async (transaction: any, identifier: string, req: any): Promise<any> => {
   return LearnerProficiencyAggregateData.update(req, {
     where: { identifier },
+    transaction,
   });
 };

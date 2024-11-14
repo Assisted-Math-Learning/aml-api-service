@@ -11,14 +11,15 @@ export const getQuestionLevelDataByLearnerIdQuestionIdAndQuestionSetId = async (
   });
 };
 
-export const createLearnerProficiencyQuestionLevelData = async (req: Optional<any, string> | undefined): Promise<LearnerProficiencyQuestionLevelData> => {
-  return LearnerProficiencyQuestionLevelData.create(req);
+export const createLearnerProficiencyQuestionLevelData = async (transaction: any, req: Optional<any, string> | undefined): Promise<LearnerProficiencyQuestionLevelData> => {
+  return LearnerProficiencyQuestionLevelData.create(req, { transaction });
 };
 
-export const updateLearnerProficiencyQuestionLevelData = async (identifier: string, req: any): Promise<any> => {
+export const updateLearnerProficiencyQuestionLevelData = async (transaction: any, identifier: string, req: any): Promise<any> => {
   const whereClause: Record<string, any> = { identifier };
   const updatedLearnerData = await LearnerProficiencyQuestionLevelData.update(req, {
     where: whereClause,
+    transaction,
   });
   return { updatedLearnerData };
 };
@@ -57,14 +58,15 @@ export const getQuestionSetLevelDataByLearnerIdAndQuestionSetId = async (learner
   });
 };
 
-export const createLearnerProficiencyQuestionSetLevelData = async (req: Optional<any, string> | undefined): Promise<LearnerProficiencyQuestionSetLevelData> => {
-  return LearnerProficiencyQuestionSetLevelData.create(req);
+export const createLearnerProficiencyQuestionSetLevelData = async (transaction: any, req: Optional<any, string> | undefined): Promise<LearnerProficiencyQuestionSetLevelData> => {
+  return LearnerProficiencyQuestionSetLevelData.create(req, { transaction });
 };
 
-export const updateLearnerProficiencyQuestionSetLevelData = async (identifier: string, req: any): Promise<any> => {
+export const updateLearnerProficiencyQuestionSetLevelData = async (transaction: any, identifier: string, req: any): Promise<any> => {
   const whereClause: Record<string, any> = { identifier };
   const updatedLearnerData = await LearnerProficiencyQuestionSetLevelData.update(req, {
     where: whereClause,
+    transaction,
   });
   return { updatedLearnerData };
 };

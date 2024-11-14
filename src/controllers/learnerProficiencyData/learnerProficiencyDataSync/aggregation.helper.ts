@@ -183,6 +183,7 @@ export const getAggregateDataForGivenTaxonomyKey = (
 };
 
 export const aggregateLearnerData = async (
+  transaction: any,
   learner: Learner,
   dataKey: 'class_id' | 'l1_skill_id' | 'l2_skill_id' | 'l3_skill_id',
   dataMap: { [key: string]: { total: number; questionsCount: number; sub_skills: { [skillType: string]: number } } },
@@ -190,7 +191,7 @@ export const aggregateLearnerData = async (
   for (const dataKeyValue of Object.keys(dataMap)) {
     const existingEntry = await findAggregateData({ learner_id: learner.identifier, [dataKey]: dataKeyValue });
     if (existingEntry) {
-      await updateAggregateData(existingEntry.identifier, {
+      await updateAggregateData(transaction, existingEntry.identifier, {
         questions_count: dataMap[dataKeyValue].questionsCount,
         sub_skills: dataMap[dataKeyValue].sub_skills,
         score: +(dataMap[dataKeyValue].total / dataMap[dataKeyValue].questionsCount).toFixed(2),
@@ -198,7 +199,7 @@ export const aggregateLearnerData = async (
       });
       continue;
     }
-    await createAggregateData({
+    await createAggregateData(transaction, {
       identifier: uuid.v4(),
       learner_id: learner.identifier,
       taxonomy: learner.taxonomy,
