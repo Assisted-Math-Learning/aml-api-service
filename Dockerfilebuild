@@ -1,4 +1,11 @@
 FROM alpine/git as clone
+
+ARG VITE_REACT_APP_ENV
+ARG VITE_SENTRY_DSN
+
+ENV VITE_REACT_APP_ENV=${VITE_REACT_APP_ENV}
+ENV VITE_SENTRY_DSN=${VITE_SENTRY_DSN}
+
 WORKDIR /app
 RUN git clone -b develop https://github.com/Assisted-Math-Learning/aml-portal.git
 RUN cd /app/aml-portal
