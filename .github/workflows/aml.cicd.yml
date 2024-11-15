@@ -26,3 +26,6 @@ jobs:
           file: ./Dockerfilebuild
           push: true
           tags: ${{ vars.DOCKERHUB_USERNAME }}/aml-api-service:${{ github.ref_name }}
+        env:
+          VITE_REACT_APP_ENV: develop
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
