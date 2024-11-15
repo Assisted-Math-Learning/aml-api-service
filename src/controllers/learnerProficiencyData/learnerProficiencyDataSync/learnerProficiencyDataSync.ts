@@ -31,6 +31,7 @@ import { createLearnerJourney, readLearnerJourney, readLearnerJourneyByLearnerId
 import { LearnerJourneyStatus } from '../../../enums/learnerJourneyStatus';
 import moment from 'moment';
 import { Learner } from '../../../models/learner';
+import { ApiLogs } from '../../../models/apiLogs';
 
 const aggregateLearnerDataOnClassAndSkillLevel = async (learner: Learner, questionLevelData: any[]) => {
   const classMap = getAggregateDataForGivenTaxonomyKey(questionLevelData, 'class');
@@ -51,6 +52,12 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
   const dataBody = _.get(req, 'body.request');
   const resmsgid = _.get(res, 'resmsgid');
   const learner = (req as any).learner;
+
+  await ApiLogs.create({
+    learner_id: learner.id,
+    request_type: apiId,
+    request_body: dataBody,
+  });
 
   logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: validating request body`);
   const isRequestValid: Record<string, any> = schemaValidation(requestBody, learnerProficiencyDataSyncJSON);

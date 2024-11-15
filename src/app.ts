@@ -12,6 +12,7 @@ import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import RateLimit from 'express-rate-limit';
+import { cronProvider } from './providers/cron.provider';
 
 const { envPort } = appConfiguration;
 
@@ -119,6 +120,9 @@ const initializeServer = (): void => {
     app.listen(envPort, () => {
       logger.info(`Listening on port. ${envPort}`);
     });
+
+    // Register cron jobs
+    cronProvider.register();
 
     // Handle uncaught exceptions and unhandled rejections
     process.on('uncaughtException', unexpectedErrorHandler);

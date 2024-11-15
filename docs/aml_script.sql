@@ -2139,3 +2139,14 @@ create table if not exists learner_proficiency_aggregate_data (
   created_at timestamp with time zone not null,
   updated_at timestamp with time zone not null
 );
+
+create table if not exists api_logs
+(
+    id serial primary key,
+    request_type varchar(255) not null,
+    learner_id   varchar(255),
+    request_body jsonb,
+    error_body   jsonb,
+    created_at   timestamp with time zone not null,
+    updated_at   timestamp with time zone not null
+);
