@@ -95,13 +95,14 @@ const evaluateLearner = async (req: Request, res: Response) => {
 
         if (nextPracticeQuestionSet) {
           questionSetId = nextPracticeQuestionSet.identifier;
+          break;
+        } else {
+          /**
+           * Adding continue here, so that if all the questions till the highest applicable grade are
+           * completed, then question sets don't repeat for current l1_skill
+           */
+          continue;
         }
-        // TODO: move back to above if block after subtraction is introduced
-        /**
-         * Moving break outside the above if block, so that if all the questions till the highest applicable grade are
-         * completed, then question sets don't repeat
-         */
-        break;
       }
     }
 
