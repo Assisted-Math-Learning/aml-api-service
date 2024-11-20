@@ -18,6 +18,8 @@ RUN mkdir -p /opt/api-service/dist
 COPY --from=clone /app/aml-portal /opt/api-service/portal
 WORKDIR /opt/api-service/portal
 RUN ls -lah
+RUN echo $VITE_REACT_APP_ENV >> .env
+RUN echo $VITE_SENTRY_DSN >> .env
 RUN npm install
 RUN npm run build
 RUN cp -r /opt/api-service/portal/dist /opt/api-service/dist
