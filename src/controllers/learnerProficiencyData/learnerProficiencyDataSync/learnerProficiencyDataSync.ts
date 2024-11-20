@@ -53,7 +53,7 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
   const resmsgid = _.get(res, 'resmsgid');
   const learner = (req as any).learner;
 
-  await ApiLogs.create({
+  const apiLog = await ApiLogs.create({
     learner_id: learner.id,
     request_type: apiId,
     request_body: dataBody,
@@ -128,35 +128,35 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
         _.set(questionSetTimestampMap, [question_set_id, 'end_time'], end_time);
       }
 
-    /**
-     * If an entry already exists for the (learner_id, question_id, question_set_id) pair, then we increment the attempt count & update the new values
-     */
-    const learnerDataExists = await getQuestionLevelDataByLearnerIdQuestionIdAndQuestionSetId(learner_id, question_id, question_set_id);
-    if (!_.isEmpty(learnerDataExists)) {
-      const updateData = {
-        learner_response,
-        sub_skills: subSkillScores,
-        score,
-        attempts_count: learnerDataExists.attempts_count + 1,
-        updated_by: learner_id,
-      };
-      await updateLearnerProficiencyQuestionLevelData(transaction, learnerDataExists.identifier, updateData);
-      continue;
-    }
+      /**
+       * If an entry already exists for the (learner_id, question_id, question_set_id) pair, then we increment the attempt count & update the new values
+       */
+      const learnerDataExists = await getQuestionLevelDataByLearnerIdQuestionIdAndQuestionSetId(learner_id, question_id, question_set_id);
+      if (!_.isEmpty(learnerDataExists)) {
+        const updateData = {
+          learner_response,
+          sub_skills: subSkillScores,
+          score,
+          attempts_count: learnerDataExists.attempts_count + 1,
+          updated_by: learner_id,
+        };
+        await updateLearnerProficiencyQuestionLevelData(transaction, learnerDataExists.identifier, updateData);
+        continue;
+      }
 
-    await createLearnerProficiencyQuestionLevelData(transaction, {
-      identifier: uuid.v4(),
-      learner_id,
-      question_id,
-      question_set_id,
-      taxonomy: question.taxonomy,
-      sub_skills: subSkillScores,
-      learner_response,
-      score,
-      created_by: learner_id,
-    });
-  }
-  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question level data updated`);
+      await createLearnerProficiencyQuestionLevelData(transaction, {
+        identifier: uuid.v4(),
+        learner_id,
+        question_id,
+        question_set_id,
+        taxonomy: question.taxonomy,
+        sub_skills: subSkillScores,
+        learner_response,
+        score,
+        created_by: learner_id,
+      });
+    }
+    logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question level data updated`);
 
     /**
      * Updating question set level data in the following block
@@ -258,9 +258,11 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
 
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: COMMIT TRANSACTION`);
     await transaction.commit();
-  } catch (e) {
+  } catch (e: any) {
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: ROLLBACK TRANSACTION`);
     await transaction.rollback();
+    apiLog.error_body = JSON.stringify(Object.entries(e));
+    await apiLog.save();
     throw e;
   }
 
