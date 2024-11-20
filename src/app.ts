@@ -60,7 +60,6 @@ const initializeServer = (): void => {
     // Middleware to enable CORS
     app.use(
       cors({
-        origin: /.*/,
         credentials: true,
       }),
     );
