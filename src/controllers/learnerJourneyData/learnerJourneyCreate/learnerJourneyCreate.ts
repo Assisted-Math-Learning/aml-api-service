@@ -10,6 +10,7 @@ import { createLearnerJourney, readLearnerJourneyByLearnerIdAndQuestionSetId, up
 import * as uuid from 'uuid';
 import moment from 'moment';
 import { LearnerJourneyStatus } from '../../../enums/learnerJourneyStatus';
+import { AppDataSource } from '../../../config';
 
 export const apiId = 'api.learner.journey.create';
 
@@ -31,10 +32,12 @@ const learnerJourneyCreate = async (req: Request, res: Response) => {
 
   // TODO: validate learner_id & question_set_id
 
+  const transaction = await AppDataSource.transaction();
+
   let { learnerJourney } = await readLearnerJourneyByLearnerIdAndQuestionSetId(dataBody.learner_id, dataBody.question_set_id);
 
   if (learnerJourney && learnerJourney.status === LearnerJourneyStatus.COMPLETED) {
-    await updateLearnerJourney(learnerJourney.identifier, {
+    await updateLearnerJourney(transaction, learnerJourney.identifier, {
       attempts_count: learnerJourney.attempts_count + 1,
       start_time: dataBody.start_time,
       end_time: null,
@@ -47,8 +50,10 @@ const learnerJourneyCreate = async (req: Request, res: Response) => {
       created_by: uuid.v4(), // TODO: Replace with valid user identifier
     };
 
-    learnerJourney = await createLearnerJourney(learnerJourneyInsertData);
+    learnerJourney = await createLearnerJourney(transaction, learnerJourneyInsertData);
   }
+
+  await transaction.commit();
 
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'learner journey started successfully', identifier: learnerJourney.dataValues.identifier } });
 };

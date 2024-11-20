@@ -8,6 +8,7 @@ import { ResponseHandler } from '../../../utils/responseHandler';
 import { amlError } from '../../../types/amlError';
 import { readLearnerJourney, updateLearnerJourney } from '../../../services/learnerJourney';
 import moment from 'moment/moment';
+import { AppDataSource } from '../../../config';
 
 export const apiId = 'api.learner.journey.update';
 
@@ -42,10 +43,14 @@ const learnerJourneyUpdate = async (req: Request, res: Response) => {
     throw amlError(code, isRequestValid.message, 'BAD_REQUEST', 400);
   }
 
-  await updateLearnerJourney(learnerJourney!.identifier, {
+  const transaction = await AppDataSource.transaction();
+
+  await updateLearnerJourney(transaction, learnerJourney!.identifier, {
     ...dataBody,
     completed_question_ids: _.uniq([...(learnerJourney!.completed_question_ids || []), ...(dataBody.completed_question_ids || [])]),
   });
+
+  await transaction.commit();
 
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'learner journey updated successfully' } });
 };
