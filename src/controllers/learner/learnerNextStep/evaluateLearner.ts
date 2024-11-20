@@ -95,8 +95,12 @@ const evaluateLearner = async (req: Request, res: Response) => {
 
         if (nextPracticeQuestionSet) {
           questionSetId = nextPracticeQuestionSet.identifier;
-          break;
         }
+        /**
+         * Moving break outside the above if block, so that if all the questions till the highest applicable grade are
+         * completed, then question sets don't repeat
+         */
+        break;
       }
     }
 
