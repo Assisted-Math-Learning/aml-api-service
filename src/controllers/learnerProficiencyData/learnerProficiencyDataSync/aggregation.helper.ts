@@ -16,7 +16,7 @@ export const getScoreForTheQuestion = (question: Question, learnerResponse: { re
   switch (question_type) {
     case QuestionType.GRID_1:
     case QuestionType.FIB: {
-      if (answers && answers.result) {
+      if (answers && answers.result.toString()) {
         const { result: correctAnswer } = answers;
         if (correctAnswer.toString() === result.toString()) {
           score = 1;
