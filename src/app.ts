@@ -13,11 +13,8 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import RateLimit from 'express-rate-limit';
 import { cronProvider } from './providers/cron.provider';
-import * as _ from 'lodash';
 
 const { envPort } = appConfiguration;
-
-const devOrigins = ['http://localhost:5173'];
 
 // PostgreSQL connection
 const pgPool = new pg.Pool({
@@ -61,13 +58,11 @@ const initializeServer = (): void => {
     app.use(express.urlencoded({ extended: true }));
 
     // Middleware to enable CORS
-    const corsConfig = {
-      credentials: true,
-    };
-    if (appConfiguration.applicationEnv === 'development') {
-      _.set(corsConfig, 'origin', devOrigins);
-    }
-    app.use(cors(corsConfig));
+    app.use(
+      cors({
+        credentials: true,
+      }),
+    );
 
     // Enable CORS preflight for all routes
     app.options(/.*/, cors());
@@ -86,10 +81,10 @@ const initializeServer = (): void => {
         resave: false,
         saveUninitialized: false,
         cookie: {
-          sameSite: appConfiguration.applicationEnv === 'development' ? 'none' : 'strict',
+          sameSite: 'strict',
           secure: process.env.AML_SERVICE_APPLICATION_ENV === 'production',
           maxAge: 1000 * 60 * 60 * 24, // 24 hours
-          httpOnly: true, // Mitigate XSS attacks
+          httpOnly: false, // Mitigate XSS attacks
         },
       }),
     );
