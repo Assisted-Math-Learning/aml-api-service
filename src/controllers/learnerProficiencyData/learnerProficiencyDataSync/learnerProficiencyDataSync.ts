@@ -32,6 +32,7 @@ import moment from 'moment';
 import { Learner } from '../../../models/learner';
 import { ApiLogs } from '../../../models/apiLogs';
 import { AppDataSource } from '../../../config';
+import { LearnerProficiencyQuestionLevelData } from '../../../models/learnerProficiencyQuestionLevelData';
 
 const aggregateLearnerDataOnClassAndSkillLevel = async (transaction: any, learner: Learner, questionLevelData: any[]) => {
   const classMap = getAggregateDataForGivenTaxonomyKey(questionLevelData, 'class');
@@ -98,6 +99,8 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
   }
   const transaction = await AppDataSource.transaction();
 
+  const newLearnerAttempts: { [id: number]: LearnerProficiencyQuestionLevelData } = {};
+
   try {
     /**
      * Updating question level data in the following block
@@ -141,10 +144,11 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
           updated_by: learner_id,
         };
         await updateLearnerProficiencyQuestionLevelData(transaction, learnerDataExists.identifier, updateData);
+        _.set(newLearnerAttempts, learnerDataExists?.id, { ...learnerDataExists, ...updateData });
         continue;
       }
 
-      await createLearnerProficiencyQuestionLevelData(transaction, {
+      const newData = await createLearnerProficiencyQuestionLevelData(transaction, {
         identifier: uuid.v4(),
         learner_id,
         question_id,
@@ -155,6 +159,7 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
         score,
         created_by: learner_id,
       });
+      _.set(newLearnerAttempts, newData.dataValues.id, newData.dataValues);
     }
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question level data updated`);
 
@@ -249,11 +254,19 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
      * Updating grade/skill level data in the following block
      */
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: reading learner attempts`);
-    const learnerAttempts = await getQuestionLevelDataRecordsForLearner(learner_id);
+    const existingLearnerAttempts = await getQuestionLevelDataRecordsForLearner(learner_id);
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: learner attempts read`);
 
+    const unUpdatedExistingAttempts = existingLearnerAttempts
+      .map((attempt) => {
+        if (Object.prototype.hasOwnProperty.call(newLearnerAttempts, attempt.id)) {
+          return undefined;
+        }
+        return attempt;
+      })
+      .filter((v) => !!v);
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: aggregating learner data`);
-    await aggregateLearnerDataOnClassAndSkillLevel(transaction, learner, learnerAttempts);
+    await aggregateLearnerDataOnClassAndSkillLevel(transaction, learner, [...unUpdatedExistingAttempts, ...Object.values(newLearnerAttempts)]);
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: learner data aggregated`);
 
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: COMMIT TRANSACTION`);

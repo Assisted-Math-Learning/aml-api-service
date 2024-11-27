@@ -6,7 +6,6 @@ import { LearnerProficiencyQuestionSetLevelData } from '../models/learnerProfici
 export const getQuestionLevelDataByLearnerIdQuestionIdAndQuestionSetId = async (learnerId: string, questionId: string, questionSetId: string): Promise<LearnerProficiencyQuestionLevelData | null> => {
   return LearnerProficiencyQuestionLevelData.findOne({
     where: { learner_id: learnerId, question_id: questionId, question_set_id: questionSetId },
-    attributes: { exclude: ['id'] },
     raw: true,
   });
 };
