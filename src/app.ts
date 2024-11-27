@@ -17,6 +17,8 @@ import * as _ from 'lodash';
 
 const { envPort } = appConfiguration;
 
+const devOrigins = ['http://localhost:5173'];
+
 // PostgreSQL connection
 const pgPool = new pg.Pool({
   user: process.env.AML_SERVICE_DB_USER,
@@ -63,7 +65,7 @@ const initializeServer = (): void => {
       credentials: true,
     };
     if (appConfiguration.applicationEnv === 'development') {
-      _.set(corsConfig, 'origin', /.*/);
+      _.set(corsConfig, 'origin', devOrigins);
     }
     app.use(cors(corsConfig));
 
@@ -84,10 +86,10 @@ const initializeServer = (): void => {
         resave: false,
         saveUninitialized: false,
         cookie: {
-          sameSite: 'strict',
+          sameSite: appConfiguration.applicationEnv === 'development' ? 'lax' : 'strict',
           secure: process.env.AML_SERVICE_APPLICATION_ENV === 'production',
           maxAge: 1000 * 60 * 60 * 24, // 24 hours
-          httpOnly: false, // Mitigate XSS attacks
+          httpOnly: true, // Mitigate XSS attacks
         },
       }),
     );
