@@ -22,7 +22,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
   const resmsgid = _.get(res, 'resmsgid');
   const learner = (req as any).learner;
 
-  if (learner.identifier !== learner_id) {
+  if (learner?.identifier !== learner_id) {
     const code = 'LEARNER_DOES_NOT_EXIST';
     logger.error({ code, apiId, msgid, resmsgid, message: 'Learner does not exist' });
     throw amlError(code, 'Learner does not exist', 'NOT_FOUND', 404);
@@ -85,16 +85,16 @@ const evaluateLearner = async (req: Request, res: Response) => {
      */
     if (learnerJourney) {
       const learnerJourneyQuestionSet = await getQuestionSetById(learnerJourney.question_set_id);
-      if (learnerJourneyQuestionSet!.purpose !== QuestionSetPurposeType.MAIN_DIAGNOSTIC && learnerJourneyQuestionSet!.taxonomy.l1_skill.identifier === skillIdentifier) {
+      if (learnerJourneyQuestionSet!.purpose !== QuestionSetPurposeType.MAIN_DIAGNOSTIC && learnerJourneyQuestionSet!.taxonomy.l1_skill?.identifier === skillIdentifier) {
         const nextPracticeQuestionSet = await getNextPracticeQuestionSetInSequence({
-          boardId: learnerJourneyQuestionSet!.taxonomy.board.identifier,
+          boardId: learnerJourneyQuestionSet!.taxonomy.board?.identifier,
           classIds: allApplicableGradeIds,
-          l1SkillId: learnerJourneyQuestionSet!.taxonomy.l1_skill.identifier,
+          l1SkillId: learnerJourneyQuestionSet!.taxonomy.l1_skill?.identifier,
           lastSetSequence: learnerJourneyQuestionSet!.sequence,
         });
 
         if (nextPracticeQuestionSet) {
-          questionSetId = nextPracticeQuestionSet.identifier;
+          questionSetId = nextPracticeQuestionSet?.identifier;
           break;
         } else {
           /**
@@ -111,9 +111,9 @@ const evaluateLearner = async (req: Request, res: Response) => {
      * last attempted question set purpose is MD OR
      * no more practice question sets are available for the current skill
      */
-    const mainDiagnosticQS = await getMainDiagnosticQuestionSet({ boardId: boardEntity?.[0]?.identifier, classId: highestApplicableGradeMapping.identifier, l1SkillId: skillIdentifier });
+    const mainDiagnosticQS = await getMainDiagnosticQuestionSet({ boardId: boardEntity?.[0]?.identifier, classId: highestApplicableGradeMapping?.identifier, l1SkillId: skillIdentifier });
 
-    const { learnerJourney: learnerJourneyForMDQS } = await readLearnerJourneyByLearnerIdAndQuestionSetId(learner_id, mainDiagnosticQS.identifier);
+    const { learnerJourney: learnerJourneyForMDQS } = await readLearnerJourneyByLearnerIdAndQuestionSetId(learner_id, mainDiagnosticQS?.identifier);
     if (_.isEmpty(learnerJourneyForMDQS)) {
       questionSetId = mainDiagnosticQS.identifier;
       break;
@@ -131,7 +131,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
     if (lowestApplicableGradeForPractice) {
       const practiceQuestionSet = await getPracticeQuestionSet({ boardId: learnerBoardId, classId: lowestApplicableGradeForPractice, l1SkillId: skillIdentifier });
       if (practiceQuestionSet) {
-        questionSetId = practiceQuestionSet.identifier;
+        questionSetId = practiceQuestionSet?.identifier;
         break;
       }
     }
