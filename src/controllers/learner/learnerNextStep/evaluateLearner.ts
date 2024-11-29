@@ -121,7 +121,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
 
     let lowestApplicableGradeForPractice = '';
     for (const grade of allApplicableGradeIds) {
-      const learnerAggregateData = await findAggregateData({ learner_id, class_id: grade });
+      const learnerAggregateData = await findAggregateData({ learner_id, class_id: grade, l1_skill_id: skillIdentifier });
       if (learnerAggregateData && learnerAggregateData?.score < PASSING_MARKS) {
         lowestApplicableGradeForPractice = grade;
         break;
@@ -135,14 +135,17 @@ const evaluateLearner = async (req: Request, res: Response) => {
         break;
       }
     }
+  }
 
-    // TODO: Remove later
-    if (!lowestApplicableGradeForPractice) {
-      const practiceQuestionSet = await getPracticeQuestionSet({ boardId: learnerBoardId, classId: highestApplicableGradeMapping.identifier, l1SkillId: skillIdentifier });
-      if (practiceQuestionSet) {
-        questionSetId = practiceQuestionSet.identifier;
-        break;
-      }
+  // TODO: Remove later
+  if (!questionSetId && requiredL1Skills.length) {
+    const practiceQuestionSet = await getPracticeQuestionSet({
+      boardId: learnerBoardId,
+      classId: highestApplicableGradeMapping.identifier,
+      l1SkillId: requiredL1Skills[requiredL1Skills.length - 1].identifier,
+    });
+    if (practiceQuestionSet) {
+      questionSetId = practiceQuestionSet.identifier;
     }
   }
 

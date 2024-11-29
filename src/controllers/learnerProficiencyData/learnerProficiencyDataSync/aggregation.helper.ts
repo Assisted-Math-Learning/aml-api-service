@@ -130,71 +130,50 @@ export const calculateAverageScoreForQuestionSet = (questionLevelData: LearnerPr
   return +(totalScore / questionLevelData.length).toFixed(2);
 };
 
-export const getAggregateDataForGivenTaxonomyKey = (
+export const getLearnerAggregateDataForClassAndL1SkillPair = (
   questionLevelData: LearnerProficiencyQuestionLevelData[],
-  taxonomyKey: string,
-  isArray = false,
-): { [key: string]: { total: number; questionsCount: number; sub_skills: { [skillType: string]: number } } } => {
-  // key is the value of the taxonomyKey in the taxonomy object, e.g. => if taxonomyKey is l1_skill, key will be addition
-  const resMap: { [key: string]: { total: number; questionsCount: number; sub_skills: { [skillType: number]: number } } } = {};
+): { class_id: string; l1_skill_id: string; total: number; questionsCount: number; sub_skills: { [skillType: string]: number } }[] => {
+  const response: { class_id: string; l1_skill_id: string; total: number; questionsCount: number; sub_skills: { [skillType: string]: number } }[] = [];
 
-  const relatedQuestionsMap: { [key: string]: any[] } = {};
+  const map: { [classId__l1SkillId: string]: LearnerProficiencyQuestionLevelData[] } = {};
 
   for (const data of questionLevelData) {
-    const { taxonomy } = data;
-    if (taxonomy && Object.keys(taxonomy || {}).length > 0) {
-      if (Object.prototype.hasOwnProperty.call(taxonomy, taxonomyKey)) {
-        if (isArray) {
-          const dataPoints = (_.get(taxonomy, taxonomyKey) || []).filter((v: any) => !!v);
-          for (const datum of dataPoints) {
-            const taxonomyKeyValue = _.get(datum, 'identifier');
-            if (!Object.prototype.hasOwnProperty.call(resMap, taxonomyKeyValue)) {
-              _.set(resMap, taxonomyKeyValue, { total: 0, questionsCount: 0, sub_skills: {} });
-            }
-            resMap[taxonomyKeyValue].total += data.score;
-            resMap[taxonomyKeyValue].questionsCount += 1;
-            if (!Object.prototype.hasOwnProperty.call(relatedQuestionsMap, taxonomyKeyValue)) {
-              _.set(relatedQuestionsMap, taxonomyKeyValue, []);
-            }
-            relatedQuestionsMap[taxonomyKeyValue].push(data);
-          }
-        } else {
-          const taxonomyKeyValue = _.get(taxonomy, [taxonomyKey, 'identifier']);
-          if (!Object.prototype.hasOwnProperty.call(resMap, taxonomyKeyValue)) {
-            _.set(resMap, taxonomyKeyValue, { total: 0, questionsCount: 0, sub_skills: {} });
-          }
-          resMap[taxonomyKeyValue].total += data.score;
-          resMap[taxonomyKeyValue].questionsCount += 1;
-          if (!Object.prototype.hasOwnProperty.call(relatedQuestionsMap, taxonomyKeyValue)) {
-            _.set(relatedQuestionsMap, taxonomyKeyValue, []);
-          }
-          relatedQuestionsMap[taxonomyKeyValue].push(data);
-        }
-      }
+    const key = `${data.taxonomy.class.identifier}__${data.taxonomy.l1_skill.identifier}`;
+    if (!Object.prototype.hasOwnProperty.call(map, key)) {
+      map[key] = [];
     }
+    map[key].push(data);
   }
 
-  for (const taxonomyKeyValue of Object.keys(relatedQuestionsMap)) {
-    const relatedQuestions = relatedQuestionsMap[taxonomyKeyValue];
-    resMap[taxonomyKeyValue].sub_skills = calculateSubSkillScoresForQuestionSet(relatedQuestions);
-  }
+  Object.entries(map).forEach(([classId__l1SkillId, questionsData]) => {
+    const [classId, l1SkillId] = classId__l1SkillId.split('__');
+    const totalScore = _.sum(questionsData.map((data) => data.score));
+    const questionsCount = questionsData.length;
+    const subSkillScores = calculateSubSkillScoresForQuestionSet(questionsData);
+    response.push({
+      class_id: classId,
+      l1_skill_id: l1SkillId,
+      questionsCount,
+      total: totalScore,
+      sub_skills: subSkillScores,
+    });
+  });
 
-  return resMap;
+  return response;
 };
 
 export const aggregateLearnerData = async (
   transaction: any,
   learner: Learner,
-  dataKey: 'class_id' | 'l1_skill_id' | 'l2_skill_id' | 'l3_skill_id',
-  dataMap: { [key: string]: { total: number; questionsCount: number; sub_skills: { [skillType: string]: number } } },
+  reqData: { class_id: string; l1_skill_id: string; total: number; questionsCount: number; sub_skills: { [skillType: string]: number } }[],
 ) => {
-  for (const dataKeyValue of Object.keys(dataMap)) {
-    const existingEntry = await findAggregateData({ learner_id: learner.identifier, [dataKey]: dataKeyValue });
+  for (const datum of reqData) {
+    const existingEntry = await findAggregateData({ learner_id: learner.identifier, class_id: datum.class_id, l1_skill_id: datum.l1_skill_id });
     if (existingEntry) {
       await updateAggregateData(transaction, existingEntry.identifier, {
-        questions_count: dataMap[dataKeyValue].questionsCount,
-        sub_skills: dataMap[dataKeyValue].sub_skills,
-        score: +(dataMap[dataKeyValue].total / dataMap[dataKeyValue].questionsCount).toFixed(2),
+        questions_count: datum.questionsCount,
+        sub_skills: datum.sub_skills,
+        score: +(datum.total / datum.questionsCount).toFixed(2),
         updated_by: learner.identifier,
       });
       continue;
@@ -203,10 +182,11 @@ export const aggregateLearnerData = async (
       identifier: uuid.v4(),
       learner_id: learner.identifier,
       taxonomy: learner.taxonomy,
-      [dataKey]: dataKeyValue,
-      questions_count: dataMap[dataKeyValue].questionsCount,
-      sub_skills: dataMap[dataKeyValue].sub_skills,
-      score: +(dataMap[dataKeyValue].total / dataMap[dataKeyValue].questionsCount).toFixed(2),
+      class_id: datum.class_id,
+      l1_skill_id: datum.l1_skill_id,
+      questions_count: datum.questionsCount,
+      sub_skills: datum.sub_skills,
+      score: +(datum.total / datum.questionsCount).toFixed(2),
       created_by: learner.identifier,
     });
   }
