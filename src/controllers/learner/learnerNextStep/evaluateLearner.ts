@@ -70,6 +70,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
   const requiredL1Skills = await fetchSkillsByIds(requiredL1SkillsIds);
 
   let questionSetId: string = '';
+  let allQuestionsAttempted = false;
 
   for (const skillEntity of requiredL1Skills) {
     const { identifier: skillIdentifier } = skillEntity;
@@ -101,6 +102,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
            * Adding continue here, so that if all the questions till the highest applicable grade are
            * completed, then question sets don't repeat for current l1_skill
            */
+          allQuestionsAttempted = true;
           continue;
         }
       }
@@ -138,7 +140,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
   }
 
   // TODO: Remove later
-  if (!questionSetId && requiredL1Skills.length) {
+  if (!questionSetId && requiredL1Skills.length && allQuestionsAttempted) {
     const practiceQuestionSet = await getPracticeQuestionSet({
       boardId: learnerBoardId,
       classId: highestApplicableGradeMapping.identifier,
