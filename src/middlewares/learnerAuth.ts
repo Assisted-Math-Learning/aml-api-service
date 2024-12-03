@@ -6,12 +6,13 @@ import { amlError } from '../types/amlError';
 import httpStatus from 'http-status';
 import lodash from 'lodash';
 
-export const learnerAuth = async (req: Request, _: any, next: NextFunction) => {
+export const learnerAuth = async (req: Request, res: any, next: NextFunction) => {
   const apiId = lodash.get(req, 'id');
   const learnerId = lodash.get(req, ['session', 'learnerId']);
   if (!learnerId) {
     const code = 'UNAUTHENTICATED';
     logger.error({ code, apiId, message: 'Unauthenticated' });
+    res.clearCookie('connect.sid');
     throw amlError(code, 'Unauthenticated', 'UNAUTHENTICATED', httpStatus.UNAUTHORIZED);
   }
 
@@ -20,6 +21,7 @@ export const learnerAuth = async (req: Request, _: any, next: NextFunction) => {
   if (!learner) {
     const code = 'UNAUTHORIZED_ACCESS';
     logger.error({ code, apiId, message: 'Unauthorized Access' });
+    res.clearCookie('connect.sid');
     throw amlError(code, 'Unauthorized Access', 'UNAUTHORIZED_ACCESS', httpStatus.UNAUTHORIZED);
   }
 
@@ -28,7 +30,8 @@ export const learnerAuth = async (req: Request, _: any, next: NextFunction) => {
     req.session.destroy((err) => {
       if (err) return next(err);
       const code = 'SESSION_EXPIRED';
-      logger.error({ code, apiId, message: 'USession Expired' });
+      logger.error({ code, apiId, message: 'Session Expired' });
+      res.clearCookie('connect.sid');
       throw amlError(code, 'Session Expired', 'SESSION_EXPIRED', httpStatus.extra.iis.LOGIN_TIME_OUT);
     });
   }
