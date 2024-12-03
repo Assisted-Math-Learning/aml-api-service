@@ -16,6 +16,7 @@ const logout = (req: Request, res: Response) => {
       throw amlError(code, message, 'SERVER_ERROR', 500);
     }
     res.clearCookie('connect.sid');
+    res.clearCookie('_csrf');
     ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Logout successful' } });
   });
 };
