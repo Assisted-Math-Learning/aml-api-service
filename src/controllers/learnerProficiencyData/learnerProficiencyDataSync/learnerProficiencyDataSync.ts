@@ -122,7 +122,7 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
         _.set(questionSetTimestampMap, [question_set_id, 'start_time'], start_time);
       }
 
-      if (end_time && moment(start_time).isValid()) {
+      if (end_time && moment(end_time).isValid()) {
         _.set(questionSetTimestampMap, [question_set_id, 'end_time'], end_time);
       }
 
@@ -176,9 +176,11 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
           return attempt;
         })
         .filter((v) => !!v);
+      const allAttemptedQuestionsOfThisQuestionSet = [...unUpdatedExistingAttempts, ...Object.values(newLearnerAttempts)];
+      const highestAttemptCount = Math.max(...allAttemptedQuestionsOfThisQuestionSet.map((data) => data?.attempts_count));
       if (totalQuestionsCount === completedQuestionIds.length && totalQuestionsCount > 0) {
-        const avgScore = calculateAverageScoreForQuestionSet([...unUpdatedExistingAttempts, ...Object.values(newLearnerAttempts)]);
-        const subSkillScores = calculateSubSkillScoresForQuestionSet([...unUpdatedExistingAttempts, ...Object.values(newLearnerAttempts)]);
+        const avgScore = calculateAverageScoreForQuestionSet(allAttemptedQuestionsOfThisQuestionSet);
+        const subSkillScores = calculateSubSkillScoresForQuestionSet(allAttemptedQuestionsOfThisQuestionSet);
         /**
          * If an entry already exists for the (learner_id, question_set_id) pair, then we increment the attempt count
          */
@@ -233,8 +235,9 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
         const payload = {
           status: journeyStatus,
           completed_question_ids: completedQuestionIds,
-          attempts_count: totalQuestionsCount === completedQuestionIds.length ? learnerJourney.attempts_count + 1 : learnerJourney.attempts_count,
+          attempts_count: totalQuestionsCount === completedQuestionIds.length ? highestAttemptCount : learnerJourney.attempts_count,
           updated_by: learner_id,
+          end_time: journeyStatus === LearnerJourneyStatus.IN_PROGRESS ? null : learnerJourney.end_time,
         };
         if (start_time) {
           _.set(payload, 'start_time', start_time);
