@@ -140,7 +140,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
   }
 
   // TODO: Remove later
-  if (!questionSetId && requiredL1Skills.length && allQuestionsAttempted) {
+  if (!questionSetId && requiredL1Skills.length && !allQuestionsAttempted) {
     const practiceQuestionSet = await getPracticeQuestionSet({
       boardId: learnerBoardId,
       classId: highestApplicableGradeMapping.identifier,
