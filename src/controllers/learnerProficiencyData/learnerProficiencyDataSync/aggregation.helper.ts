@@ -5,20 +5,47 @@ import { Question } from '../../../models/question';
 import { QuestionType } from '../../../enums/questionType';
 import { LearnerProficiencyQuestionLevelData } from '../../../models/learnerProficiencyQuestionLevelData';
 import { Learner } from '../../../models/learner';
+import { QuestionOperation } from '../../../enums/questionOperation';
 
-export const getScoreForTheQuestion = (question: Question, learnerResponse: { result: string; answerTop?: string }): number => {
+export const getScoreForTheQuestion = (question: Question, learnerResponse: { result?: string; answerTop?: string; quotient?: string; remainder?: string }): number => {
   const { question_type, question_body } = question;
   const { answers, correct_option, numbers, options } = question_body;
-  const { result, answerTop } = learnerResponse;
+  const { result, answerTop, quotient: lrQuotient, remainder: lrRemainder } = learnerResponse;
 
   let score = 0;
 
   switch (question_type) {
     case QuestionType.GRID_1:
     case QuestionType.FIB: {
+      if (question.operation === QuestionOperation.DIVISION) {
+        if (question_type === QuestionType.GRID_1) {
+          const quotient = _.get(answers, ['result', 'quotient'], '');
+          const remainder = _.get(answers, ['result', 'remainder'], '');
+          if (lrQuotient?.toString() === quotient && lrRemainder?.toString() === remainder) {
+            score = 1;
+          }
+        }
+        if (question_type === QuestionType.FIB) {
+          const fibType = _.get(answers, 'fib_type');
+          if (fibType === 1) {
+            const correctAnswer = _.get(answers, ['result'], '');
+            if (correctAnswer.toString() === result?.toString()) {
+              score = 1;
+            }
+          }
+          if (fibType === 2) {
+            const quotient = _.get(answers, ['result', 'quotient'], '');
+            const remainder = _.get(answers, ['result', 'remainder'], '');
+            if (quotient === lrQuotient?.toString() && remainder === lrRemainder?.toString()) {
+              score = 1;
+            }
+          }
+        }
+        break;
+      }
       if (answers && answers.result.toString()) {
         const { result: correctAnswer } = answers;
-        if (correctAnswer.toString() === result.toString()) {
+        if (correctAnswer.toString() === result?.toString()) {
           score = 1;
         }
       }
@@ -28,7 +55,7 @@ export const getScoreForTheQuestion = (question: Question, learnerResponse: { re
       if (correct_option) {
         const correctOptionIndex = +correct_option.split(' ')[1] - 1;
         const correctAnswer = options[correctOptionIndex];
-        if (correctAnswer.toString() === result.toString()) {
+        if (correctAnswer.toString() === result?.toString()) {
           score = 1;
         }
       }

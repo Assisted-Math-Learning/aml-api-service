@@ -2,6 +2,7 @@ import { DataTypes, Model } from 'sequelize';
 import { AppDataSource } from '../config';
 import { QuestionType } from '../enums/questionType';
 import { Taxonomy } from '../types/taxonomy';
+import { QuestionOperation } from '../enums/questionOperation';
 
 // Define interfaces for the structures used in the Question model
 interface Repository {
@@ -22,7 +23,7 @@ export class Question extends Model {
   declare identifier: string;
   declare benchmark_time: number;
   declare question_type: QuestionType;
-  declare operation: string;
+  declare operation: QuestionOperation;
   declare name: { [key: string]: string };
   declare description?: { [key: string]: string } | null;
   declare tenant?: { id: number; name: { [key: string]: string } } | null;
