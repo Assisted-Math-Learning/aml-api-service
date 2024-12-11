@@ -2150,3 +2150,9 @@ create table if not exists api_logs
     created_at   timestamp with time zone not null,
     updated_at   timestamp with time zone not null
 );
+
+---------------------------------------
+-- Add supported_lang to board_master--
+---------------------------------------
+
+ALTER TABLE board_master ADD COLUMN supported_lang JSONB;

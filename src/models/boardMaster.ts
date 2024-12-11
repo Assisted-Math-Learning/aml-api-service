@@ -5,6 +5,7 @@ export class boardMaster extends Model {
   declare id: number;
   declare identifier: string;
   declare name: { [key: string]: string };
+  declare supported_lang: { [key: string]: string };
   declare class_ids: Array<{
     identifier: string;
     sequence_no: number;
@@ -32,6 +33,10 @@ boardMaster.init(
     name: {
       type: DataTypes.JSONB,
       allowNull: false,
+    },
+    supported_lang: {
+      type: DataTypes.JSONB,
+      allowNull: true,
     },
     class_ids: {
       type: DataTypes.JSONB, // Storing array of objects as JSONB

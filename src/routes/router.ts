@@ -48,6 +48,7 @@ import deleteRepositoryById from '../controllers/repositoryDelete/repositoryDele
 import discardRepositoryById from '../controllers/repositoryDiscard/repositoryDiscard';
 import { searchRepositories } from '../controllers/repositorySearch/repositorySearch';
 import { authRouter } from './auth.route';
+import boardReadById from '../controllers/boardRead/boardRead';
 
 export const router = express.Router();
 
@@ -68,6 +69,8 @@ router.post('/bulk/upload/url', setDataToRequestObject('api.bulk.url'), getBulkU
 router.get('/bulk/template/read/:fileName', setDataToRequestObject('api.bulk.template'), getTemplate);
 
 router.get('/bulk/upload/status/:process_id', setDataToRequestObject('api.bulk.status'), uploadStatus);
+
+router.get('/board/read/:board_id', setDataToRequestObject('api.board.read'), boardReadById);
 
 router.post('/board/update/:board_id', setDataToRequestObject('api.board.update'), updateBoard);
 
