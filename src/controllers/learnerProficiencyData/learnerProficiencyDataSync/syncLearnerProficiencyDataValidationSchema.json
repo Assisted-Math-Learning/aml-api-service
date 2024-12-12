@@ -47,9 +47,14 @@
                   },
                   "answer_top": {
                     "type": "string"
+                  },
+                  "quotient": {
+                    "type": "string"
+                  },
+                  "remainder": {
+                    "type": "string"
                   }
-                },
-                "required": ["result"]
+                }
               },
               "start_time": {
                 "type": "string"
@@ -82,9 +87,14 @@
                   },
                   "answer_top": {
                     "type": "string"
+                  },
+                  "quotient": {
+                    "type": "string"
+                  },
+                  "remainder": {
+                    "type": "string"
                   }
-                },
-                "required": ["result"]
+                }
               },
               "start_time": {
                 "type": "string"
