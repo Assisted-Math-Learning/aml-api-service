@@ -10,6 +10,7 @@ export class Learner extends Model {
     board: { identifier: string; name: { [key: string]: string } };
     class: { identifier: string; name: { [key: string]: string } };
   };
+  declare tenant_id: string;
   declare created_by: string;
   declare updated_by: string;
 }
@@ -39,6 +40,10 @@ Learner.init(
       type: DataTypes.JSONB,
       allowNull: false,
       unique: true,
+    },
+    tenant_id: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     created_by: {
       type: DataTypes.STRING,

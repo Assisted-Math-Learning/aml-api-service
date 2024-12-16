@@ -2156,3 +2156,25 @@ create table if not exists api_logs
 ---------------------------------------
 
 ALTER TABLE board_master ADD COLUMN supported_lang JSONB;
+
+----------------------------------------
+-- Addition of tenant in learner table--
+----------------------------------------
+
+INSERT INTO tenant 
+  (identifier, name, type, board_id, is_active, status, created_by, updated_by) 
+VALUES 
+  (
+    '9811db1e-e7e8-46d1-8a7b-86e32d45999b',
+    '{ "en": "Default Tenant" }', 
+    '{ "en": "government" }', 
+    (SELECT array_agg(id) from board_master),
+    TRUE, 
+    'draft', 
+    'system', 
+    NULL
+  );
+
+ALTER TABLE learner
+ADD COLUMN tenant_id VARCHAR(255) NOT NULL DEFAULT '9811db1e-e7e8-46d1-8a7b-86e32d45999b';
+-----------------------------------------
