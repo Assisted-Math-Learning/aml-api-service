@@ -2177,4 +2177,7 @@ VALUES
 
 ALTER TABLE learner
 ADD COLUMN tenant_id VARCHAR(255) NOT NULL DEFAULT '9811db1e-e7e8-46d1-8a7b-86e32d45999b';
+
+ALTER TABLE learner
+ALTER COLUMN tenant_id DROP DEFAULT;
 -----------------------------------------
