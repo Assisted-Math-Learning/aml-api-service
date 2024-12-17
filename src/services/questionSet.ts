@@ -143,9 +143,14 @@ export const getQuestionSetsByIdentifiers = async (identifiers: string[]): Promi
   });
 };
 
-export const getMainDiagnosticQuestionSet = async (filters: { boardId?: string; classId?: string; l1SkillId?: string }): Promise<any> => {
+export const getMainDiagnosticQuestionSet = async (filters: { repositoryIds: string[]; boardId?: string; classId?: string; l1SkillId?: string }): Promise<any> => {
   let whereClause: any = {
     purpose: QuestionSetPurposeType.MAIN_DIAGNOSTIC,
+    repository: {
+      identifier: {
+        [Op.in]: filters.repositoryIds,
+      },
+    },
   };
 
   if (filters.boardId) {
@@ -191,7 +196,7 @@ export const getMainDiagnosticQuestionSet = async (filters: { boardId?: string; 
   });
 };
 
-export const getPracticeQuestionSet = (filters: { boardId: string; classId: string; l1SkillId: string }): Promise<any> => {
+export const getPracticeQuestionSet = (filters: { repositoryIds: string[]; boardId: string; classId: string; l1SkillId: string }): Promise<any> => {
   const whereClause: any = {
     purpose: {
       [Op.ne]: QuestionSetPurposeType.MAIN_DIAGNOSTIC,
@@ -207,6 +212,11 @@ export const getPracticeQuestionSet = (filters: { boardId: string; classId: stri
         identifier: filters.l1SkillId,
       },
     },
+    repository: {
+      identifier: {
+        [Op.in]: filters.repositoryIds,
+      },
+    },
   };
 
   return QuestionSet.findOne({
@@ -215,7 +225,7 @@ export const getPracticeQuestionSet = (filters: { boardId: string; classId: stri
   });
 };
 
-export const getNextPracticeQuestionSetInSequence = (filters: { boardId: string; classIds: string[]; l1SkillId: string; lastSetSequence: number }): Promise<any> => {
+export const getNextPracticeQuestionSetInSequence = (filters: { repositoryIds: string[]; boardId: string; classIds: string[]; l1SkillId: string; lastSetSequence: number }): Promise<any> => {
   const whereClause: any = {
     sequence: {
       [Op.gt]: filters.lastSetSequence,
@@ -234,6 +244,11 @@ export const getNextPracticeQuestionSetInSequence = (filters: { boardId: string;
       },
       l1_skill: {
         identifier: filters.l1SkillId,
+      },
+    },
+    repository: {
+      identifier: {
+        [Op.in]: filters.repositoryIds,
       },
     },
   };

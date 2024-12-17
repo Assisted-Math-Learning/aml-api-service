@@ -2181,3 +2181,37 @@ ADD COLUMN tenant_id VARCHAR(255) NOT NULL DEFAULT '9811db1e-e7e8-46d1-8a7b-86e3
 ALTER TABLE learner
 ALTER COLUMN tenant_id DROP DEFAULT;
 -----------------------------------------
+
+-------------------------------------------
+-- Making repository column not nullable --
+-------------------------------------------
+
+ALTER TABLE question ALTER COLUMN repository TYPE JSONB USING repository::jsonb;
+ALTER TABLE question ALTER COLUMN repository SET NOT NULL;
+
+ALTER TABLE question_set ALTER COLUMN repository TYPE JSONB USING repository::jsonb;
+ALTER TABLE question_set ALTER COLUMN repository SET NOT NULL;
+
+ALTER TABLE content ALTER COLUMN repository TYPE JSONB USING repository::jsonb;
+ALTER TABLE content ALTER COLUMN repository SET NOT NULL;
+
+--------------------------------------------
+-- Creating repository associations table --
+--------------------------------------------
+
+create table repository_associations
+(
+    id            serial
+        primary key,
+    repository_id varchar(255)                  not null,
+    tenant_id     varchar(255),
+    board_id      varchar(255),
+    learner_id    varchar(255),
+    sequence      integer                  not null,
+    is_active     boolean default true     not null,
+    created_by    varchar(255)             not null,
+    updated_by    varchar(255),
+    created_at    timestamp with time zone not null,
+    updated_at    timestamp with time zone not null,
+    deleted_at    timestamp with time zone
+);

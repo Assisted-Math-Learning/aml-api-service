@@ -14,6 +14,7 @@ import { QuestionSetPurposeType } from '../../../enums/questionSetPurposeType';
 import { boardMaster } from '../../../models/boardMaster';
 import { classMaster } from '../../../models/classMaster';
 import { fetchSkillsByIds } from '../../../services/skill';
+import { findRepositoryAssociations } from '../../../services/repositoryAssociation';
 
 const evaluateLearner = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -41,6 +42,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
 
   const learnerBoardId = _.get(learner, ['taxonomy', 'board', 'identifier']);
   const learnerClassId = _.get(learner, ['taxonomy', 'class', 'identifier']);
+  const tenantId = _.get(learner, ['tenant_id']);
   /**
    * Validate learner board
    */
@@ -60,6 +62,26 @@ const evaluateLearner = async (req: Request, res: Response) => {
     logger.error({ code, apiId, msgid, resmsgid, message: `Learner Class: ${learnerClassId} does not exist` });
     throw amlError(code, `Learner Class: ${learnerClassId} does not exist`, 'NOT_FOUND', 404);
   }
+
+  let repositoriesAssociations = await findRepositoryAssociations({ learnerId: learner_id });
+
+  if (!repositoriesAssociations.length) {
+    repositoriesAssociations = await findRepositoryAssociations({ boardId: learnerBoardId });
+  }
+
+  if (!repositoriesAssociations.length) {
+    repositoriesAssociations = await findRepositoryAssociations({ tenantId });
+  }
+
+  if (!repositoriesAssociations.length) {
+    ResponseHandler.successResponse(req, res, {
+      status: httpStatus.OK,
+      data: { message: 'No more practice questions available', data: { question_set_id: '' } },
+    });
+    return;
+  }
+
+  const repositoryIds = repositoriesAssociations.map((repositoryAssociation) => repositoryAssociation.repository_id);
 
   const class_ids = (boardEntity?.[0]?.class_ids || []).sort((a, b) => a.sequence_no - b.sequence_no);
   const currentGrade = class_ids.find((datum) => datum.identifier === classEntity?.[0]?.identifier);
@@ -88,6 +110,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
       const learnerJourneyQuestionSet = await getQuestionSetById(learnerJourney.question_set_id);
       if (learnerJourneyQuestionSet!.purpose !== QuestionSetPurposeType.MAIN_DIAGNOSTIC && learnerJourneyQuestionSet!.taxonomy.l1_skill?.identifier === skillIdentifier) {
         const nextPracticeQuestionSet = await getNextPracticeQuestionSetInSequence({
+          repositoryIds,
           boardId: learnerJourneyQuestionSet!.taxonomy.board?.identifier,
           classIds: allApplicableGradeIds,
           l1SkillId: learnerJourneyQuestionSet!.taxonomy.l1_skill?.identifier,
@@ -113,7 +136,12 @@ const evaluateLearner = async (req: Request, res: Response) => {
      * last attempted question set purpose is MD OR
      * no more practice question sets are available for the current skill
      */
-    const mainDiagnosticQS = await getMainDiagnosticQuestionSet({ boardId: boardEntity?.[0]?.identifier, classId: highestApplicableGradeMapping?.identifier, l1SkillId: skillIdentifier });
+    const mainDiagnosticQS = await getMainDiagnosticQuestionSet({
+      repositoryIds,
+      boardId: boardEntity?.[0]?.identifier,
+      classId: highestApplicableGradeMapping?.identifier,
+      l1SkillId: skillIdentifier,
+    });
 
     const { learnerJourney: learnerJourneyForMDQS } = await readLearnerJourneyByLearnerIdAndQuestionSetId(learner_id, mainDiagnosticQS?.identifier);
     if (_.isEmpty(learnerJourneyForMDQS)) {
@@ -131,7 +159,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
     }
 
     if (lowestApplicableGradeForPractice) {
-      const practiceQuestionSet = await getPracticeQuestionSet({ boardId: learnerBoardId, classId: lowestApplicableGradeForPractice, l1SkillId: skillIdentifier });
+      const practiceQuestionSet = await getPracticeQuestionSet({ repositoryIds, boardId: learnerBoardId, classId: lowestApplicableGradeForPractice, l1SkillId: skillIdentifier });
       if (practiceQuestionSet) {
         questionSetId = practiceQuestionSet?.identifier;
         break;
@@ -142,10 +170,12 @@ const evaluateLearner = async (req: Request, res: Response) => {
   // TODO: Remove later
   if (!questionSetId && requiredL1Skills.length && !allQuestionsAttempted) {
     const practiceQuestionSet = await getPracticeQuestionSet({
+      repositoryIds,
       boardId: learnerBoardId,
       classId: highestApplicableGradeMapping.identifier,
       l1SkillId: requiredL1Skills[requiredL1Skills.length - 1].identifier,
     });
+
     if (practiceQuestionSet) {
       questionSetId = practiceQuestionSet.identifier;
     }
