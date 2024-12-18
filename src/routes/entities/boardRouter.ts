@@ -5,7 +5,7 @@ import boardReadById from '../../controllers/boardRead/boardRead';
 
 const boardRouter = express.Router();
 
-boardRouter.get('/board/read/:board_id', setDataToRequestObject('api.board.read'), boardReadById);
+boardRouter.get('/read/:board_id', setDataToRequestObject('api.board.read'), boardReadById);
 
 boardRouter.post('/update/:board_id', setDataToRequestObject('api.board.update'), updateBoard);
 
