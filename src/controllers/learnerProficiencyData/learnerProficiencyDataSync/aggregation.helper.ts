@@ -21,7 +21,7 @@ export const getScoreForTheQuestion = (question: Question, learnerResponse: { re
         if (question_type === QuestionType.GRID_1) {
           const quotient = _.get(answers, ['result', 'quotient'], '');
           const remainder = _.get(answers, ['result', 'remainder'], '');
-          if (lrQuotient?.toString() === quotient && lrRemainder?.toString() === remainder) {
+          if (lrQuotient?.toString() === quotient.toString() && lrRemainder?.toString() === remainder.toString()) {
             score = 1;
           }
         }
@@ -36,14 +36,13 @@ export const getScoreForTheQuestion = (question: Question, learnerResponse: { re
           if (fibType.toString() === '2') {
             const quotient = _.get(answers, ['result', 'quotient'], '');
             const remainder = _.get(answers, ['result', 'remainder'], '');
-            if (quotient === lrQuotient?.toString() && remainder === lrRemainder?.toString()) {
+            if (quotient.toString() === lrQuotient?.toString() && remainder.toString() === lrRemainder?.toString()) {
               score = 1;
             }
           }
         }
         break;
-      }
-      if (answers && answers.result.toString()) {
+      } else if (answers && answers.result.toString()) {
         const { result: correctAnswer } = answers;
         if (correctAnswer.toString() === result?.toString()) {
           score = 1;
