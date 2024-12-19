@@ -6,6 +6,7 @@ import { QuestionType } from '../../../enums/questionType';
 import { LearnerProficiencyQuestionLevelData } from '../../../models/learnerProficiencyQuestionLevelData';
 import { Learner } from '../../../models/learner';
 import { QuestionOperation } from '../../../enums/questionOperation';
+import { FibType } from '../../../enums/fibType';
 
 export const getScoreForTheQuestion = (question: Question, learnerResponse: { result?: string; answerTop?: string; quotient?: string; remainder?: string }): number => {
   const { question_type, question_body } = question;
@@ -27,13 +28,13 @@ export const getScoreForTheQuestion = (question: Question, learnerResponse: { re
         }
         if (question_type === QuestionType.FIB) {
           const fibType = _.get(answers, 'fib_type');
-          if (fibType.toString() === '1') {
+          if (fibType.toString() === FibType.ONE) {
             const correctAnswer = _.get(answers, ['result'], '');
             if (correctAnswer.toString() === result?.toString()) {
               score = 1;
             }
           }
-          if (fibType.toString() === '2') {
+          if (fibType.toString() === FibType.TWO) {
             const quotient = _.get(answers, ['result', 'quotient'], '');
             const remainder = _.get(answers, ['result', 'remainder'], '');
             if (quotient.toString() === lrQuotient?.toString() && remainder.toString() === lrRemainder?.toString()) {
