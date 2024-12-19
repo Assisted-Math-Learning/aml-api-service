@@ -27,13 +27,13 @@ export const getScoreForTheQuestion = (question: Question, learnerResponse: { re
         }
         if (question_type === QuestionType.FIB) {
           const fibType = _.get(answers, 'fib_type');
-          if (fibType === 1) {
+          if (fibType.toString() === '1') {
             const correctAnswer = _.get(answers, ['result'], '');
             if (correctAnswer.toString() === result?.toString()) {
               score = 1;
             }
           }
-          if (fibType === 2) {
+          if (fibType.toString() === '2') {
             const quotient = _.get(answers, ['result', 'quotient'], '');
             const remainder = _.get(answers, ['result', 'remainder'], '');
             if (quotient === lrQuotient?.toString() && remainder === lrRemainder?.toString()) {
