@@ -2,6 +2,7 @@ import { Op, Optional } from 'sequelize';
 import { Status } from '../enums/status';
 import { Repository } from '../models/repository';
 import _ from 'lodash';
+import { DEFAULT_LIMIT } from '../constants/constants';
 
 export const checkRepositoryNameExists = async (repositoryNames: { [key: string]: string }): Promise<{ exists: boolean; repository?: any }> => {
   // Convert repositoryNames into conditions dynamically
@@ -94,6 +95,6 @@ export const getRepositoryList = async (req: Record<string, any>) => {
     };
   }
 
-  const repositories = await Repository.findAll({ limit: limit || 100, offset: offset || 0, ...(whereClause && { where: whereClause }), attributes: { exclude: ['id'] } });
+  const repositories = await Repository.findAll({ limit: limit || DEFAULT_LIMIT, offset: offset || 0, ...(whereClause && { where: whereClause }), attributes: { exclude: ['id'] } });
   return repositories;
 };

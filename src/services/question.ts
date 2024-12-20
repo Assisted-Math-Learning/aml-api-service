@@ -2,6 +2,7 @@ import { Op, Optional } from 'sequelize';
 import * as _ from 'lodash';
 import { Question } from '../models/question';
 import { Status } from '../enums/status';
+import { DEFAULT_LIMIT } from '../constants/constants';
 
 // Create a new question
 export const createQuestionData = async (req: Optional<any, string>): Promise<any> => {
@@ -65,7 +66,7 @@ export const getQuestionList = async (req: Record<string, any>) => {
   const offset: any = _.get(req, 'offset');
   const { filters = {} } = req || {};
   filters.status = Status.LIVE;
-  const questions = await Question.findAll({ limit: limit || 100, offset: offset || 0, ...(filters && { where: filters }), attributes: { exclude: ['id'] }, raw: true });
+  const questions = await Question.findAll({ limit: limit || DEFAULT_LIMIT, offset: offset || 0, ...(filters && { where: filters }), attributes: { exclude: ['id'] }, raw: true });
   return questions;
 };
 
