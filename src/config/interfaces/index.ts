@@ -30,4 +30,5 @@ export interface IConfiguration {
     bucketRegion: string;
     bucketOutput: string;
   };
+  aml_jwt_secret_key: string;
 }

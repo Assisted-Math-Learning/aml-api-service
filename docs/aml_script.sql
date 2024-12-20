@@ -2215,3 +2215,26 @@ create table repository_associations
     updated_at    timestamp with time zone not null,
     deleted_at    timestamp with time zone
 );
+
+--------------------------------------------
+-- Creating users table --
+--------------------------------------------
+
+create table users
+(
+    id         serial
+        primary key,
+    identifier varchar(255)             not null
+        unique,
+    role       varchar(255)             not null,
+    first_name varchar(255)             not null,
+    last_name  varchar(255)             not null,
+    email      varchar(255)             not null
+        unique,
+    password   varchar(255)             not null,
+    is_active  boolean default true     not null,
+    created_by varchar(255)             not null,
+    updated_by varchar(255),
+    created_at timestamp with time zone not null,
+    updated_at timestamp with time zone not null
+);

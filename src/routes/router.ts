@@ -14,6 +14,7 @@ import boardRouter from './entities/boardRouter';
 import classRouter from './entities/classRouter';
 import skillRouter from './entities/skillRouter';
 import subSkillRouter from './entities/subSkillRouter';
+import { adminAuthRouter } from './admin.auth.route';
 
 export const router = express.Router();
 
@@ -46,6 +47,8 @@ router.use('/content', contentRouter);
 router.use('/repository', repositoryRouter);
 
 router.use('/auth', authRouter);
+
+router.use('/admin/auth', adminAuthRouter);
 
 router.all('*', (_, res) => {
   res.status(404).json({
