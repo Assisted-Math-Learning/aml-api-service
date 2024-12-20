@@ -34,6 +34,7 @@ const appConfiguration: IConfiguration = {
     bucketRegion: get(envVars, 'AML_AWS_BUCKET_REGION', 'us-east-1'),
     bucketOutput: get(envVars, 'AML_AWS_BUCKET_OUTPUT', 'table'),
   },
+  aml_jwt_secret_key: get(envVars, 'AML_JWT_SECRET_KEY', 'your-secret-key'),
 };
 
 export default appConfiguration;
