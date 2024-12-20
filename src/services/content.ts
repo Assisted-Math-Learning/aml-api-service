@@ -2,6 +2,7 @@ import { Op, Optional } from 'sequelize';
 import { Content } from '../models/content';
 import { Status } from '../enums/status';
 import _ from 'lodash';
+import { DEFAULT_LIMIT } from '../constants/constants';
 
 // Get a media Content by ID
 export const getContentMediaById = async (getObject: { contentId: number; mediaIds: string[] }): Promise<any> => {
@@ -111,6 +112,6 @@ export const getContentList = async (req: Record<string, any>) => {
     };
   }
 
-  const contents = await Content.findAll({ limit: limit || 100, offset: offset || 0, ...(whereClause && { where: whereClause }), attributes: { exclude: ['id'] } });
+  const contents = await Content.findAll({ limit: limit || DEFAULT_LIMIT, offset: offset || 0, ...(whereClause && { where: whereClause }), attributes: { exclude: ['id'] } });
   return contents;
 };

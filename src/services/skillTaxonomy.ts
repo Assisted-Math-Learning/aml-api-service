@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import { Status } from '../enums/status';
 import * as uuid from 'uuid';
 import { SkillType } from '../enums/skillType';
+import { DEFAULT_LIMIT } from '../constants/constants';
 
 // Create skill taxonomy service
 export const createSkillTaxonomyData = async (req: { [key: string]: any }[]): Promise<any> => {
@@ -190,7 +191,7 @@ export const getSkillTaxonomySearch = async (req: Record<string, any>, order?: a
   }
 
   const options = {
-    limit: limit || 100,
+    limit: limit || DEFAULT_LIMIT,
     offset: offset || 0,
     where: whereClause,
     attributes: { exclude: ['id'] },

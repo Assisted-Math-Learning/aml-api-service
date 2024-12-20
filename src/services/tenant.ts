@@ -3,6 +3,7 @@ import { Op, Optional } from 'sequelize';
 import { UpdateTenant } from '../types/tenantModel';
 import _ from 'lodash';
 import { Status } from '../enums/status';
+import { DEFAULT_LIMIT } from '../constants/constants';
 
 //create service for tenant
 export const createTenantData = async (req: Optional<any, string> | undefined): Promise<any> => {
@@ -51,7 +52,7 @@ export const getTenantSearch = async (req: Record<string, any>) => {
     };
   }
 
-  const tenants = await Tenant.findAll({ limit: limit || 100, offset: offset || 0, ...(whereClause && { where: whereClause }), attributes: { exclude: ['id'] } });
+  const tenants = await Tenant.findAll({ limit: limit || DEFAULT_LIMIT, offset: offset || 0, ...(whereClause && { where: whereClause }), attributes: { exclude: ['id'] } });
   return tenants;
 };
 

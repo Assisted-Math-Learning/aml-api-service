@@ -3,6 +3,9 @@ import { SkillType } from '../enums/skillType';
 import { Status } from '../enums/status';
 import { SkillMaster } from '../models/skill';
 import { amlError } from '../types/amlError';
+import { DEFAULT_LIMIT } from '../constants/constants';
+import _ from 'lodash';
+import { Sequelize } from 'sequelize-typescript';
 
 export async function fetchSkillIdsByName(): Promise<Map<string, { id: number; name: string; type: string }>> {
   const skills = await SkillMaster.findAll({
@@ -99,4 +102,58 @@ export const fetchSkillsByIds = async (skillIds: string[]): Promise<SkillMaster[
       identifier: skillIds,
     },
   });
+};
+
+// list skill
+
+export const getSkillList = async (req: Record<string, any>) => {
+  const limit: any = _.get(req, 'limit');
+  const offset: any = _.get(req, 'offset');
+  const searchQuery: any = _.get(req, 'search_query');
+  const skillType: any = _.get(req, 'skill_type');
+
+  let whereClause: any = {};
+
+  if (skillType) {
+    whereClause = {
+      ...whereClause,
+      type: skillType,
+    };
+  }
+
+  if (searchQuery) {
+    whereClause = {
+      ...whereClause,
+      [Op.or]: [
+        Sequelize.literal(`
+    EXISTS (
+      SELECT 1 
+      FROM jsonb_each_text(name) AS kv
+      WHERE LOWER(kv.value) LIKE '%${searchQuery.toLowerCase()}%'
+    )
+  `),
+        Sequelize.literal(`
+    EXISTS (
+      SELECT 1 
+      FROM jsonb_each_text(description) AS kv
+      WHERE LOWER(kv.value) LIKE '%${searchQuery.toLowerCase()}%'
+    )
+  `),
+      ],
+    };
+  }
+
+  const finalLimit = limit || DEFAULT_LIMIT;
+  const finalOffset = offset || 0;
+
+  const { rows, count } = await SkillMaster.findAndCountAll({ where: whereClause, limit: finalLimit, offset: finalOffset });
+
+  return {
+    skills: rows,
+    meta: {
+      offset: finalOffset,
+      limit: finalLimit,
+      total: count,
+    },
+  };
 };
