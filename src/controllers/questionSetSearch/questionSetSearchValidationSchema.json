@@ -41,6 +41,34 @@
               },
               "description": "Array of question types.",
               "minItems": 1
+            },
+            "board_id": {
+              "type": "string",
+              "description": "board id of the question"
+            },
+            "class_id": {
+              "type": "string",
+              "description": "class id of the question"
+            },
+            "l1_skill_id": {
+              "type": "string",
+              "description": "l1 skill id of the question"
+            },
+            "l2_skill_id": {
+              "type": "string",
+              "description": "l2 skill id of the question"
+            },
+            "l3_skill_id": {
+              "type": "string",
+              "description": "l3 skill id of the question"
+            },
+            "sub_skill_id": {
+              "type": "string",
+              "description": "sub skill id of the question"
+            },
+            "repository_id": {
+              "type": "string",
+              "description": "repository id of the question"
             }
           },
           "description": "Object containing search criteria. Can include any fields defined in the Tenant model.",

@@ -1,6 +1,5 @@
 import { Op, Optional } from 'sequelize';
 import { Status } from '../enums/status';
-import { Question } from '../models/question';
 import { QuestionSet } from '../models/questionSet';
 import _ from 'lodash';
 import { QuestionSetPurposeType } from '../enums/questionSetPurposeType';
@@ -78,12 +77,25 @@ export const discardQuestionSet = async (id: string): Promise<any> => {
 };
 
 // Get list of question sets with optional filters
-export const getQuestionSetList = async (req: Record<string, any>) => {
+export const getQuestionSetList = async (req: {
+  filters: {
+    title?: string[];
+    repository_id?: string;
+    board_id?: string;
+    class_id?: string;
+    l1_skill_id?: string;
+    l2_skill_id?: string;
+    l3_skill_id?: string;
+    sub_skill_id?: string;
+  };
+  limit?: number;
+  offset?: number;
+}) => {
   const limit: number = _.get(req, 'limit', 100);
   const offset: number = _.get(req, 'offset', 0);
   const { filters = {} } = req || {};
 
-  const whereClause: any = {
+  let whereClause: any = {
     status: Status.LIVE,
     is_active: true,
   };
@@ -99,36 +111,63 @@ export const getQuestionSetList = async (req: Record<string, any>) => {
     };
   }
 
-  const questionWhereClause: any = {
-    status: Status.LIVE,
-  };
+  if (filters.repository_id) {
+    whereClause = _.set(whereClause, ['repository', 'identifier'], filters.repository_id);
+  }
 
-  if (filters.question_type) {
-    questionWhereClause.question_type = {
-      [Op.or]: filters.question_type.map((type: string) => ({
-        [Op.iLike]: `%${type}%`,
-      })),
+  if (filters.board_id) {
+    whereClause = _.set(whereClause, ['taxonomy', 'board', 'identifier'], filters.board_id);
+  }
+
+  if (filters.class_id) {
+    whereClause = _.set(whereClause, ['taxonomy', 'class', 'identifier'], filters.class_id);
+  }
+
+  if (filters.l1_skill_id) {
+    whereClause = _.set(whereClause, ['taxonomy', 'l1_skill', 'identifier'], filters.l1_skill_id);
+  }
+
+  if (filters.l2_skill_id) {
+    whereClause = {
+      ...whereClause,
+      taxonomy: {
+        [Op.contains]: {
+          l2_skill: [{ identifier: filters.l2_skill_id }],
+        },
+      },
     };
   }
 
-  const questionSets = await QuestionSet.findAll({
+  if (filters.l3_skill_id) {
+    whereClause = {
+      ...whereClause,
+      taxonomy: {
+        [Op.contains]: {
+          l3_skill: [{ identifier: filters.l3_skill_id }],
+        },
+      },
+    };
+  }
+
+  const finalLimit = limit || 100;
+  const finalOffset = offset || 0;
+
+  const { rows, count } = await QuestionSet.findAndCountAll({
     limit,
     offset,
     where: whereClause,
-    include: [
-      {
-        model: Question,
-        as: 'questions',
-        where: filters.question_type ? questionWhereClause : undefined,
-        required: !!filters.question_type,
-
-        attributes: { exclude: ['id'] },
-      },
-    ],
     attributes: { exclude: ['id'] },
+    raw: true,
   });
 
-  return questionSets;
+  return {
+    question_sets: rows,
+    meta: {
+      offset: finalOffset,
+      limit: finalLimit,
+      total: count,
+    },
+  };
 };
 
 export const getQuestionSetsByIdentifiers = async (identifiers: string[]): Promise<QuestionSet[]> => {

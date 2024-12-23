@@ -63,7 +63,17 @@ export const discardQuestion = async (id: string): Promise<any> => {
 };
 
 export const getQuestionList = async (req: {
-  filters: { question_type?: string[]; question_set_id?: string; board_id?: string; class_id?: string; l1_skill_id?: string; l2_skill_id?: string; l3_skill_id?: string; sub_skill_id?: string };
+  filters: {
+    repository_id?: string;
+    question_type?: string[];
+    question_set_id?: string;
+    board_id?: string;
+    class_id?: string;
+    l1_skill_id?: string;
+    l2_skill_id?: string;
+    l3_skill_id?: string;
+    sub_skill_id?: string;
+  };
   limit?: number;
   offset?: number;
 }) => {
@@ -74,6 +84,10 @@ export const getQuestionList = async (req: {
   let whereClause: any = {
     status: Status.LIVE,
   };
+
+  if (filters.repository_id) {
+    whereClause = _.set(whereClause, ['repository', 'identifier'], filters.repository_id);
+  }
 
   if (filters.question_type) {
     whereClause = _.set(whereClause, ['question_type'], filters.question_type);
@@ -135,9 +149,11 @@ export const getQuestionList = async (req: {
 
   return {
     questions: rows,
-    offset: finalOffset,
-    limit: finalLimit,
-    total: count,
+    meta: {
+      offset: finalOffset,
+      limit: finalLimit,
+      total: count,
+    },
   };
 };
 

@@ -22,10 +22,7 @@ export const searchQuestionSets = async (req: Request, res: Response) => {
     throw amlError(code, isRequestValid.message, 'BAD_REQUEST', 400);
   }
 
-  let questionSetData = await getQuestionSetList(requestBody.request);
-  questionSetData = _.map(questionSetData, (data: any) => {
-    return data?.dataValues;
-  });
+  const questionSetData = await getQuestionSetList(requestBody.request);
   logger.info({ apiId, requestBody, message: `Question Sets are listed successfully` });
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: questionSetData });
 };
