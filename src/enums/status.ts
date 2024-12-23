@@ -12,3 +12,8 @@ export enum ProcessStatus {
   REOPEN = 'reopen',
   VALIDATED = 'validated',
 }
+
+export enum QuestionStatus {
+  NOOP = 'noop',
+  REVISITED = 'revisited',
+}
