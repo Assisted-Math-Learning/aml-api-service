@@ -35,6 +35,7 @@ import { ApiLogs } from '../../../models/apiLogs';
 import { AppDataSource } from '../../../config';
 import { LearnerProficiencyQuestionLevelData } from '../../../models/learnerProficiencyQuestionLevelData';
 import { QuestionSetPurposeType } from '../../../enums/questionSetPurposeType';
+import { QuestionStatus } from '../../../enums/status';
 
 const aggregateLearnerDataOnClassAndSkillLevel = async (transaction: any, learner: Learner, questionLevelData: any[]) => {
   const aggregateData = getLearnerAggregateDataForClassAndL1SkillPair(questionLevelData);
@@ -102,7 +103,7 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
      */
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: updating question level data`);
     for (const datum of questions_data) {
-      const { question_id, question_set_id, start_time, end_time } = datum;
+      const { question_id, question_set_id, start_time, end_time, status } = datum;
       const learner_response = datum.learner_response as { result: string; answerTop?: string };
       const question = _.get(questionMap, question_id, undefined);
 
@@ -131,11 +132,13 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
        */
       const learnerDataExists = await getQuestionLevelDataByLearnerIdQuestionIdAndQuestionSetId(learner_id, question_id, question_set_id);
       if (!_.isEmpty(learnerDataExists)) {
+        const updatedAttemptsCount = status === QuestionStatus.REVISITED ? learnerDataExists.attempts_count : learnerDataExists.attempts_count + 1;
+
         const updateData = {
           learner_response,
           sub_skills: subSkillScores,
           score,
-          attempts_count: learnerDataExists.attempts_count + 1,
+          attempts_count: updatedAttemptsCount,
           updated_by: learner_id,
         };
         await updateLearnerProficiencyQuestionLevelData(transaction, learnerDataExists.identifier, updateData);
