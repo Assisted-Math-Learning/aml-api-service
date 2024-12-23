@@ -112,7 +112,9 @@ export const getSkillList = async (req: Record<string, any>) => {
   const searchQuery: any = _.get(req, 'search_query');
   const skillType: any = _.get(req, 'skill_type');
 
-  let whereClause: any = {};
+  let whereClause: any = {
+    status: Status.LIVE,
+  };
 
   if (skillType) {
     whereClause = {

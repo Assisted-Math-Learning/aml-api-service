@@ -79,7 +79,9 @@ export const getBoardList = async (req: Record<string, any>) => {
   const offset: any = _.get(req, 'offset');
   const searchQuery: any = _.get(req, 'search_query');
 
-  let whereClause: any = {};
+  let whereClause: any = {
+    status: Status.LIVE,
+  };
 
   if (searchQuery) {
     whereClause = {
