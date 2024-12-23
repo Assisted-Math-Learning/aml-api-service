@@ -30,7 +30,7 @@ export const userAuth = async (req: Request, res: Response, next: NextFunction) 
     throw amlError(code, 'Invalid Token', 'INVALID_TOKEN', 498);
   }
 
-  if (!user) {
+  if (!user || !user.is_active) {
     const code = 'USER_NOT_FOUND';
     throw amlError(code, 'User Not Found', 'NOT_FOUND', 404);
   }

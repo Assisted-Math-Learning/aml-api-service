@@ -10,6 +10,8 @@ import { ResponseHandler } from '../../../utils/responseHandler';
 import httpStatus from 'http-status';
 import { getUserByEmail } from '../../../services/user';
 import { appConfiguration } from '../../../config';
+import { UserTransformer } from '../../../transformers/entity/user.transformer';
+import { getTenant } from '../../../services/tenant';
 
 const { aml_jwt_secret_key } = appConfiguration;
 
@@ -58,19 +60,16 @@ const login = async (req: Request, res: Response) => {
   );
 
   const result = {
-    user: {
-      id: user.id,
-      email: user.email,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      role: user.role,
-      identifier: user.identifier,
-      is_active: user.is_active,
-      createdBy: user.created_by,
-      updatedBy: user.updated_by,
-    },
+    user: new UserTransformer(user).transform(),
     token,
   };
+
+  if (user.tenant_id) {
+    const tenant = await getTenant(user.tenant_id);
+    if (tenant) {
+      _.set(result, 'tenant', tenant);
+    }
+  }
 
   ResponseHandler.successResponse(req, res, {
     status: httpStatus.OK,

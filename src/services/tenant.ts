@@ -19,14 +19,12 @@ export const updateTenantData = async (identifier: string, req: UpdateTenant): P
 };
 
 //get tenant
-export const getTenant = async (tenant_id: string): Promise<any> => {
-  const tenant = await Tenant.findOne({
+export const getTenant = async (tenant_id: string) => {
+  return Tenant.findOne({
     where: { identifier: tenant_id, is_active: true, status: Status.LIVE },
     attributes: { exclude: ['id'] },
+    raw: true,
   });
-
-  return tenant?.dataValues;
-  return tenant?.dataValues;
 };
 
 //filter tenants

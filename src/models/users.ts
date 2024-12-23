@@ -1,10 +1,12 @@
 import { DataTypes, Model } from 'sequelize';
 import { AppDataSource } from '../config';
+import { UserRole } from '../enums/userRole';
 
 export class User extends Model {
   declare id: number;
   declare identifier: string;
-  declare role: string;
+  declare tenant_id?: string;
+  declare role: UserRole;
   declare first_name: string;
   declare last_name: string;
   declare email: string;
@@ -25,6 +27,10 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+    },
+    tenant_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     role: {
       type: DataTypes.STRING,

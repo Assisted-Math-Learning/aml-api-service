@@ -2220,12 +2220,13 @@ create table repository_associations
 -- Creating users table --
 --------------------------------------------
 
-create table users
+create table if not exists users
 (
     id         serial
         primary key,
     identifier varchar(255)             not null
         unique,
+    tenant_id varchar(255),
     role       varchar(255)             not null,
     first_name varchar(255)             not null,
     last_name  varchar(255)             not null,
