@@ -6,7 +6,6 @@ export class Repository extends Model {
   declare name: { [key: string]: string };
   declare identifier: string;
   declare description?: { [key: string]: string } | null;
-  declare tenant?: { id: number; name: { [key: string]: string } } | null;
   declare status: 'draft' | 'live';
   declare is_active: boolean;
   declare created_by: string;
@@ -34,11 +33,6 @@ Repository.init(
       type: DataTypes.JSONB,
       allowNull: true,
       comment: 'Description of the repository in multiple languages',
-    },
-    tenant: {
-      type: DataTypes.JSONB,
-      allowNull: true,
-      comment: 'Details of the tenant associated with the repository',
     },
     status: {
       type: DataTypes.ENUM('draft', 'live'),
