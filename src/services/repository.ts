@@ -3,7 +3,6 @@ import { Status } from '../enums/status';
 import { Repository } from '../models/repository';
 import _ from 'lodash';
 import { DEFAULT_LIMIT } from '../constants/constants';
-import { Tenant } from '../models/tenant';
 
 export const checkRepositoryNameExists = async (repositoryNames: { [key: string]: string }): Promise<{ exists: boolean; repository?: any }> => {
   // Convert repositoryNames into conditions dynamically
@@ -100,40 +99,48 @@ export const getRepositoryList = async (req: Record<string, any>) => {
   return repositories;
 };
 
-// list repositories by tenant
-export const getRepositoryListByTenant = async (req: Record<string, any>, tenant: Tenant) => {
+// list repositories by ids
+export const getRepositoryListByIds = async (req: Record<string, any>, repository_identifiers?: string[]) => {
   const limit: any = _.get(req, 'limit');
   const offset: any = _.get(req, 'offset');
   const searchQuery: any = _.get(req, 'search_query');
+  const status: any = _.get(req, 'status');
+  const is_active: any = _.get(req, 'is_active');
 
-  let whereClause: any = {
-    status: Status.LIVE,
-    is_active: true,
-    [Op.and]: [
-      Sequelize.literal(`
-        tenant = to_jsonb('${JSON.stringify(tenant.name)}'::json)
-      `),
-    ],
-  };
+  let whereClause: any = {};
+
+  if (status) {
+    whereClause.status = status;
+  }
+
+  if (is_active) {
+    whereClause.is_active = is_active;
+  }
+
+  if (repository_identifiers && repository_identifiers.length > 0) {
+    whereClause.identifier = {
+      [Op.in]: repository_identifiers,
+    };
+  }
 
   if (searchQuery) {
     whereClause = {
       ...whereClause,
       [Op.or]: [
         Sequelize.literal(`
-    EXISTS (
-      SELECT 1
-      FROM jsonb_each_text(name) AS kv
+        EXISTS (
+          SELECT 1
+          FROM jsonb_each_text(name) AS kv
       WHERE LOWER(kv.value) LIKE '%${searchQuery.toLowerCase()}%'
-    )
-  `),
+        )
+      `),
         Sequelize.literal(`
-    EXISTS (
-      SELECT 1
-      FROM jsonb_each_text(description) AS kv
+        EXISTS (
+          SELECT 1
+          FROM jsonb_each_text(description) AS kv
       WHERE LOWER(kv.value) LIKE '%${searchQuery.toLowerCase()}%'
-    )
-  `),
+        )
+      `),
       ],
     };
   }

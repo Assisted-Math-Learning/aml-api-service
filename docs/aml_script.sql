@@ -2239,3 +2239,9 @@ create table if not exists users
     created_at timestamp with time zone not null,
     updated_at timestamp with time zone not null
 );
+
+--------------------------------------------
+-- Dropping tenant from repository table --
+--------------------------------------------
+
+ALTER table repository DROP column tenant;

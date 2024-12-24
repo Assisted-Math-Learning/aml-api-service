@@ -19,3 +19,14 @@ export const findRepositoryAssociations = async (data: { learnerId?: string; boa
   }
   return RepositoryAssociation.findAll({ where: { ...whereClause, is_active: true }, order: [['sequence', 'asc']] });
 };
+
+// get repository identifiers by tenant
+
+export const getRepositoryIds = async (tenantId: string): Promise<string[]> => {
+  const repositoryAssociations = await RepositoryAssociation.findAll({
+    where: { tenant_id: tenantId, is_active: true },
+    attributes: ['repository_id'],
+  });
+
+  return repositoryAssociations.map((ra) => ra.repository_id);
+};

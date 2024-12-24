@@ -7,8 +7,9 @@ import listRepositoryJson from './listRepositoriesValidationSchema.json';
 import { amlError } from '../../types/amlError';
 import logger from '../../utils/logger';
 import { getTenant } from '../../services/tenant';
-import { getRepositoryListByTenant } from '../../services/repository';
 import { Repository } from '../../models/repository';
+import { getRepositoryIds } from '../../services/repositoryAssociation';
+import { getRepositoryListByIds } from '../../services/repository';
 
 interface RepositoryResponse {
   repositories: Repository[];
@@ -37,8 +38,11 @@ const listRepositories = async (req: Request, res: Response) => {
   if (user.tenant_id) {
     const tenant = await getTenant(user.tenant_id);
     if (tenant) {
-      repositoryData = await getRepositoryListByTenant(requestBody.request, tenant);
+      const repositoryIdentifiers = await getRepositoryIds(tenant.identifier);
+      repositoryData = await getRepositoryListByIds(requestBody.request, repositoryIdentifiers);
     }
+  } else {
+    repositoryData = await getRepositoryListByIds(requestBody.request);
   }
 
   logger.info({ apiId, requestBody, message: `Repositories are listed successfully` });
