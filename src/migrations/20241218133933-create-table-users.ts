@@ -21,6 +21,10 @@ export = {
         type: DataTypes.STRING,
         unique: true,
       },
+      tenant_id: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
       role: {
         allowNull: false,
         type: DataTypes.STRING,

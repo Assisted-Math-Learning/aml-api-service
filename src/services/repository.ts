@@ -1,8 +1,9 @@
-import { Op, Optional } from 'sequelize';
+import { Op, Optional, Sequelize } from 'sequelize';
 import { Status } from '../enums/status';
 import { Repository } from '../models/repository';
 import _ from 'lodash';
 import { DEFAULT_LIMIT } from '../constants/constants';
+import { Tenant } from '../models/tenant';
 
 export const checkRepositoryNameExists = async (repositoryNames: { [key: string]: string }): Promise<{ exists: boolean; repository?: any }> => {
   // Convert repositoryNames into conditions dynamically
@@ -97,4 +98,57 @@ export const getRepositoryList = async (req: Record<string, any>) => {
 
   const repositories = await Repository.findAll({ limit: limit || DEFAULT_LIMIT, offset: offset || 0, ...(whereClause && { where: whereClause }), attributes: { exclude: ['id'] } });
   return repositories;
+};
+
+// list repositories by tenant
+export const getRepositoryListByTenant = async (req: Record<string, any>, tenant: Tenant) => {
+  const limit: any = _.get(req, 'limit');
+  const offset: any = _.get(req, 'offset');
+  const searchQuery: any = _.get(req, 'search_query');
+
+  let whereClause: any = {
+    status: Status.LIVE,
+    is_active: true,
+    [Op.and]: [
+      Sequelize.literal(`
+        tenant = to_jsonb('${JSON.stringify(tenant.name)}'::json)
+      `),
+    ],
+  };
+
+  if (searchQuery) {
+    whereClause = {
+      ...whereClause,
+      [Op.or]: [
+        Sequelize.literal(`
+    EXISTS (
+      SELECT 1
+      FROM jsonb_each_text(name) AS kv
+      WHERE LOWER(kv.value) LIKE '%${searchQuery.toLowerCase()}%'
+    )
+  `),
+        Sequelize.literal(`
+    EXISTS (
+      SELECT 1
+      FROM jsonb_each_text(description) AS kv
+      WHERE LOWER(kv.value) LIKE '%${searchQuery.toLowerCase()}%'
+    )
+  `),
+      ],
+    };
+  }
+
+  const finalLimit = limit || DEFAULT_LIMIT;
+  const finalOffset = offset || 0;
+
+  const { rows, count } = await Repository.findAndCountAll({ where: whereClause, limit: finalLimit, offset: finalOffset });
+
+  return {
+    repositories: rows,
+    meta: {
+      offset: finalOffset,
+      limit: finalLimit,
+      total: count,
+    },
+  };
 };

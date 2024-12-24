@@ -7,6 +7,8 @@ import repositoryUpdate from '../../controllers/repositoryUpdate/repositoryUpdat
 import deleteRepositoryById from '../../controllers/repositoryDelete/repositoryDelete';
 import discardRepositoryById from '../../controllers/repositoryDiscard/repositoryDiscard';
 import { searchRepositories } from '../../controllers/repositorySearch/repositorySearch';
+import listRepositories from '../../controllers/listRepositories/listRepositories';
+import { userAuth } from '../../middlewares/userAuth';
 
 const repositoryRouter = express.Router();
 
@@ -23,5 +25,7 @@ repositoryRouter.post('/delete/:repository_id', setDataToRequestObject('api.repo
 repositoryRouter.post('/discard/:repository_id', setDataToRequestObject('api.repository.discard'), discardRepositoryById);
 
 repositoryRouter.post('/search', setDataToRequestObject('api.repository.search'), searchRepositories);
+
+repositoryRouter.post('/list', setDataToRequestObject('api.repository.list'), userAuth, listRepositories);
 
 export default repositoryRouter;
