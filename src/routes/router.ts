@@ -1,6 +1,4 @@
 import express from 'express';
-import { learnerRouter } from './entities/learnerRouter';
-import { authRouter } from './auth.route';
 import tenantRouter from './entities/tenantRouter';
 import masterRouter from './entities/masterRouter';
 import bulkUploadRouter from './entities/bulkUploadRouter';
@@ -14,41 +12,47 @@ import boardRouter from './entities/boardRouter';
 import classRouter from './entities/classRouter';
 import skillRouter from './entities/skillRouter';
 import subSkillRouter from './entities/subSkillRouter';
-import { adminAuthRouter } from './admin.auth.route';
+import { userAuthRouter } from './userAuth.route';
+import { userAuth } from '../middlewares/userAuth';
+import { portalRouter } from './portal.router';
 
 export const router = express.Router();
 
-router.use('/tenant', tenantRouter);
+router.use('/auth', userAuthRouter);
 
-router.use('/master', masterRouter);
+router.use('/tenant', userAuth, tenantRouter);
 
-router.use('/bulk', bulkUploadRouter);
+router.use('/master', userAuth, masterRouter);
 
-router.use('/board', boardRouter);
+router.use('/bulk', userAuth, bulkUploadRouter);
 
-router.use('/class', classRouter);
+router.use('/board', userAuth, boardRouter);
 
-router.use('/skill', skillRouter);
+router.use('/class', userAuth, classRouter);
 
-router.use('/sub-skill', subSkillRouter);
+router.use('/skill', userAuth, skillRouter);
 
-router.use('/skill-taxonomy', skillTaxonomyRouter);
+router.use('/sub-skill', userAuth, subSkillRouter);
 
-router.use('/media', mediaRouter);
+router.use('/skill-taxonomy', userAuth, skillTaxonomyRouter);
 
-router.use('/learner', learnerRouter);
+router.use('/media', userAuth, mediaRouter);
 
-router.use('/question', questionRouter);
+router.use('/question', userAuth, questionRouter);
 
-router.use('/question-set', questionSetRouter);
+router.use('/question-set', userAuth, questionSetRouter);
 
-router.use('/content', contentRouter);
+router.use('/content', userAuth, contentRouter);
 
-router.use('/repository', repositoryRouter);
+router.use('/repository', userAuth, repositoryRouter);
 
-router.use('/auth', authRouter);
+/**
+ * ******************************
+ * ***** AML PORTAL ROUTES ******
+ * ******************************
+ */
 
-router.use('/admin/auth', adminAuthRouter);
+router.use('/portal', portalRouter);
 
 router.all('*', (_, res) => {
   res.status(404).json({
