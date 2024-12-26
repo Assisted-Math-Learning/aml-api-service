@@ -6,7 +6,7 @@ import { QuestionType } from '../../../enums/questionType';
 import { LearnerProficiencyQuestionLevelData } from '../../../models/learnerProficiencyQuestionLevelData';
 import { Learner } from '../../../models/learner';
 import { QuestionOperation } from '../../../enums/questionOperation';
-import { FibType } from '../../../enums/fibType';
+import { FIBType } from '../../../enums/fibType';
 
 export const getScoreForTheQuestion = (question: Question, learnerResponse: { result?: string; answerTop?: string; quotient?: string; remainder?: string }): number => {
   const { question_type, question_body } = question;
@@ -16,36 +16,33 @@ export const getScoreForTheQuestion = (question: Question, learnerResponse: { re
   let score = 0;
 
   switch (question_type) {
-    case QuestionType.GRID_1:
-    case QuestionType.FIB: {
+    case QuestionType.GRID_1: {
       if (question.operation === QuestionOperation.DIVISION) {
-        if (question_type === QuestionType.GRID_1) {
-          const quotient = _.get(answers, ['result', 'quotient'], '');
-          const remainder = _.get(answers, ['result', 'remainder'], '');
-          if (lrQuotient?.toString() === quotient.toString() && lrRemainder?.toString() === remainder.toString()) {
-            score = 1;
-          }
+        const quotient = _.get(answers, ['result', 'quotient'], '');
+        const remainder = _.get(answers, ['result', 'remainder'], '');
+        if (lrQuotient?.toString() === quotient.toString() && lrRemainder?.toString() === remainder?.toString()) {
+          score = 1;
         }
-        if (question_type === QuestionType.FIB) {
-          const fibType = _.get(answers, 'fib_type');
-          if (fibType.toString() === FibType.ONE) {
-            const correctAnswer = _.get(answers, ['result'], '');
-            if (correctAnswer.toString() === result?.toString()) {
-              score = 1;
-            }
-          }
-          if (fibType.toString() === FibType.TWO) {
-            const quotient = _.get(answers, ['result', 'quotient'], '');
-            const remainder = _.get(answers, ['result', 'remainder'], '');
-            if (quotient.toString() === lrQuotient?.toString() && remainder.toString() === lrRemainder?.toString()) {
-              score = 1;
-            }
-          }
-        }
-        break;
       } else if (answers && answers.result.toString()) {
-        const { result: correctAnswer } = answers;
+        const correctAnswer = _.get(answers, ['result'], '');
         if (correctAnswer.toString() === result?.toString()) {
+          score = 1;
+        }
+      }
+      break;
+    }
+    case QuestionType.FIB: {
+      const fibType = _.get(answers, 'fib_type');
+      if ([FIBType.FIB_STANDARD, FIBType.FIB_STANDARD_WITH_IMAGE].includes(fibType)) {
+        const correctAnswer = _.get(answers, ['result'], '');
+        if (correctAnswer.toString() === result?.toString()) {
+          score = 1;
+        }
+      }
+      if ([FIBType.FIB_QUOTIENT_REMAINDER, FIBType.FIB_QUOTIENT_REMAINDER_WITH_IMAGE].includes(fibType)) {
+        const quotient = _.get(answers, ['result', 'quotient'], '');
+        const remainder = _.get(answers, ['result', 'remainder'], '');
+        if (quotient?.toString() === lrQuotient?.toString() && remainder?.toString() === lrRemainder?.toString()) {
           score = 1;
         }
       }

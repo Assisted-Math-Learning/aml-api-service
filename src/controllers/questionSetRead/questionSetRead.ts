@@ -11,6 +11,7 @@ import { QuestionType } from '../../enums/questionType';
 import { getFileUrlByFolderAndFileName } from '../../services/awsService';
 import { getContentByIds } from '../../services/content';
 import { Content } from '../../models/content';
+import { FIBType } from '../../enums/fibType';
 
 export const apiId = 'api.questionSet.read';
 
@@ -37,7 +38,11 @@ const readQuestionSetById = async (req: Request, res: Response) => {
   // Create a map of questions by their identifier for easy lookup
   const questionsMap = new Map(
     questionsDetails.map((q: Question) => {
-      if (q.question_type === QuestionType.MCQ && q?.question_body?.question_image) {
+      if (
+        (q.question_type === QuestionType.MCQ ||
+          (q.question_type === QuestionType.FIB && [FIBType.FIB_STANDARD_WITH_IMAGE, FIBType.FIB_QUOTIENT_REMAINDER_WITH_IMAGE].includes(q.question_body.answers?.fib_type))) &&
+        q?.question_body?.question_image
+      ) {
         const { src, file_name } = q.question_body.question_image;
         return [q.identifier, { ...q, question_body: { ...q.question_body, question_image_url: getFileUrlByFolderAndFileName(src, file_name) } }];
       }
