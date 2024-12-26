@@ -1,7 +1,7 @@
 import { QueryInterface, DataTypes } from 'sequelize';
 
-const tableName = 'learner';
-const columnName = 'tenant_id';
+const tableName = 'repository';
+const columnName = 'tenant';
 
 export = {
   /**
@@ -10,10 +10,7 @@ export = {
    * @param queryInterface
    */
   up: async (queryInterface: QueryInterface) => {
-    await queryInterface.addColumn(tableName, columnName, {
-      type: DataTypes.STRING,
-      allowNull: false,
-    });
+    await queryInterface.removeColumn(tableName, columnName);
   },
 
   /**
@@ -22,6 +19,9 @@ export = {
    * @param queryInterface
    */
   down: async (queryInterface: QueryInterface) => {
-    await queryInterface.removeColumn(tableName, columnName);
+    await queryInterface.addColumn(tableName, columnName, {
+      type: DataTypes.JSONB,
+      allowNull: true,
+    });
   },
 };
