@@ -61,7 +61,7 @@ export const getScoreForTheQuestion = (question: Question, learnerResponse: { re
     case QuestionType.GRID_2: {
       const { n1, n2 } = numbers;
       if (numbers && n1 && n2) {
-        if ((n1.toString() === answerTop && n2.toString() === result) || (n2.toString() === answerTop && n1.toString() === result)) {
+        if ((n1.toString() === answerTop?.toString() && n2.toString() === result?.toString()) || (n2.toString() === answerTop?.toString() && n1.toString() === result?.toString())) {
           score = 1;
         }
       }
