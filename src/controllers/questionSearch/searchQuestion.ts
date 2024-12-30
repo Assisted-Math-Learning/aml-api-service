@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import logger from '../../utils/logger';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import { getQuestionList } from '../../services/question';
+import { questionService } from '../../services/questionService';
 import questionSearch from './questionSearchValidationSchema.json';
 import { schemaValidation } from '../../services/validationService';
 import { amlError } from '../../types/amlError';
@@ -22,7 +22,7 @@ export const searchQuestions = async (req: Request, res: Response) => {
     throw amlError(code, isRequestValid.message, 'BAD_REQUEST', 400);
   }
 
-  const questionData = await getQuestionList(requestBody.request);
+  const questionData = await questionService.getQuestionList(requestBody.request);
 
   logger.info({ apiId, requestBody, message: `Questions are listed successfully` });
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: questionData });

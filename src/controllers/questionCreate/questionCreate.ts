@@ -3,7 +3,7 @@ import logger from '../../utils/logger';
 import * as _ from 'lodash';
 import questionSchema from './questionCreateValidationSchema.json';
 import httpStatus from 'http-status';
-import { createQuestionData } from '../../services/question';
+import { questionService } from '../../services/questionService';
 import { schemaValidation } from '../../services/validationService';
 import * as uuid from 'uuid';
 import { amlError } from '../../types/amlError';
@@ -163,7 +163,7 @@ const createQuestion = async (req: Request, res: Response) => {
   });
 
   // Create the question
-  const insertedQuestionData = await createQuestionData(questionData);
+  const insertedQuestionData = await questionService.createQuestionData(questionData);
 
   logger.info({ apiId, requestBody, message: `Question Created Successfully with identifier:${insertedQuestionData.identifier}` });
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Created', identifier: insertedQuestionData.identifier } });

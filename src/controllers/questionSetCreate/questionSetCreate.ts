@@ -15,7 +15,7 @@ import { checkClassNameExists } from '../../services/class';
 import { checkSkillExists } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
 import { checkSubSkillsExist } from '../../services/subSkill';
-import { checkQuestionsExist } from '../../services/question';
+import { questionService } from '../../services/questionService';
 
 export const apiId = 'api.questionSet.create';
 
@@ -72,7 +72,7 @@ const createQuestionSet = async (req: Request, res: Response) => {
   const questionIdentifiers: string[] = questions.map((q: { identifier: any }) => q.identifier);
 
   // Check if the questions exist
-  const { exists: questionsExist, foundQuestions } = await checkQuestionsExist(questionIdentifiers);
+  const { exists: questionsExist, foundQuestions } = await questionService.checkQuestionsExist(questionIdentifiers);
 
   if (!questionsExist) {
     const code = 'QUESTIONS_NOT_FOUND';

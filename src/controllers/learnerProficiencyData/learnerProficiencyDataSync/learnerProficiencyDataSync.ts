@@ -17,7 +17,7 @@ import {
   updateLearnerProficiencyQuestionSetLevelData,
 } from '../../../services/learnerProficiencyData';
 import { getQuestionSetsByIdentifiers } from '../../../services/questionSet';
-import { getQuestionsByIdentifiers } from '../../../services/question';
+import { questionService } from '../../../services/questionService';
 import * as uuid from 'uuid';
 import {
   aggregateLearnerData,
@@ -82,7 +82,7 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
    */
   const questionIds = questions_data.map((datum: any) => datum.question_id);
   logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: reading questions`);
-  const questions = await getQuestionsByIdentifiers(questionIds);
+  const questions = await questionService.getQuestionsByIdentifiers(questionIds);
   logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: questions read`);
 
   const questionSetIds = _.uniq(questions_data.map((datum: any) => datum.question_set_id));

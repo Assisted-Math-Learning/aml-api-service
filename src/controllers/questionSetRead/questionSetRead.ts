@@ -5,7 +5,7 @@ import httpStatus from 'http-status';
 import { getQuestionSetByIdAndStatus } from '../../services/questionSet';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
-import { getAllQuestionsByIdentifiers } from '../../services/question';
+import { questionService } from '../../services/questionService';
 import { Question } from '../../models/question';
 import { QuestionType } from '../../enums/questionType';
 import { getFileUrlByFolderAndFileName } from '../../services/awsService';
@@ -30,14 +30,14 @@ const readQuestionSetById = async (req: Request, res: Response) => {
   }
 
   const questionIds = questionSetDetails.questions.map((q: { identifier: any }) => q.identifier);
-  const questionsDetails = await getAllQuestionsByIdentifiers(questionIds);
+  const questionsDetails = await questionService.getQuestionsByIdentifiers(questionIds);
 
   const contentIds = questionSetDetails.content_ids;
   const contents = contentIds && contentIds?.length > 0 ? await getContentByIds(contentIds) : [];
 
   // Create a map of questions by their identifier for easy lookup
   const questionsMap = new Map(
-    questionsDetails.map((q: Question) => {
+    questionsDetails.map((q: Question): any => {
       if (
         (q.question_type === QuestionType.MCQ ||
           (q.question_type === QuestionType.FIB && [FIBType.FIB_STANDARD_WITH_IMAGE, FIBType.FIB_QUOTIENT_REMAINDER_WITH_IMAGE].includes(q.question_body.answers?.fib_type))) &&

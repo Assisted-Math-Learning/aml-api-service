@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import logger from '../../utils/logger';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import { getQuestionById, discardQuestion } from '../../services/question';
+import { questionService } from '../../services/questionService';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
 
@@ -13,7 +13,7 @@ const discardQuestionById = async (req: Request, res: Response) => {
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const resmsgid = _.get(res, 'resmsgid');
 
-  const questionDetails = await getQuestionById(question_id);
+  const questionDetails = await questionService.getQuestionById(question_id);
 
   //validating Question is exist
   if (_.isEmpty(questionDetails)) {
@@ -22,7 +22,7 @@ const discardQuestionById = async (req: Request, res: Response) => {
     throw amlError(code, 'Question not exists', 'NOT_FOUND', 404);
   }
 
-  await discardQuestion(question_id);
+  await questionService.discardQuestion(question_id);
 
   logger.info({ apiId, msgid, resmsgid, question_id, message: 'Question Discarded successfully' });
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Discard successfully' } });

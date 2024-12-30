@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import { getQuestionById, updateQuestionData } from '../../services/question';
+import { questionService } from '../../services/questionService';
 import { schemaValidation } from '../../services/validationService';
 import logger from '../../utils/logger';
 import questionUpdateSchema from './questionUpdateValidationSchema.json';
@@ -35,7 +35,7 @@ const updateQuestionById = async (req: Request, res: Response) => {
   }
 
   // Validate question existence
-  const question = await getQuestionById(question_id);
+  const question = await questionService.getQuestionById(question_id);
 
   if (_.isEmpty(question)) {
     const code = 'QUESTION_NOT_EXISTS';
@@ -159,7 +159,7 @@ const updateQuestionById = async (req: Request, res: Response) => {
   const mergedData = _.merge({}, question, dataBody, updatedDataBody);
 
   // Update Question
-  await updateQuestionData(question_id, mergedData);
+  await questionService.updateQuestionData(question_id, mergedData);
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Updated' } });
 };
 
