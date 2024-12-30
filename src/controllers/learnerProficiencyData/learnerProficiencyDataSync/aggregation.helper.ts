@@ -8,10 +8,10 @@ import { Learner } from '../../../models/learner';
 import { QuestionOperation } from '../../../enums/questionOperation';
 import { FIBType } from '../../../enums/fibType';
 
-export const getScoreForTheQuestion = (question: Question, learnerResponse: { result?: string; answerTop?: string; quotient?: string; remainder?: string }): number => {
+export const getScoreForTheQuestion = (question: Question, learnerResponse: { result?: string; quotient?: string; remainder?: string; answerTopRow?: string; answerBottomRow?: string }): number => {
   const { question_type, question_body } = question;
   const { answers, correct_option, numbers, options } = question_body;
-  const { result, answerTop, quotient: lrQuotient, remainder: lrRemainder } = learnerResponse;
+  const { result, quotient: lrQuotient, remainder: lrRemainder, answerTopRow, answerBottomRow } = learnerResponse;
 
   let score = 0;
 
@@ -59,9 +59,17 @@ export const getScoreForTheQuestion = (question: Question, learnerResponse: { re
       break;
     }
     case QuestionType.GRID_2: {
+      const { operation } = question;
       const { n1, n2 } = numbers;
-      if (numbers && n1 && n2) {
-        if ((n1.toString() === answerTop?.toString() && n2.toString() === result?.toString()) || (n2.toString() === answerTop?.toString() && n1.toString() === result?.toString())) {
+      if (numbers && n1 && n2 && answerTopRow && answerBottomRow) {
+        if (
+          operation === QuestionOperation.ADDITION &&
+          ((n1.toString() === answerTopRow?.toString() && n2.toString() === answerBottomRow?.toString()) ||
+            (n2.toString() === answerTopRow?.toString() && n1.toString() === answerBottomRow?.toString()))
+        ) {
+          score = 1;
+        }
+        if (operation === QuestionOperation.SUBTRACTION && n1.toString() === answerTopRow?.toString() && n2.toString() === answerBottomRow?.toString()) {
           score = 1;
         }
       }
