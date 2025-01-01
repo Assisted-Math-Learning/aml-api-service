@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import logger from '../../utils/logger';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import { getQuestionSetByIdAndStatus, discardQuestionSet } from '../../services/questionSet';
+import { questionSetService } from '../../services/questionSetService';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
 
@@ -13,7 +13,7 @@ const discardQuestionSetById = async (req: Request, res: Response) => {
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const resmsgid = _.get(res, 'resmsgid');
 
-  const questionDetails = await getQuestionSetByIdAndStatus(questionSet_id);
+  const questionDetails = await questionSetService.getQuestionSetByIdAndStatus(questionSet_id);
 
   // Validating if question set exists
   if (_.isEmpty(questionDetails)) {
@@ -22,7 +22,7 @@ const discardQuestionSetById = async (req: Request, res: Response) => {
     throw amlError(code, 'Question Set not exists', 'NOT_FOUND', 404);
   }
 
-  await discardQuestionSet(questionSet_id);
+  await questionSetService.discardQuestionSet(questionSet_id);
 
   logger.info({ apiId, msgid, resmsgid, questionSet_id, message: 'Question Set discarded successfully' });
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Set discarded successfully' } });

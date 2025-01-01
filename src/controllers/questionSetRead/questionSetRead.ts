@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import logger from '../../utils/logger';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import { getQuestionSetByIdAndStatus } from '../../services/questionSet';
+import { questionSetService } from '../../services/questionSetService';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { questionService } from '../../services/questionService';
@@ -20,7 +20,7 @@ const readQuestionSetById = async (req: Request, res: Response) => {
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const resmsgid = _.get(res, 'resmsgid');
 
-  const questionSetDetails = await getQuestionSetByIdAndStatus(questionSet_id);
+  const questionSetDetails = await questionSetService.getQuestionSetByIdAndStatus(questionSet_id);
 
   // Validating if question set exists
   if (_.isEmpty(questionSetDetails)) {
@@ -36,7 +36,7 @@ const readQuestionSetById = async (req: Request, res: Response) => {
   const contents = contentIds && contentIds?.length > 0 ? await getContentByIds(contentIds) : [];
 
   // Create a map of questions by their identifier for easy lookup
-  const questionsMap = new Map(
+  const questionsMap: { [key: string]: any } = new Map(
     questionsDetails.map((q: Question): any => {
       if (
         (q.question_type === QuestionType.MCQ ||
@@ -59,9 +59,9 @@ const readQuestionSetById = async (req: Request, res: Response) => {
       return agg;
     }, []),
     questions: questionSetDetails.questions
-      .map((q: { identifier: any }) => questionsMap.get(q.identifier))
+      .map((q): Question => questionsMap.get(q.identifier))
       .filter(Boolean)
-      .sort((a: { identifier: any }, b: { identifier: any }) => {
+      .sort((a, b) => {
         const sequenceA = questionSetDetails.questions.find((q: { identifier: any }) => q.identifier === a.identifier)?.sequence || 0;
         const sequenceB = questionSetDetails.questions.find((q: { identifier: any }) => q.identifier === b.identifier)?.sequence || 0;
         return sequenceA - sequenceB;

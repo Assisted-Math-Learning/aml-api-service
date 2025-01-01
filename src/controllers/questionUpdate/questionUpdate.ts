@@ -14,7 +14,7 @@ import { checkClassNameExists } from '../../services/class';
 import { checkSkillExists } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
 import { checkSubSkillsExist } from '../../services/subSkill';
-import { getQuestionSetById } from '../../services/questionSet';
+import { questionSetService } from '../../services/questionSetService';
 
 export const apiId = 'api.question.update';
 
@@ -48,7 +48,7 @@ const updateQuestionById = async (req: Request, res: Response) => {
 
   //checking question id if it exists
   if (questionSetId) {
-    const questionSet = await getQuestionSetById(questionSetId);
+    const questionSet = await questionSetService.getQuestionSetById(questionSetId);
     if (_.isEmpty(questionSet)) {
       const code = 'QUESTION_SET_NOT_EXISTS';
       logger.error({ code, apiId, msgid, resmsgid, message: `Question set id not exists` });

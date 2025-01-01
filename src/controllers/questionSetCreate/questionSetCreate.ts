@@ -3,7 +3,7 @@ import logger from '../../utils/logger';
 import * as _ from 'lodash';
 import questionSetSchema from './questionSetCreateValidationSchema.json';
 import httpStatus from 'http-status';
-import { createQuestionSetData } from '../../services/questionSet';
+import { questionSetService } from '../../services/questionSetService';
 import { schemaValidation } from '../../services/validationService';
 import * as uuid from 'uuid';
 import { amlError } from '../../types/amlError';
@@ -188,7 +188,7 @@ const createQuestionSet = async (req: Request, res: Response) => {
     sub_skills: subSkillObjects,
   });
 
-  const questionSetData = await createQuestionSetData(questionSetInsertData);
+  const questionSetData = await questionSetService.createQuestionSetData(questionSetInsertData);
 
   logger.info({ apiId, requestBody, message: `Question Set Created Successfully with identifier:${questionSetData.identifier}` });
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Set Successfully Created', identifier: questionSetData.identifier } });

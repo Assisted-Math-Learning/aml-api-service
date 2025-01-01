@@ -6,7 +6,7 @@ import questionSearch from './questionSetSearchValidationSchema.json';
 import { schemaValidation } from '../../services/validationService';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
-import { getQuestionSetList } from '../../services/questionSet';
+import { questionSetService } from '../../services/questionSetService';
 
 export const apiId = 'api.questionSet.search';
 
@@ -22,7 +22,7 @@ export const searchQuestionSets = async (req: Request, res: Response) => {
     throw amlError(code, isRequestValid.message, 'BAD_REQUEST', 400);
   }
 
-  const questionSetData = await getQuestionSetList(requestBody.request);
+  const questionSetData = await questionSetService.getQuestionSetList(requestBody.request);
   logger.info({ apiId, requestBody, message: `Question Sets are listed successfully` });
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: questionSetData });
 };

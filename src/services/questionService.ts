@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Question } from '../models/question';
 import { Status } from '../enums/status';
 import { DEFAULT_LIMIT } from '../constants/constants';
-import { getQuestionSetById } from './questionSet';
+import { questionSetService } from './questionSetService';
 
 class QuestionService {
   static getInstance() {
@@ -80,7 +80,7 @@ class QuestionService {
     }
 
     if (filters.question_set_id) {
-      const questionSet = await getQuestionSetById(filters.question_set_id);
+      const questionSet = await questionSetService.getQuestionSetById(filters.question_set_id);
       if (questionSet) {
         const { questions } = questionSet;
         const questionIds = questions.map((question) => question.identifier);

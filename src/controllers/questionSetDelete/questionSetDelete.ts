@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import logger from '../../utils/logger';
 import * as _ from 'lodash';
-import { getQuestionSetByIdAndStatus, deleteQuestionSet } from '../../services/questionSet';
+import { questionSetService } from '../../services/questionSetService';
 import { amlError } from '../../types/amlError';
 import httpStatus from 'http-status';
 import { ResponseHandler } from '../../utils/responseHandler';
@@ -13,7 +13,7 @@ const deleteQuestionSetById = async (req: Request, res: Response) => {
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const resmsgid = _.get(res, 'resmsgid');
 
-  const questionSetDetails = await getQuestionSetByIdAndStatus(questionSet_id, { is_active: true });
+  const questionSetDetails = await questionSetService.getQuestionSetByIdAndStatus(questionSet_id, { is_active: true });
   // Validating if question set exists
   if (_.isEmpty(questionSetDetails)) {
     const code = 'QUESTION_SET_NOT_EXISTS';
@@ -21,7 +21,7 @@ const deleteQuestionSetById = async (req: Request, res: Response) => {
     throw amlError(code, 'Question Set not exists', 'NOT_FOUND', 404);
   }
 
-  await deleteQuestionSet(questionSet_id);
+  await questionSetService.deleteQuestionSet(questionSet_id);
 
   logger.info({ apiId, msgid, resmsgid, questionSet_id, message: 'Question Set deleted successfully' });
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Set deleted successfully' } });

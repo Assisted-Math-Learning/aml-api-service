@@ -7,7 +7,7 @@ import { amlError } from '../../../types/amlError';
 import { getEntitySearch } from '../../../services/master';
 import { readLearnerJourney, readLearnerJourneyByLearnerIdAndQuestionSetId } from '../../../services/learnerJourney';
 import { LearnerJourneyStatus } from '../../../enums/learnerJourneyStatus';
-import { getMainDiagnosticQuestionSet, getNextPracticeQuestionSetInSequence, getPracticeQuestionSet, getQuestionSetById } from '../../../services/questionSet';
+import { questionSetService } from '../../../services/questionSetService';
 import { findAggregateData } from '../../../services/learnerAggregateData';
 import { PASSING_MARKS } from '../../../constants/constants';
 import { QuestionSetPurposeType } from '../../../enums/questionSetPurposeType';
@@ -107,9 +107,9 @@ const evaluateLearner = async (req: Request, res: Response) => {
      * If not a fresh user
      */
     if (learnerJourney) {
-      const learnerJourneyQuestionSet = await getQuestionSetById(learnerJourney.question_set_id);
+      const learnerJourneyQuestionSet = await questionSetService.getQuestionSetById(learnerJourney.question_set_id);
       if (learnerJourneyQuestionSet!.purpose !== QuestionSetPurposeType.MAIN_DIAGNOSTIC && learnerJourneyQuestionSet!.taxonomy.l1_skill?.identifier === skillIdentifier) {
-        const nextPracticeQuestionSet = await getNextPracticeQuestionSetInSequence({
+        const nextPracticeQuestionSet = await questionSetService.getNextPracticeQuestionSetInSequence({
           repositoryIds,
           boardId: learnerJourneyQuestionSet!.taxonomy.board?.identifier,
           classIds: allApplicableGradeIds,
@@ -136,12 +136,29 @@ const evaluateLearner = async (req: Request, res: Response) => {
      * last attempted question set purpose is MD OR
      * no more practice question sets are available for the current skill
      */
-    const mainDiagnosticQS = await getMainDiagnosticQuestionSet({
+    const mainDiagnosticQS = await questionSetService.getMainDiagnosticQuestionSet({
       repositoryIds,
       boardId: boardEntity?.[0]?.identifier,
       classId: highestApplicableGradeMapping?.identifier,
       l1SkillId: skillIdentifier,
     });
+
+    if (!mainDiagnosticQS) {
+      const code = 'NO_MAIN_DIAGNOSTIC_QUESTION_SET_AVAILABLE';
+      logger.error({
+        code,
+        apiId,
+        msgid,
+        resmsgid,
+        message: `Main Diagnostic Question Set for repository: ${JSON.stringify(repositoryIds)}, skill: ${skillEntity?.name?.en || skillEntity?.identifier}, board: ${boardEntity?.[0]?.identifier}, class: ${classEntity?.[0]?.identifier} does not exist`,
+      });
+      throw amlError(
+        code,
+        `Main Diagnostic Question Set for repository: ${JSON.stringify(repositoryIds)}, skill: ${skillEntity?.name?.en || skillEntity?.identifier}, board: ${boardEntity?.[0]?.identifier}, class: ${classEntity?.[0]?.identifier} does not exist`,
+        'NOT_FOUND',
+        404,
+      );
+    }
 
     const { learnerJourney: learnerJourneyForMDQS } = await readLearnerJourneyByLearnerIdAndQuestionSetId(learner_id, mainDiagnosticQS?.identifier);
     if (_.isEmpty(learnerJourneyForMDQS)) {
@@ -159,7 +176,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
     }
 
     if (lowestApplicableGradeForPractice) {
-      const practiceQuestionSet = await getPracticeQuestionSet({ repositoryIds, boardId: learnerBoardId, classId: lowestApplicableGradeForPractice, l1SkillId: skillIdentifier });
+      const practiceQuestionSet = await questionSetService.getPracticeQuestionSet({ repositoryIds, boardId: learnerBoardId, classId: lowestApplicableGradeForPractice, l1SkillId: skillIdentifier });
       if (practiceQuestionSet) {
         questionSetId = practiceQuestionSet?.identifier;
         break;
@@ -169,7 +186,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
 
   // TODO: Remove later
   if (!questionSetId && requiredL1Skills.length && !allQuestionsAttempted) {
-    const practiceQuestionSet = await getPracticeQuestionSet({
+    const practiceQuestionSet = await questionSetService.getPracticeQuestionSet({
       repositoryIds,
       boardId: learnerBoardId,
       classId: highestApplicableGradeMapping.identifier,
