@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import { ResponseHandler } from '../../utils/responseHandler';
-import { getBoardList } from '../../services/board';
+import { boardService } from '../../services/boardService';
 import _ from 'lodash';
 import { schemaValidation } from '../../services/validationService';
 import listBoardJson from './listBoardsValidationSchema.json';
@@ -20,7 +20,7 @@ const listBoards = async (req: Request, res: Response) => {
     logger.error({ code, apiId, msgid, resmsgid, requestBody, message: isRequestValid.message });
     throw amlError(code, isRequestValid.message, 'BAD_REQUEST', 400);
   }
-  const boardsData = await getBoardList(requestBody.request);
+  const boardsData = await boardService.getBoardList(requestBody.request);
 
   logger.info({ apiId, requestBody, message: `Boards are listed successfully` });
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: boardsData });

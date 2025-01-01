@@ -1,5 +1,5 @@
 import app from '../../app';
-import { boardMaster } from '../../models/boardMaster';
+import { BoardMaster } from '../../models/boardMaster';
 import { classMaster } from '../../models/classMaster';
 import { SubSkillMaster } from '../../models/subSkillMaster';
 import chai from 'chai';
@@ -22,12 +22,12 @@ describe('Master Insert API', () => {
 
   it('Should bulk insert entities into the database', (done) => {
     // Mocking findOne to simulate no entities found
-    chai.spy.on(boardMaster, 'findOne', () => Promise.resolve(null));
+    chai.spy.on(BoardMaster, 'findOne', () => Promise.resolve(null));
     chai.spy.on(classMaster, 'findOne', () => Promise.resolve(null));
     chai.spy.on(SubSkillMaster, 'findOne', () => Promise.resolve(null));
 
     // Mocking create to simulate entity creation
-    chai.spy.on(boardMaster, 'create', () => Promise.resolve({ id: 1, name: 'Board1' }));
+    chai.spy.on(BoardMaster, 'create', () => Promise.resolve({ id: 1, name: 'Board1' }));
     chai.spy.on(classMaster, 'create', () => Promise.resolve({ id: 1, name: 'Class1' }));
     chai.spy.on(SubSkillMaster, 'create', () => Promise.resolve({ id: 1, name: 'SubSkill1' }));
 
@@ -63,12 +63,12 @@ describe('Master Insert API', () => {
   // Test case: Insert fails due to database connection issues
   it('Should return an error when database connection fails', (done) => {
     // Mocking create to simulate a failure
-    chai.spy.on(boardMaster, 'findOne', () => Promise.resolve(null));
+    chai.spy.on(BoardMaster, 'findOne', () => Promise.resolve(null));
     chai.spy.on(classMaster, 'findOne', () => Promise.resolve(null));
     chai.spy.on(SubSkillMaster, 'findOne', () => Promise.resolve(null));
 
     // Mocking create to simulate an error during creation
-    chai.spy.on(boardMaster, 'create', () => Promise.reject(new Error('Database error')));
+    chai.spy.on(BoardMaster, 'create', () => Promise.reject(new Error('Database error')));
     chai.spy.on(classMaster, 'create', () => Promise.reject(new Error('Database error')));
     chai.spy.on(SubSkillMaster, 'create', () => Promise.reject(new Error('Database error')));
 

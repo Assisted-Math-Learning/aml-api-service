@@ -11,7 +11,7 @@ import { getMainDiagnosticQuestionSet, getNextPracticeQuestionSetInSequence, get
 import { findAggregateData } from '../../../services/learnerAggregateData';
 import { PASSING_MARKS } from '../../../constants/constants';
 import { QuestionSetPurposeType } from '../../../enums/questionSetPurposeType';
-import { boardMaster } from '../../../models/boardMaster';
+import { BoardMaster } from '../../../models/boardMaster';
 import { classMaster } from '../../../models/classMaster';
 import { fetchSkillsByIds } from '../../../services/skill';
 import { findRepositoryAssociations } from '../../../services/repositoryAssociation';
@@ -46,7 +46,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
   /**
    * Validate learner board
    */
-  const boardEntity: boardMaster[] = await getEntitySearch({ entityType: 'board', filters: { identifier: learnerBoardId } });
+  const boardEntity: BoardMaster[] = await getEntitySearch({ entityType: 'board', filters: { identifier: learnerBoardId } });
   if (!boardEntity.length) {
     const code = 'LEARNER_BOARD_NOT_FOUND';
     logger.error({ code, apiId, msgid, resmsgid, message: `Learner Board: ${learnerBoardId} does not exist` });
@@ -83,10 +83,10 @@ const evaluateLearner = async (req: Request, res: Response) => {
 
   const repositoryIds = repositoriesAssociations.map((repositoryAssociation) => repositoryAssociation.repository_id);
 
-  const class_ids = (boardEntity?.[0]?.class_ids || []).sort((a, b) => a.sequence_no - b.sequence_no);
-  const currentGrade = class_ids.find((datum) => datum.identifier === classEntity?.[0]?.identifier);
+  const class_ids = (boardEntity?.[0]?.class_ids || []).sort((a: { sequence_no: number }, b: { sequence_no: number }) => a.sequence_no - b.sequence_no);
+  const currentGrade = class_ids.find((datum: { identifier: string }) => datum.identifier === classEntity?.[0]?.identifier);
 
-  const currentGradeIndex = class_ids.findIndex((datum) => datum.identifier === classEntity?.[0]?.identifier);
+  const currentGradeIndex = class_ids.findIndex((datum: { identifier: string }) => datum.identifier === classEntity?.[0]?.identifier);
   const highestApplicableGradeMapping = class_ids[currentGradeIndex - 1] as { identifier: string; l1_skill_ids: string[] };
   const requiredL1SkillsIds = highestApplicableGradeMapping.l1_skill_ids;
   const requiredL1Skills = await fetchSkillsByIds(requiredL1SkillsIds);
@@ -96,7 +96,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
 
   for (const skillEntity of requiredL1Skills) {
     const { identifier: skillIdentifier } = skillEntity;
-    const allApplicableGradeIds = class_ids.reduce((agg: string[], curr) => {
+    const allApplicableGradeIds = class_ids.reduce((agg: string[], curr: { l1_skill_ids: string | string[]; sequence_no: number; identifier: string }) => {
       if (curr.l1_skill_ids.includes(skillIdentifier) && curr.sequence_no < currentGrade!.sequence_no) {
         agg.push(curr.identifier);
       }

@@ -1,4 +1,4 @@
-import { boardMaster } from '../models/boardMaster';
+import { BoardMaster } from '../models/boardMaster';
 import { classMaster } from '../models/classMaster';
 import { SubSkillMaster } from '../models/subSkillMaster';
 import { Status } from '../enums/status';
@@ -133,7 +133,7 @@ const handleBoardInsertion = async (boardData: any[]) => {
         }
       }
 
-      return insertData(boardMaster, board, 'name');
+      return insertData(BoardMaster, board, 'name');
     }),
   );
 
@@ -168,7 +168,7 @@ export const getEntitySearch = async (req: Record<string, any>): Promise<any> =>
     skill: SkillMaster,
     subSkill: SubSkillMaster,
     class: classMaster,
-    board: boardMaster,
+    board: BoardMaster,
   };
 
   const model = modelMappings[entityType];

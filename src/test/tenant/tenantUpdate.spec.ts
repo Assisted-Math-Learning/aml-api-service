@@ -4,7 +4,7 @@ import chaiSpies from 'chai-spies';
 import app from '../../app';
 import { Tenant } from '../../models/tenant';
 import { updateTenatTenantBoard } from './fixture';
-import { boardMaster } from '../../models/boardMaster';
+import { BoardMaster } from '../../models/boardMaster';
 
 chai.use(chaiHttp);
 chai.use(chaiSpies);
@@ -21,7 +21,7 @@ describe('Tenant update API', () => {
       return Promise.resolve({ dataValues: { id: 1, is_active: true } });
     });
 
-    chai.spy.on(boardMaster, 'findAll', () => {
+    chai.spy.on(BoardMaster, 'findAll', () => {
       return Promise.resolve({ dataValues: [{ id: 1, name: 'Board 1', is_active: true }] });
     });
 

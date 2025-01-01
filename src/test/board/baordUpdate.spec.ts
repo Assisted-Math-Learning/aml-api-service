@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import chaiSpies from 'chai-spies';
 import app from '../../app';
-import { boardMaster } from '../../models/boardMaster'; // Adjust this import as needed
+import { BoardMaster } from '../../models/boardMaster'; // Adjust this import as needed
 import { board_update_request } from './fixture'; // Ensure this file provides the correct fixtures
 import { SkillTaxonomy } from '../../models/skillTaxonomy';
 import { classMaster } from '../../models/classMaster';
@@ -20,7 +20,7 @@ describe('BOARD UPDATE API', () => {
 
   // Test case: Successful board update
   it('should return 200 and update the board successfully', (done) => {
-    chai.spy.on(boardMaster, 'findOne', () => {
+    chai.spy.on(BoardMaster, 'findOne', () => {
       return Promise.resolve({ dataValues: { status: 'live' } });
     });
 
@@ -45,7 +45,7 @@ describe('BOARD UPDATE API', () => {
       ]);
     });
 
-    chai.spy.on(boardMaster, 'update', () => {
+    chai.spy.on(BoardMaster, 'update', () => {
       return Promise.resolve([1, [{ id: 1, status: 'live' }]]); // Simulate successful update
     });
 
@@ -64,7 +64,7 @@ describe('BOARD UPDATE API', () => {
 
   // Test case: Database connection error
   it('should return 500 and database connection error in read', (done) => {
-    chai.spy.on(boardMaster, 'findOne', () => {
+    chai.spy.on(BoardMaster, 'findOne', () => {
       return Promise.reject(new Error('Database Connection Error'));
     });
 
@@ -84,7 +84,7 @@ describe('BOARD UPDATE API', () => {
 
   // Test case: Not Found error
   it('should return 404 if the board does not exist', (done) => {
-    chai.spy.on(boardMaster, 'findOne', () => {
+    chai.spy.on(BoardMaster, 'findOne', () => {
       return Promise.resolve(null); // Simulate not found
     });
 

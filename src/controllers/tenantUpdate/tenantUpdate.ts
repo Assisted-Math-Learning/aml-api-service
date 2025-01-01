@@ -5,7 +5,7 @@ import { getTenant, updateTenantData } from '../../services/tenant';
 import { schemaValidation } from '../../services/validationService';
 import logger from '../../utils/logger';
 import tenantUpdateJson from './updateTenantValidationSchema.json';
-import { getBoards } from '../../services/board';
+import { boardService } from '../../services/boardService';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { amlError } from '../../types/amlError';
 
@@ -35,7 +35,7 @@ const updateTenant = async (req: Request, res: Response) => {
 
   // Validate boards
   if (dataBody.board_id) {
-    const boards = await getBoards(dataBody.board_id);
+    const boards = await boardService.getBoards(dataBody.board_id);
 
     if (boards.length !== dataBody.board_id.length) {
       const code = 'BOARD_NOT_EXISTS';

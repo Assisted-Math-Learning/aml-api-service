@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 import spies from 'chai-spies';
 import { describe, it } from 'mocha';
 import { tenant_request } from './fixture';
-import { boardMaster } from '../../models/boardMaster';
+import { BoardMaster } from '../../models/boardMaster';
 
 chai.use(spies);
 chai.should();
@@ -26,7 +26,7 @@ describe('TENANT CREATE API', () => {
       return Promise.resolve(null);
     });
 
-    chai.spy.on(boardMaster, 'findAll', () => {
+    chai.spy.on(BoardMaster, 'findAll', () => {
       return Promise.resolve([{ id: 1, name: 'Board 1', is_active: true }]);
     });
 
@@ -88,7 +88,7 @@ describe('TENANT CREATE API', () => {
       return Promise.reject(new Error('Database Connection Error'));
     });
 
-    chai.spy.on(boardMaster, 'findAll', () => {
+    chai.spy.on(BoardMaster, 'findAll', () => {
       return Promise.reject(new Error('Database Connection Error'));
     });
 

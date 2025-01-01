@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import httpStatus from 'http-status';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
-import { getBoard } from '../../services/board';
+import { boardService } from '../../services/boardService';
 
 export const apiId = 'api.board.read';
 
@@ -14,7 +14,7 @@ const boardReadById = async (req: Request, res: Response) => {
   const resmsgid = _.get(res, 'resmsgid');
 
   // Fetch board details by identifier
-  const boardDetails = await getBoard(boardId);
+  const boardDetails = await boardService.getBoardByIdentifier(boardId);
 
   // Validate if board exists
   if (_.isEmpty(boardDetails)) {

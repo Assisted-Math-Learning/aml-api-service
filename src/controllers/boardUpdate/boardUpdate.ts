@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import { getBoard, updateBoardData } from '../../services/board';
+import { boardService } from '../../services/boardService';
 import { schemaValidation } from '../../services/validationService';
 import logger from '../../utils/logger';
 import boardUpdateJson from './updateBoardValidationSchema.json';
@@ -29,7 +29,7 @@ const updateBoard = async (req: Request, res: Response) => {
   }
 
   // Validate board existence
-  const board = await getBoard(board_id);
+  const board = await boardService.getBoardByIdentifier(board_id);
   if (_.isEmpty(board)) {
     const code = 'BOARD_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: 'Board does not exist' });
@@ -79,7 +79,7 @@ const updateBoard = async (req: Request, res: Response) => {
     }
   }
 
-  await updateBoardData(board_id, updatedData);
+  await boardService.updateBoardData(board_id, updatedData);
 
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Board Successfully Updated' } });
 };

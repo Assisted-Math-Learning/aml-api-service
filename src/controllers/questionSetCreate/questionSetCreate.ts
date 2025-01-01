@@ -10,7 +10,7 @@ import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { checkTenantNameExists } from '../../services/tenant';
 import { checkRepositoryNameExists } from '../../services/repository';
-import { checkBoardNamesExists } from '../../services/board';
+import { boardService } from '../../services/boardService';
 import { checkClassNameExists } from '../../services/class';
 import { checkSkillExists } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
@@ -92,7 +92,7 @@ const createQuestionSet = async (req: Request, res: Response) => {
 
   // Check board
   const boardName = dataBody.taxonomy.board.name;
-  const boardExists = await checkBoardNamesExists(boardName);
+  const boardExists = await boardService.checkBoardNamesExists(boardName);
   if (!boardExists.exists) {
     const code = 'BOARD_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: `Board not exists` });

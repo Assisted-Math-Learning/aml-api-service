@@ -6,7 +6,7 @@ import httpStatus from 'http-status';
 import { createTenantData } from '../../services/tenant';
 import { schemaValidation } from '../../services/validationService';
 import * as uuid from 'uuid';
-import { getBoards } from '../../services/board';
+import { boardService } from '../../services/boardService';
 import { Status } from '../../enums/status';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { amlError } from '../../types/amlError';
@@ -27,7 +27,7 @@ const createTenant = async (req: Request, res: Response) => {
     throw amlError(code, isRequestValid.message, 'BAD_REQUEST', 400);
   }
 
-  const boards = await getBoards(dataBody.board_id);
+  const boards = await boardService.getBoards(dataBody.board_id);
 
   if (boards.length !== dataBody.board_id.length) {
     const code = 'BOARD_NOT_EXISTS';

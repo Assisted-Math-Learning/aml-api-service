@@ -11,7 +11,7 @@ import { ResponseHandler } from '../../utils/responseHandler';
 import { createContentData } from '../../services/content';
 import { checkTenantNameExists } from '../../services/tenant';
 import { checkRepositoryNameExists } from '../../services/repository';
-import { checkBoardNamesExists } from '../../services/board';
+import { boardService } from '../../services/boardService';
 import { checkClassNameExists } from '../../services/class';
 import { SkillType } from '../../enums/skillType';
 import { checkSkillExists } from '../../services/skill';
@@ -66,7 +66,7 @@ const createContent = async (req: Request, res: Response) => {
 
   // Check board
   const boardName = dataBody.taxonomy.board.name;
-  const boardExists = await checkBoardNamesExists(boardName);
+  const boardExists = await boardService.checkBoardNamesExists(boardName);
   if (!boardExists.exists) {
     const code = 'BOARD_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: `Board not exists` });

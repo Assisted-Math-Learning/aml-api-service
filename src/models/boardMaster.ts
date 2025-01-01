@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import { AppDataSource } from '../config';
 
-export class boardMaster extends Model {
+export class BoardMaster extends Model {
   declare id: number;
   declare identifier: string;
   declare name: { [key: string]: string };
@@ -19,7 +19,7 @@ export class boardMaster extends Model {
   declare updated_by: string | null;
 }
 
-boardMaster.init(
+BoardMaster.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -69,7 +69,7 @@ boardMaster.init(
   },
   {
     sequelize: AppDataSource,
-    modelName: 'boardMaster',
+    modelName: 'BoardMaster',
     tableName: 'board_master',
     timestamps: true,
     createdAt: 'created_at',
