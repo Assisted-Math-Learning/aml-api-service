@@ -57,6 +57,9 @@ const login = async (req: Request, res: Response) => {
       email: user.email,
     },
     aml_jwt_secret_key,
+    {
+      expiresIn: 604800,
+    },
   );
 
   const result = {

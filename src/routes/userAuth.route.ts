@@ -4,8 +4,8 @@ import login from '../controllers/adminAuth/login/login';
 import me from '../controllers/user/me';
 import { userAuth } from '../middlewares/userAuth';
 
-export const adminAuthRouter = express.Router();
+export const userAuthRouter = express.Router();
 
-adminAuthRouter.post('/login', setDataToRequestObject('api.admin.auth.login'), login);
+userAuthRouter.post('/login', setDataToRequestObject('api.user.auth.login'), login);
 
-adminAuthRouter.get('/me', setDataToRequestObject('api.admin.auth.me'), userAuth, me);
+userAuthRouter.get('/me', setDataToRequestObject('api.user.auth.me'), userAuth, me);

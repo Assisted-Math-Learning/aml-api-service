@@ -5,26 +5,12 @@ import { appConfiguration } from './config';
 import logger from './utils/logger';
 import { router } from './routes/router';
 import { amlErrorHandler } from './middlewares/errorhandler';
-import session from 'express-session';
-import pg from 'pg';
-import ConnectPgSimple from 'connect-pg-simple';
-import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import RateLimit from 'express-rate-limit';
 import { cronProvider } from './providers/cron.provider';
 
 const { envPort } = appConfiguration;
-
-// PostgreSQL connection
-const pgPool = new pg.Pool({
-  user: process.env.AML_SERVICE_DB_USER,
-  host: process.env.AML_SERVICE_DB_HOST,
-  database: process.env.AML_SERVICE_DB_NAME,
-  password: process.env.AML_SERVICE_DB_PASS,
-  port: 5432,
-});
-const PgSession = ConnectPgSimple(session);
 
 const app: Application = express();
 
@@ -70,26 +56,6 @@ const initializeServer = (): void => {
     // Use cookie-parser middleware
     app.use(cookieParser());
 
-    // Session configuration using PostgreSQL
-    app.use(
-      session({
-        store: new PgSession({
-          pool: pgPool, // Connection pool
-          tableName: 'learner_sessions', // Using a specific table for session storage
-        }),
-        secret: appConfiguration.appSecret, // Use a strong secret in production
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-          sameSite: 'strict',
-          // secure: process.env.AML_SERVICE_APPLICATION_ENV === 'production',
-          secure: false, // TODO: needs to be addressed ASAP
-          maxAge: 1000 * 60 * 60 * 24, // 24 hours
-          httpOnly: false, // Mitigate XSS attacks
-        },
-      }),
-    );
-
     const limiter = RateLimit({
       windowMs: 60 * 1000, // 1 minute
       limit: 100, // max 100 requests per windowMs
@@ -98,10 +64,6 @@ const initializeServer = (): void => {
 
     // static route
     app.use(express.static(path.join(__dirname, 'dist')));
-
-    // CSRF protection middleware
-    const csrfProtection = csrf({ cookie: true });
-    app.use(csrfProtection);
 
     // Router
     app.use('/api/v1', router);

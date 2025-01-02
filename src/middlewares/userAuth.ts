@@ -9,7 +9,7 @@ import { UserTransformer } from '../transformers/entity/user.transformer';
 const { aml_jwt_secret_key } = appConfiguration;
 
 export const userAuth = async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header('Authorization')?.replace('bearer ', '');
+  const token = req.header('Authorization')?.toLowerCase()?.replace('bearer ', '');
 
   let user;
 

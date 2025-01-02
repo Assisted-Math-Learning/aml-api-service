@@ -3,7 +3,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "enum": ["api.admin.auth.login"]
+      "enum": ["api.user.auth.login"]
     },
     "ver": {
       "type": "string"
