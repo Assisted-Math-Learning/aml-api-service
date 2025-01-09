@@ -31,6 +31,7 @@ class QuestionSetService {
     return QuestionSet.findOne({
       where: conditions,
       attributes: { exclude: ['id'] },
+      raw: true,
     });
   }
 
