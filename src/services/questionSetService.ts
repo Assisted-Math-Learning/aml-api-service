@@ -3,6 +3,7 @@ import { Status } from '../enums/status';
 import { QuestionSet } from '../models/questionSet';
 import _ from 'lodash';
 import { QuestionSetPurposeType } from '../enums/questionSetPurposeType';
+import { Sequelize } from 'sequelize-typescript';
 
 class QuestionSetService {
   static getInstance() {
@@ -31,6 +32,7 @@ class QuestionSetService {
     return QuestionSet.findOne({
       where: conditions,
       attributes: { exclude: ['id'] },
+      raw: true,
     });
   }
 
@@ -62,7 +64,9 @@ class QuestionSetService {
 
   async getQuestionSetList(req: {
     filters: {
-      title?: string[];
+      is_active?: boolean;
+      status?: Status;
+      search_query?: string;
       repository_id?: string;
       board_id?: string;
       class_id?: string;
@@ -79,18 +83,42 @@ class QuestionSetService {
     const { filters = {} } = req || {};
 
     let whereClause: any = {
-      status: Status.LIVE,
       is_active: true,
     };
 
-    if (filters.title) {
-      whereClause.title = {
-        [Op.or]: filters.title.map((termObj: any) => {
-          const [key, value] = Object.entries(termObj)[0];
-          return {
-            [key]: { [Op.iLike]: `%${String(value)}%` },
-          };
-        }),
+    if (Object.prototype.hasOwnProperty.call(filters, 'is_active')) {
+      whereClause = {
+        ...whereClause,
+        is_active: filters.is_active,
+      };
+    }
+
+    if (filters.status) {
+      whereClause = {
+        ...whereClause,
+        status: filters.status,
+      };
+    }
+
+    if (filters.search_query) {
+      whereClause = {
+        ...whereClause,
+        [Op.or]: [
+          Sequelize.literal(`
+    EXISTS (
+      SELECT 1 
+      FROM jsonb_each_text(title) AS kv
+      WHERE LOWER(kv.value) LIKE '%${filters.search_query.toLowerCase()}%'
+    )
+  `),
+          Sequelize.literal(`
+    EXISTS (
+      SELECT 1 
+      FROM jsonb_each_text(description) AS kv
+      WHERE LOWER(kv.value) LIKE '%${filters.search_query.toLowerCase()}%'
+    )
+  `),
+        ],
       };
     }
 
@@ -141,6 +169,7 @@ class QuestionSetService {
       where: whereClause,
       attributes: { exclude: ['id'] },
       raw: true,
+      order: [['updated_at', 'desc']],
     });
 
     return {
@@ -167,6 +196,8 @@ class QuestionSetService {
 
   async getMainDiagnosticQuestionSet(filters: { repositoryIds: string[]; boardId?: string; classId?: string; l1SkillId?: string }) {
     let whereClause: any = {
+      status: Status.LIVE,
+      is_active: true,
       purpose: QuestionSetPurposeType.MAIN_DIAGNOSTIC,
       repository: {
         identifier: {
@@ -220,6 +251,8 @@ class QuestionSetService {
 
   async getPracticeQuestionSet(filters: { repositoryIds: string[]; boardId: string; classId: string; l1SkillId: string }) {
     const whereClause: any = {
+      status: Status.LIVE,
+      is_active: true,
       purpose: {
         [Op.ne]: QuestionSetPurposeType.MAIN_DIAGNOSTIC,
       },
@@ -249,6 +282,8 @@ class QuestionSetService {
 
   async getNextPracticeQuestionSetInSequence(filters: { repositoryIds: string[]; boardId: string; classIds: string[]; l1SkillId: string; lastSetSequence: number }) {
     const whereClause: any = {
+      status: Status.LIVE,
+      is_active: true,
       sequence: {
         [Op.gt]: filters.lastSetSequence,
       },

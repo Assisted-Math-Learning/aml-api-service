@@ -53,155 +53,41 @@
             }
           }
         },
-        "tenant": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "minProperties": 1
-            }
-          },
-          "required": ["name"],
-          "additionalProperties": false
+        "repository_id": {
+          "type": "string"
         },
-        "repository": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "minProperties": 1
-            }
-          },
-          "required": ["name"],
-          "additionalProperties": false
+        "board_id": {
+          "type": "string"
         },
-        "taxonomy": {
-          "type": "object",
-          "properties": {
-            "board": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "minProperties": 1
-                }
-              }
-            },
-            "class": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "minProperties": 1
-                }
-              }
-            },
-            "l1_skill": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "minProperties": 1
-                }
-              }
-            },
-            "l2_skill": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "minProperties": 1
-                  }
-                }
-              },
-              "uniqueItems": true
-            },
-            "l3_skill": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "minProperties": 1
-                  }
-                }
-              },
-              "uniqueItems": true
-            }
-          },
-          "required": ["board", "class", "l1_skill", "l2_skill"],
-          "additionalProperties": false
+        "class_id": {
+          "type": "string"
+        },
+        "l1_skill_id": {
+          "type": "string"
+        },
+        "l2_skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "l3_skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sub_skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "gradient": {
           "type": "string"
         },
-        "media": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "fileName": {
-                "type": "string"
-              },
-              "mediaType": {
-                "type": "string"
-              },
-              "mimeType": {
-                "type": "string"
-              },
-              "src": {
-                "type": "string"
-              }
-            },
-            "required": ["fileName", "mediaType", "mimeType", "src"],
-            "additionalProperties": false
-          },
-          "uniqueItems": true
-        },
-        "sub_skills": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "minProperties": 1
-              }
-            },
-            "required": ["name"],
-            "additionalProperties": false
-          },
-          "uniqueItems": true
+        "benchmark_time": {
+          "type": "integer"
         },
         "question_body": {
           "type": "object",
@@ -210,18 +96,16 @@
             "options": { "type": "array" },
             "correct_option": { "type": "string" },
             "answers": { "type": "object" },
-            "wrong_answer": { "type": "array" }
-          },
-          "additionalProperties": false
-        },
-        "benchmark_time": {
-          "type": "integer"
+            "wrong_answer": { "type": "array" },
+            "question_image": { "type": "object" }
+          }
         }
       },
-      "required": ["question_type", "taxonomy", "question_body", "benchmark_time"],
+      "required": ["name", "description", "question_type", "operation", "question_body", "benchmark_time", "repository_id", "board_id", "class_id", "l1_skill_id"],
       "if": {
         "properties": {
-          "question_type": { "const": "Mcq" }
+          "operation": { "const": "Addition" },
+          "question_type": { "const": "Grid-1" }
         }
       },
       "then": {
@@ -230,32 +114,19 @@
             "type": "object",
             "properties": {
               "numbers": {
-                "type": "object"
+                "type": "object",
+                "properties": {
+                  "n1": { "type": "number" },
+                  "n2": { "type": "number" }
+                },
+                "required": ["n1", "n2"],
+                "additionalProperties": false
               },
-              "options": {
-                "type": "array",
-                "items": { "type": "string" }
-              },
-              "correct_option": {
-                "type": "string"
-              },
-              "wrong_answer": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "value": {
-                      "type": "array",
-                      "items": { "type": "integer" }
-                    },
-                    "subskillname": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+              "grid1_show_carry": { "type": "boolean" },
+              "grid1_pre_fills_top": { "type": "string" },
+              "grid1_pre_fills_result": { "type": "string" }
             },
-            "required": ["options", "correct_option"],
+            "required": ["numbers", "grid1_show_carry", "grid1_pre_fills_top", "grid1_pre_fills_result"],
             "additionalProperties": false
           }
         }
@@ -263,7 +134,8 @@
       "else": {
         "if": {
           "properties": {
-            "question_type": { "const": "Fib" }
+            "operation": { "const": "Subtraction" },
+            "question_type": { "const": "Grid-1" }
           }
         },
         "then": {
@@ -274,33 +146,17 @@
                 "numbers": {
                   "type": "object",
                   "properties": {
-                    "n1": { "type": "string" },
-                    "n2": { "type": "string" }
-                  }
+                    "n1": { "type": "number" },
+                    "n2": { "type": "number" }
+                  },
+                  "required": ["n1", "n2"],
+                  "additionalProperties": false
                 },
-                "answers": {
-                  "type": "object",
-                  "properties": {
-                    "result": { "type": "integer" }
-                  }
-                },
-                "wrong_answer": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "value": {
-                        "type": "array",
-                        "items": { "type": "integer" }
-                      },
-                      "subskillname": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
+                "grid1_show_regroup": { "type": "boolean" },
+                "grid1_pre_fills_top": { "type": "string" },
+                "grid1_pre_fills_result": { "type": "string" }
               },
-              "required": ["numbers", "answer"],
+              "required": ["numbers", "grid1_show_regroup", "grid1_pre_fills_top", "grid1_pre_fills_result"],
               "additionalProperties": false
             }
           }
@@ -308,7 +164,8 @@
         "else": {
           "if": {
             "properties": {
-              "question_type": { "const": "Grid-2" }
+              "operation": { "const": "Multiplication" },
+              "question_type": { "const": "Grid-1" }
             }
           },
           "then": {
@@ -319,27 +176,16 @@
                   "numbers": {
                     "type": "object",
                     "properties": {
-                      "n1": { "type": "string" },
-                      "n2": { "type": "string" }
-                    }
+                      "n1": { "type": "number" },
+                      "n2": { "type": "number" }
+                    },
+                    "required": ["n1", "n2"],
+                    "additionalProperties": false
                   },
-                  "wrong_answer": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "value": {
-                          "type": "array",
-                          "items": { "type": "integer" }
-                        },
-                        "subskillname": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
+                  "grid1_multiply_intermediate_steps_prefills": { "type": "string" },
+                  "grid1_pre_fills_result": { "type": "string" }
                 },
-                "required": ["numbers"],
+                "required": ["numbers", "grid1_multiply_intermediate_steps_prefills", "grid1_pre_fills_result"],
                 "additionalProperties": false
               }
             }
@@ -347,6 +193,7 @@
           "else": {
             "if": {
               "properties": {
+                "operation": { "const": "Division" },
                 "question_type": { "const": "Grid-1" }
               }
             },
@@ -358,37 +205,140 @@
                     "numbers": {
                       "type": "object",
                       "properties": {
-                        "n1": { "type": "string" },
-                        "n2": { "type": "string" }
-                      }
+                        "n1": { "type": "number" },
+                        "n2": { "type": "number" }
+                      },
+                      "required": ["n1", "n2"],
+                      "additionalProperties": false
                     },
-                    "answers": {
-                      "type": "object",
-                      "properties": {
-                        "result": { "type": "integer" },
-                        "isPrefil": { "type": "boolean" },
-                        "answerTop": { "type": "string" },
-                        "answerResult": { "type": "string" }
-                      }
-                    },
-                    "wrong_answer": {
-                      "type": "array",
-                      "items": {
+                    "grid1_pre_fills_quotient": { "type": "string" },
+                    "grid1_pre_fills_remainder": { "type": "string" },
+                    "grid1_div_intermediate_steps_prefills": { "type": "string" }
+                  },
+                  "required": ["numbers", "grid1_pre_fills_quotient", "grid1_pre_fills_remainder", "grid1_div_intermediate_steps_prefills"],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "else": {
+              "if": {
+                "properties": {
+                  "question_type": { "const": "Mcq" }
+                }
+              },
+              "then": {
+                "properties": {
+                  "question_body": {
+                    "type": "object",
+                    "properties": {
+                      "options": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                      },
+                      "correct_option": {
+                        "type": "string"
+                      },
+                      "question_image": {
                         "type": "object",
                         "properties": {
-                          "value": {
-                            "type": "array",
-                            "items": { "type": "integer" }
+                          "src": {
+                            "type": "string"
                           },
-                          "subskillname": {
+                          "file_name": {
+                            "type": "string"
+                          },
+                          "mediaType": {
+                            "type": "string"
+                          },
+                          "mime_type": {
                             "type": "string"
                           }
-                        }
+                        },
+                        "required": ["src", "file_name", "mediaType", "mime_type"],
+                        "additionalProperties": false
                       }
+                    },
+                    "required": ["options", "correct_option"],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "else": {
+                "if": {
+                  "properties": {
+                    "question_type": { "const": "Fib" }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "question_body": {
+                      "type": "object",
+                      "properties": {
+                        "numbers": {
+                          "type": "object",
+                          "properties": {
+                            "n1": { "type": "number" },
+                            "n2": { "type": "number" }
+                          },
+                          "required": ["n1", "n2"],
+                          "additionalProperties": false
+                        },
+                        "question_image": {
+                          "type": "object",
+                          "properties": {
+                            "src": {
+                              "type": "string"
+                            },
+                            "file_name": {
+                              "type": "string"
+                            },
+                            "mediaType": {
+                              "type": "string"
+                            },
+                            "mime_type": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["src", "file_name", "mediaType", "mime_type"],
+                          "additionalProperties": false
+                        },
+                        "fib_type": {
+                          "type": "string",
+                          "enum": ["fib_standard", "fib_standard_with_image", "fib_quotient_remainder"]
+                        },
+                        "fib_answer": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["fib_type"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "else": {
+                  "if": {
+                    "properties": {
+                      "question_type": { "const": "Grid-2" }
                     }
                   },
-                  "required": ["numbers", "answer"],
-                  "additionalProperties": false
+                  "then": {
+                    "properties": {
+                      "question_body": {
+                        "type": "object",
+                        "properties": {
+                          "numbers": {
+                            "type": "object",
+                            "properties": {
+                              "n1": { "type": "number" },
+                              "n2": { "type": "number" }
+                            }
+                          }
+                        },
+                        "required": ["numbers"],
+                        "additionalProperties": false
+                      }
+                    }
+                  }
                 }
               }
             }

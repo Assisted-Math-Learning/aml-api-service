@@ -8,9 +8,8 @@ import { schemaValidation } from '../../services/validationService';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
 
-export const apiId = 'api.question.search';
-
 export const searchQuestions = async (req: Request, res: Response) => {
+  const apiId = _.get(req, 'id');
   const requestBody = _.get(req, 'body');
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const resmsgid = _.get(res, 'resmsgid');

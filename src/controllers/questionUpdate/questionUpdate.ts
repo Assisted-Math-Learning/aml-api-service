@@ -7,24 +7,23 @@ import logger from '../../utils/logger';
 import questionUpdateSchema from './questionUpdateValidationSchema.json';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
-import { checkTenantNameExists } from '../../services/tenant';
-import { checkRepositoryNameExists } from '../../services/repository';
+import { getRepositoryById } from '../../services/repository';
 import { boardService } from '../../services/boardService';
-import { checkClassNameExists } from '../../services/class';
-import { checkSkillExists } from '../../services/skill';
+import { getClassById } from '../../services/class';
+import { getSkillById } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
-import { checkSubSkillsExist } from '../../services/subSkill';
-import { questionSetService } from '../../services/questionSetService';
-
-export const apiId = 'api.question.update';
+import { getSubSkill } from '../../services/subSkill';
+import { getQuestionBody } from '../questionCreate/questionCreate.helper';
+import { User } from '../../models/users';
 
 const updateQuestionById = async (req: Request, res: Response) => {
+  const apiId = _.get(req, 'id');
   const requestBody = _.get(req, 'body');
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const question_id = _.get(req, 'params.question_id');
   const dataBody = _.get(req, 'body.request');
   const resmsgid = _.get(res, 'resmsgid');
-  const questionSetId = _.get(dataBody, 'question_set_id');
+  const loggedInUser: User | undefined = (req as any).user;
 
   // Validating the update schema
   const isRequestValid: Record<string, any> = schemaValidation(requestBody, questionUpdateSchema);
@@ -46,120 +45,130 @@ const updateQuestionById = async (req: Request, res: Response) => {
   // Initialize an updated body
   const updatedDataBody: any = {};
 
-  //checking question id if it exists
-  if (questionSetId) {
-    const questionSet = await questionSetService.getQuestionSetById(questionSetId);
-    if (_.isEmpty(questionSet)) {
-      const code = 'QUESTION_SET_NOT_EXISTS';
-      logger.error({ code, apiId, msgid, resmsgid, message: `Question set id not exists` });
-      throw amlError(code, 'Question set id not exists', 'NOT_FOUND', 404);
-    }
-  }
-
-  // Extract and check tenant
-  if (dataBody.tenant) {
-    const tenantName = dataBody.tenant.name;
-    const { exists: tenantExists, tenant } = await checkTenantNameExists(tenantName);
-    if (!tenantExists || !tenant) {
-      const code = 'TENANT_NOT_EXISTS';
-      logger.error({ code, apiId, msgid, resmsgid, message: `Tenant not exists` });
-      throw amlError(code, 'Tenant not exists', 'NOT_FOUND', 404);
-    }
-    updatedDataBody.tenant = { id: tenant.id, name: tenant.name }; // Create tenant object
-  }
-
   // Check repository
-  if (dataBody.repository) {
-    const repositoryName = dataBody.repository.name;
-    const repositoryExists = await checkRepositoryNameExists(repositoryName);
-    if (!repositoryExists.exists) {
+  if (dataBody.repository_id) {
+    const repositoryId = dataBody.repository_id;
+    const repository = await getRepositoryById(repositoryId);
+    if (!repository) {
       const code = 'REPOSITORY_NOT_EXISTS';
       logger.error({ code, apiId, msgid, resmsgid, message: `Repository not exists` });
       throw amlError(code, 'Repository not exists', 'NOT_FOUND', 404);
     }
-    updatedDataBody.repository = { id: repositoryExists.repository.id, name: repositoryExists.repository.name }; // Create repository object
+    updatedDataBody.repository = {
+      identifier: repository.identifier,
+      name: repository.name,
+    }; // Create repository object
   }
 
   // Check board
-  if (dataBody.taxonomy && dataBody.taxonomy.board) {
-    const boardName = dataBody.taxonomy.board.name;
-    const boardExists = await boardService.checkBoardNamesExists(boardName);
-    if (!boardExists.exists) {
+  if (dataBody.board_id) {
+    const boardId = dataBody.board_id;
+    const board = await boardService.getBoardByIdentifier(boardId);
+    if (!board) {
       const code = 'BOARD_NOT_EXISTS';
       logger.error({ code, apiId, msgid, resmsgid, message: `Board not exists` });
       throw amlError(code, 'Board not exists', 'NOT_FOUND', 404);
     }
-    updatedDataBody.taxonomy = { ...updatedDataBody.taxonomy, board: { id: boardExists.board.id, name: boardExists.board.name } }; // Create board object
+
+    const boardObject = {
+      identifier: board.identifier,
+      name: board.name,
+    };
+    updatedDataBody.taxonomy = { ...updatedDataBody.taxonomy, board: boardObject }; // Create board object
   }
 
   // Check class
-  if (dataBody.taxonomy && dataBody.taxonomy.class) {
-    const className = dataBody.taxonomy.class.name;
-    const classExists = await checkClassNameExists(className);
-    if (!classExists.exists) {
+  if (dataBody.class_id) {
+    const classId = dataBody.class_id;
+    const classEntity = await getClassById(classId);
+    if (!classEntity) {
       const code = 'CLASS_NOT_EXISTS';
       logger.error({ code, apiId, msgid, resmsgid, message: `Class not exists` });
       throw amlError(code, 'Class not exists', 'NOT_FOUND', 404);
     }
-    updatedDataBody.taxonomy = { ...updatedDataBody.taxonomy, class: { id: classExists.class.id, name: classExists.class.name } }; // Create class object
+
+    const classObject = {
+      identifier: classEntity.identifier,
+      name: classEntity.name,
+    };
+    updatedDataBody.taxonomy = { ...updatedDataBody.taxonomy, class: classObject }; // Create class object
   }
 
   // Check l1_skill
-  if (dataBody.taxonomy && dataBody.taxonomy.l1_skill) {
-    const l1SkillExists = await checkSkillExists(dataBody.taxonomy.l1_skill.name, SkillType.L1_SKILL);
-    if (!l1SkillExists.exists) {
+  if (dataBody.l1_skill_id) {
+    const l1Skill = await getSkillById(dataBody.l1_skill_id);
+    if (!l1Skill || l1Skill.type !== SkillType.L1_SKILL) {
       const code = 'L1_SKILL_NOT_EXISTS';
-      logger.error({ code, apiId, msgid, resmsgid, message: `L1 Skill not exists` });
+      logger.error({ code, message: `L1 Skill not exists` });
       throw amlError(code, 'L1 Skill not exists', 'NOT_FOUND', 404);
     }
-    updatedDataBody.taxonomy = { ...updatedDataBody.taxonomy, l1_skill: { id: l1SkillExists.skill.id, name: l1SkillExists.skill.name } }; // Create l1_skill object
+
+    const l1SkillObject = {
+      identifier: l1Skill.identifier,
+      name: l1Skill.name,
+    };
+    updatedDataBody.taxonomy = { ...updatedDataBody.taxonomy, l1_skill: l1SkillObject }; // Create l1_skill object
   }
 
   // Check l2_skill
-  if (dataBody.taxonomy && dataBody.taxonomy.l2_skill) {
+  if (dataBody.l2_skill_ids) {
     const l2SkillObjects = [];
-    for (const l2Skill of dataBody.taxonomy.l2_skill) {
-      const l2SkillExists = await checkSkillExists(l2Skill.name, SkillType.L2_SKILL);
-      if (!l2SkillExists.exists) {
+    for (const l2SkillId of dataBody.l2_skill_ids || []) {
+      const l2Skill = await getSkillById(l2SkillId);
+      if (!l2Skill || l2Skill.type !== SkillType.L2_SKILL) {
         const code = 'L2_SKILL_NOT_EXISTS';
-        logger.error({ code, apiId, msgid, resmsgid, message: `L2 Skill not exists` });
+        logger.error({ code, message: `L2 Skill not exists` });
         throw amlError(code, 'L2 Skill not exists', 'NOT_FOUND', 404);
       }
-      l2SkillObjects.push({ id: l2SkillExists.skill.id, name: l2SkillExists.skill.name });
+      l2SkillObjects.push({
+        identifier: l2Skill.identifier,
+        name: l2Skill.name,
+      });
     }
     updatedDataBody.taxonomy = { ...updatedDataBody.taxonomy, l2_skill: l2SkillObjects }; // Create l2_skill objects
   }
 
   // Check l3_skill
-  if (dataBody.taxonomy && dataBody.taxonomy.l3_skill) {
+  if (dataBody.l3_skill_ids) {
     const l3SkillObjects = [];
-    for (const l3Skill of dataBody.taxonomy.l3_skill) {
-      const l3SkillExists = await checkSkillExists(l3Skill.name, SkillType.L3_SKILL);
-      if (!l3SkillExists.exists) {
+    for (const l3SkillId of dataBody.l3_skill_ids || []) {
+      const l3Skill = await getSkillById(l3SkillId);
+      if (!l3Skill || l3Skill.type !== SkillType.L3_SKILL) {
         const code = 'L3_SKILL_NOT_EXISTS';
-        logger.error({ code, apiId, msgid, resmsgid, message: `L3 Skill not exists` });
+        logger.error({ code, message: `L3 Skill not exists` });
         throw amlError(code, 'L3 Skill not exists', 'NOT_FOUND', 404);
       }
-      l3SkillObjects.push({ id: l3SkillExists.skill.id, name: l3SkillExists.skill.name });
+      l3SkillObjects.push({
+        identifier: l3Skill.identifier,
+        name: l3Skill.name,
+      });
     }
     updatedDataBody.taxonomy = { ...updatedDataBody.taxonomy, l3_skill: l3SkillObjects }; // Create l3_skill objects
   }
 
   // Validate sub_skills
-  if (dataBody.sub_skills) {
-    const subSkillsExistence = await checkSubSkillsExist(dataBody.sub_skills);
-    if (!subSkillsExistence.exists) {
-      const code = 'SUB_SKILL_NOT_EXISTS';
-      logger.error({ code, apiId, msgid, resmsgid, message: `Missing sub-skills` });
-      throw amlError(code, 'Sub Skill not exists', 'NOT_FOUND', 404);
+  if (dataBody.sub_skills_ids) {
+    const subSkillObjects = [];
+    for (const subSkillId of dataBody.sub_skill_ids || []) {
+      const subSkill = await getSubSkill(subSkillId);
+      if (!subSkill) {
+        const code = 'SUB_SKILL_NOT_EXISTS';
+        logger.error({ code, message: `Missing sub-skills` });
+        throw amlError(code, 'sub Skill not exists', 'NOT_FOUND', 404);
+      }
+      subSkillObjects.push({
+        identifier: subSkill.identifier,
+        name: subSkill.name,
+      });
     }
-    updatedDataBody.sub_skills = subSkillsExistence.foundSkills; // Add found sub-skills
+    updatedDataBody.sub_skills = subSkillObjects; // Add found sub-skills
   }
 
-  const mergedData = _.merge({}, question, dataBody, updatedDataBody);
+  updatedDataBody.question_body = getQuestionBody(_.cloneDeep(dataBody));
+  updatedDataBody.updated_by = loggedInUser?.identifier ?? 'manual';
 
   // Update Question
-  await questionService.updateQuestionData(question_id, mergedData);
+  await questionService.updateQuestionData(question_id, updatedDataBody);
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Updated' } });
 };
 

@@ -40,154 +40,39 @@
           },
           "minProperties": 1
         },
-        "tenant": {
-          "type": "object",
-          "description": "The tenant information.",
-          "properties": {
-            "name": {
-              "type": "object",
-              "description": "The name of the tenant in multiple languages.",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "minProperties": 1
-            }
-          },
-          "required": ["name"],
-          "additionalProperties": false
+        "repository_id": {
+          "type": "string"
         },
-        "repository": {
-          "type": "object",
-          "description": "The repository information.",
-          "properties": {
-            "name": {
-              "type": "object",
-              "description": "The name of the repository in multiple languages.",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "minProperties": 1
-            }
-          },
-          "required": ["name"],
-          "additionalProperties": false
+        "board_id": {
+          "type": "string"
         },
-        "questions": {
+        "class_id": {
+          "type": "string"
+        },
+        "l1_skill_id": {
+          "type": "string"
+        },
+        "l2_skill_ids": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "identifier": {
-                "type": "string",
-                "description": "A unique identifier for the question."
-              },
-              "sequence": {
-                "type": "integer",
-                "description": "The sequence order of the question."
-              }
-            },
-            "required": ["identifier", "sequence"],
-            "additionalProperties": false
-          },
-          "uniqueItems": true
+            "type": "string"
+          }
+        },
+        "l3_skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sub_skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "sequence": {
           "type": "integer",
           "description": "The sequence order of the question set."
-        },
-        "taxonomy": {
-          "type": "object",
-          "properties": {
-            "board": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "minProperties": 1
-                }
-              }
-            },
-            "class": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "minProperties": 1
-                }
-              }
-            },
-            "l1_skill": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "minProperties": 1
-                }
-              }
-            },
-            "l2_skill": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "minProperties": 1
-                  }
-                }
-              },
-              "uniqueItems": true
-            },
-            "l3_skill": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "minProperties": 1
-                  }
-                }
-              },
-              "uniqueItems": true
-            }
-          },
-          "required": ["board", "class", "l1_skill"],
-          "additionalProperties": false
-        },
-        "sub_skills": {
-          "type": "array",
-          "description": "A list of sub-skills associated with the question set.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "minProperties": 1
-              }
-            },
-            "required": ["name"],
-            "additionalProperties": false
-          },
-          "uniqueItems": true
         },
         "purpose": {
           "type": "string",
@@ -215,9 +100,31 @@
         "instruction_text": {
           "type": "string",
           "description": "Instructions for the question set."
+        },
+        "enable_feedback": {
+          "type": "boolean"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "identifier": {
+                "type": "string",
+                "description": "A unique identifier for the question."
+              },
+              "sequence": {
+                "type": "integer",
+                "description": "The sequence order of the question."
+              }
+            },
+            "required": ["identifier", "sequence"],
+            "additionalProperties": false
+          },
+          "uniqueItems": true
         }
       },
-      "required": ["title", "description", "tenant", "repository", "sequence", "taxonomy", "sub_skills", "purpose", "is_atomic", "gradient", "group_name"],
+      "required": ["title", "description", "repository_id", "sequence", "board_id", "class_id", "l1_skill_id", "purpose", "is_atomic", "enable_feedback"],
       "additionalProperties": false
     }
   },

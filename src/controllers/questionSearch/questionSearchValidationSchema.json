@@ -27,6 +27,16 @@
         "filters": {
           "type": "object",
           "properties": {
+            "is_active": {
+              "type": "boolean"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["draft", "live"]
+            },
+            "search_query": {
+              "type": "string"
+            },
             "question_type": {
               "type": "array",
               "items": {

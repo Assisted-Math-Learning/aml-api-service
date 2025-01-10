@@ -40,122 +40,34 @@
           },
           "minProperties": 1
         },
-        "tenant": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "minProperties": 1
-            }
-          },
-          "required": ["name"],
-          "additionalProperties": false
+        "repository_id": {
+          "type": "string"
         },
-        "repository": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "minProperties": 1
-            }
-          },
-          "required": ["name"],
-          "additionalProperties": false
+        "board_id": {
+          "type": "string"
         },
-        "taxonomy": {
-          "type": "object",
-          "properties": {
-            "board": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "minProperties": 1
-                }
-              }
-            },
-            "class": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "minProperties": 1
-                }
-              }
-            },
-            "l1_skill": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "minProperties": 1
-                }
-              }
-            },
-            "l2_skill": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "minProperties": 1
-                  }
-                }
-              }
-            },
-            "l3_skill": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "minProperties": 1
-                  }
-                }
-              }
-            }
-          },
-          "required": ["board", "class", "l1_skill"],
-          "additionalProperties": false
+        "class_id": {
+          "type": "string"
         },
-        "sub_skills": {
+        "l1_skill_id": {
+          "type": "string"
+        },
+        "l2_skill_ids": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "minProperties": 1
-              }
-            },
-            "required": ["name"],
-            "additionalProperties": false
+            "type": "string"
+          }
+        },
+        "l3_skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sub_skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         },
         "gradient": {
@@ -185,7 +97,7 @@
           "uniqueItems": true
         }
       },
-      "required": ["name", "description", "tenant", "repository", "taxonomy", "sub_skills", "gradient"],
+      "required": ["name", "description", "repository_id", "board_id", "class_id", "l1_skill_id"],
       "additionalProperties": false
     }
   },

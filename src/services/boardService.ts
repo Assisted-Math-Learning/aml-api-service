@@ -22,6 +22,13 @@ class BoardService {
     });
   }
 
+  async getBoardsByIdentifiers(identifiers: string[]) {
+    return BoardMaster.findAll({
+      where: { identifier: identifiers, status: Status.LIVE, is_active: true },
+      raw: true,
+    });
+  }
+
   async updateBoardData(identifier: string, data: any) {
     return BoardMaster.update(data, {
       where: { identifier },

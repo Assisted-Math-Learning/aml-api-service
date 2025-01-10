@@ -4,6 +4,7 @@ import { Question } from '../models/question';
 import { Status } from '../enums/status';
 import { DEFAULT_LIMIT } from '../constants/constants';
 import { questionSetService } from './questionSetService';
+import { Sequelize } from 'sequelize-typescript';
 
 class QuestionService {
   static getInstance() {
@@ -50,6 +51,9 @@ class QuestionService {
 
   async getQuestionList(req: {
     filters: {
+      is_active?: boolean;
+      status?: Status;
+      search_query?: string;
       repository_id?: string;
       question_type?: string[];
       question_set_id?: string;
@@ -68,8 +72,44 @@ class QuestionService {
     const { filters = {} } = req || {};
 
     let whereClause: any = {
-      status: Status.LIVE,
+      is_active: true,
     };
+
+    if (Object.prototype.hasOwnProperty.call(filters, 'is_active')) {
+      whereClause = {
+        ...whereClause,
+        is_active: filters.is_active,
+      };
+    }
+
+    if (filters.status) {
+      whereClause = {
+        ...whereClause,
+        status: filters.status,
+      };
+    }
+
+    if (filters.search_query) {
+      whereClause = {
+        ...whereClause,
+        [Op.or]: [
+          Sequelize.literal(`
+    EXISTS (
+      SELECT 1 
+      FROM jsonb_each_text(name) AS kv
+      WHERE LOWER(kv.value) LIKE '%${filters.search_query.toLowerCase()}%'
+    )
+  `),
+          Sequelize.literal(`
+    EXISTS (
+      SELECT 1 
+      FROM jsonb_each_text(description) AS kv
+      WHERE LOWER(kv.value) LIKE '%${filters.search_query.toLowerCase()}%'
+    )
+  `),
+        ],
+      };
+    }
 
     if (filters.repository_id) {
       whereClause = _.set(whereClause, ['repository', 'identifier'], filters.repository_id);
@@ -131,6 +171,7 @@ class QuestionService {
       offset: finalOffset,
       attributes: { exclude: ['id'] },
       raw: true,
+      order: [['updated_at', 'desc']],
     });
 
     return {
