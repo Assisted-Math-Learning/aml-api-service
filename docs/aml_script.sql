@@ -2235,3 +2235,24 @@ ALTER table repository DROP column tenant;
 ALTER TABLE question_set ADD COLUMN enable_feedback BOOLEAN DEFAULT TRUE;
 
 UPDATE question_set SET enable_feedback = FALSE WHERE question_set.purpose = 'Main Diagnostic';
+
+--------------------------------------------
+-- Adding table telemetry_data --
+--------------------------------------------
+
+create table telemetry_data
+(
+    id         serial
+        primary key,
+    level      varchar(255)             not null,
+    learner_id varchar(255)             not null,
+    event_type varchar(255)             not null,
+    data       jsonb                    not null,
+    created_on timestamp with time zone not null
+);
+
+--------------------------------------------
+-- Adding enable_telemetry to tenant --
+--------------------------------------------
+
+ALTER TABLE tenant ADD COLUMN enable_telemetry BOOLEAN DEFAULT TRUE;

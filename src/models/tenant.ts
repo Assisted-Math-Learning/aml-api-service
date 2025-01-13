@@ -9,6 +9,7 @@ export class Tenant extends Model {
   declare board_id?: number[] | null;
   declare is_active: boolean;
   declare status: 'draft' | 'live';
+  declare enable_telemetry: boolean;
   declare created_by: string;
   declare updated_by?: string | null;
 }
@@ -44,6 +45,12 @@ Tenant.init(
       allowNull: false,
       defaultValue: true,
       comment: 'Indicates whether the tenant is active or not',
+    },
+    enable_telemetry: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+      comment: 'Indicates whether the telemetry data collection is enabled for tenant or not',
     },
     status: {
       type: DataTypes.ENUM('draft', 'live'),

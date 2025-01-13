@@ -8,6 +8,7 @@ import { getLearnerByUserName } from '../../../services/learner';
 import bcrypt from 'bcrypt';
 import { ResponseHandler } from '../../../utils/responseHandler';
 import httpStatus from 'http-status';
+import { getTenant } from '../../../services/tenant';
 
 const login = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -52,7 +53,9 @@ const login = async (req: Request, res: Response) => {
     taxonomy: learner.taxonomy,
   };
 
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Login successful', data: result } });
+  const tenant = await getTenant(learner.tenant_id);
+
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Login successful', data: { learner: result, tenant } } });
 };
 
 export default login;
