@@ -204,6 +204,13 @@ class QuestionSetService {
           [Op.in]: filters.repositoryIds,
         },
       },
+      [Op.and]: [
+        Sequelize.where(
+          Sequelize.fn('jsonb_typeof', Sequelize.col('questions')), // Assuming `taxonomy` is a JSONB column
+          'array',
+        ),
+        Sequelize.literal('jsonb_array_length(questions) > 0'),
+      ],
     };
 
     if (filters.boardId) {
@@ -272,6 +279,13 @@ class QuestionSetService {
           [Op.in]: filters.repositoryIds,
         },
       },
+      [Op.and]: [
+        Sequelize.where(
+          Sequelize.fn('jsonb_typeof', Sequelize.col('questions')), // Assuming `taxonomy` is a JSONB column
+          'array',
+        ),
+        Sequelize.literal('jsonb_array_length(questions) > 0'),
+      ],
     };
 
     return QuestionSet.findOne({
@@ -308,6 +322,13 @@ class QuestionSetService {
           [Op.in]: filters.repositoryIds,
         },
       },
+      [Op.and]: [
+        Sequelize.where(
+          Sequelize.fn('jsonb_typeof', Sequelize.col('questions')), // Assuming `taxonomy` is a JSONB column
+          'array',
+        ),
+        Sequelize.literal('jsonb_array_length(questions) > 0'),
+      ],
     };
 
     return QuestionSet.findOne({
