@@ -7,6 +7,7 @@ import questionSearch from './questionSearchValidationSchema.json';
 import { schemaValidation } from '../../services/validationService';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
+import { getFileUrlByFolderAndFileName } from '../../services/awsService';
 
 export const searchQuestions = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -21,8 +22,15 @@ export const searchQuestions = async (req: Request, res: Response) => {
     throw amlError(code, isRequestValid.message, 'BAD_REQUEST', 400);
   }
 
-  const questionData = await questionService.getQuestionList(requestBody.request);
+  const { questions, meta } = await questionService.getQuestionList(requestBody.request);
+
+  const updatedQuestions = questions.map((question) => {
+    if (question.question_body.question_image) {
+      _.set(question.question_body, 'question_image_url', getFileUrlByFolderAndFileName(question.question_body.question_image.src, question.question_body.question_image.file_name));
+    }
+    return question;
+  });
 
   logger.info({ apiId, requestBody, message: `Questions are listed successfully` });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: questionData });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { questions: updatedQuestions, meta } });
 };

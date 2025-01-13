@@ -18,6 +18,7 @@ import { questionService } from '../../services/questionService';
 import { QuestionSetPurposeType } from '../../enums/questionSetPurposeType';
 import { Status } from '../../enums/status';
 import { User } from '../../models/users';
+import { getContentById } from '../../services/content';
 
 const createQuestionSet = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -162,6 +163,20 @@ const createQuestionSet = async (req: Request, res: Response) => {
     });
   }
 
+  const contentIds = [];
+  // Validate sub_skills
+  if (dataBody.content_ids) {
+    for (const contentId of dataBody.content_ids || []) {
+      const content = await getContentById(contentId);
+      if (!content) {
+        const code = 'CONTENT_DOES_NOT_EXISTS';
+        logger.error({ code, message: `Missing content` });
+        throw amlError(code, 'Content does not exists', 'NOT_FOUND', 404);
+      }
+      contentIds.push(content.identifier);
+    }
+  }
+
   // Creating a new question set
   const questionSetInsertData = _.assign(dataBody, {
     is_active: true,
@@ -170,6 +185,7 @@ const createQuestionSet = async (req: Request, res: Response) => {
     created_by: loggedInUser?.identifier ?? 'manual',
     repository: repositoryObject,
     questions: mappedQuestions,
+    content_ids: contentIds,
     taxonomy: {
       board: boardObject,
       class: classObject,

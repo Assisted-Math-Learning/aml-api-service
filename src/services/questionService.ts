@@ -25,6 +25,7 @@ class QuestionService {
     return Question.findOne({
       where: conditions,
       attributes: { exclude: ['id'] },
+      raw: true,
     });
   }
 

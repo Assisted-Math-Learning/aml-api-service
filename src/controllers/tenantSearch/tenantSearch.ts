@@ -25,10 +25,9 @@ const searchTenants = async (req: Request, res: Response) => {
 
   // Search for tenants
   const tenantData = await getTenantSearch(requestBody.request);
-  const filteredData = _.map(tenantData, (data: any) => data?.dataValues);
 
   logger.info({ apiId, requestBody, message: `Tenants are searched successfully` });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: filteredData });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: tenantData });
 };
 
 export default searchTenants;

@@ -250,11 +250,11 @@
                           "mediaType": {
                             "type": "string"
                           },
-                          "mime_type": {
+                          "mimeType": {
                             "type": "string"
                           }
                         },
-                        "required": ["src", "file_name", "mediaType", "mime_type"],
+                        "required": ["src", "file_name", "mediaType", "mimeType"],
                         "additionalProperties": false
                       }
                     },
@@ -295,11 +295,11 @@
                             "mediaType": {
                               "type": "string"
                             },
-                            "mime_type": {
+                            "mimeType": {
                               "type": "string"
                             }
                           },
-                          "required": ["src", "file_name", "mediaType", "mime_type"],
+                          "required": ["src", "file_name", "mediaType", "mimeType"],
                           "additionalProperties": false
                         },
                         "fib_type": {

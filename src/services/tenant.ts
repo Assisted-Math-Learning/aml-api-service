@@ -50,8 +50,35 @@ export const getTenantSearch = async (req: Record<string, any>) => {
     };
   }
 
-  const tenants = await Tenant.findAll({ limit: limit || DEFAULT_LIMIT, offset: offset || 0, ...(whereClause && { where: whereClause }), attributes: { exclude: ['id'] } });
-  return tenants;
+  if (filters.type) {
+    whereClause.type = {
+      [Op.or]: filters.type.map((termObj: any) => {
+        const [key, value] = Object.entries(termObj)[0];
+        return {
+          [key]: { [Op.iLike]: `%${String(value)}%` },
+        };
+      }),
+    };
+  }
+
+  const finalLimit = limit || DEFAULT_LIMIT;
+  const finalOffset = offset || 0;
+
+  const { rows, count } = await Tenant.findAndCountAll({
+    limit: finalLimit,
+    offset: finalOffset,
+    ...(whereClause && { where: whereClause }),
+    attributes: { exclude: ['id'] },
+  });
+
+  return {
+    tenants: rows,
+    meta: {
+      offset: finalOffset,
+      limit: finalLimit,
+      total: count,
+    },
+  };
 };
 
 //tenant Name check

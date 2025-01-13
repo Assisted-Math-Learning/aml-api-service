@@ -16,6 +16,7 @@ import { getSubSkill } from '../../services/subSkill';
 import { questionService } from '../../services/questionService';
 import { QuestionSetPurposeType } from '../../enums/questionSetPurposeType';
 import { User } from '../../models/users';
+import { getContentById } from '../../services/content';
 
 const updateQuestionSetById = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -188,6 +189,21 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
       });
     }
     updatedDataBody.sub_skills = subSkillObjects; // Add found sub-skills
+  }
+
+  // Validate sub_skills
+  if (dataBody.content_ids) {
+    const contentIds = [];
+    for (const contentId of dataBody.content_ids || []) {
+      const content = await getContentById(contentId);
+      if (!content) {
+        const code = 'CONTENT_DOES_NOT_EXISTS';
+        logger.error({ code, message: `Missing content` });
+        throw amlError(code, 'Content does not exists', 'NOT_FOUND', 404);
+      }
+      contentIds.push(content.identifier);
+    }
+    updatedDataBody.content_ids = contentIds; // Add found contentIds
   }
 
   if (Object.prototype.hasOwnProperty.call(dataBody, 'enable_feedback')) {
