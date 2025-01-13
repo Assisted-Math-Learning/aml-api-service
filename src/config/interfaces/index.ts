@@ -1,4 +1,6 @@
 // Define the IConfiguration interface
+import { AppEnv } from '../../enums/appEnv';
+
 export interface IConfiguration {
   log: {
     day: string;
@@ -9,7 +11,7 @@ export interface IConfiguration {
   };
   envPort: number;
   appSecret: string;
-  applicationEnv: string;
+  applicationEnv: AppEnv;
   appVersion: string;
   whitelistedOrigins: string;
   DB: {
