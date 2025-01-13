@@ -2255,4 +2255,4 @@ create table telemetry_data
 -- Adding enable_telemetry to tenant --
 --------------------------------------------
 
-ALTER TABLE tenant ADD COLUMN enable_telemetry BOOLEAN DEFAULT TRUE;
+ALTER TABLE tenant ADD COLUMN enable_telemetry BOOLEAN DEFAULT FALSE;
