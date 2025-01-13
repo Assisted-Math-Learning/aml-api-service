@@ -52,7 +52,7 @@ const initializeServer = (): void => {
             'https://dev.portal.theaml.ai', // For FE
             'https://dashboard.dev.portal.theaml.ai', // For dashboard BE
             'http://localhost:3000', // For local
-            'http://localhost:3001' // For local
+            'http://localhost:3001', // For local
           ];
           if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
