@@ -46,6 +46,20 @@ const initializeServer = (): void => {
     // Middleware to enable CORS
     app.use(
       cors({
+        origin: (origin, callback) => {
+          // NOTE: hardcoded for now, will be changed to env variable later
+          const allowedOrigins = [
+            'https://dev.portal.theaml.ai', // For FE
+            'https://dashboard.dev.portal.theaml.ai', // For dashboard BE
+            'http://localhost:3000', // For local
+            'http://localhost:3001' // For local
+          ];
+          if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+          } else {
+            callback(new Error('Not allowed by CORS'));
+          }
+        },
         credentials: true,
       }),
     );
