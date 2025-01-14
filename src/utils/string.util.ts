@@ -3,5 +3,5 @@ export const replaceAt = (str: string, index: number, replacement: string) => {
 };
 
 export const replaceLeadingZeroes = (str?: string) => {
-  return str?.replace(/^0+(?=[1-9]|0$)/g, '');
+  return Number(str ?? '').toString();
 };
