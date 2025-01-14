@@ -17,6 +17,7 @@ import { getSkillById } from '../../services/skill';
 import { getSubSkill } from '../../services/subSkill';
 import { Status } from '../../enums/status';
 import { User } from '../../models/users';
+import { UserTransformer } from '../../transformers/entity/user.transformer';
 
 const createContent = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -151,10 +152,12 @@ const createContent = async (req: Request, res: Response) => {
     sub_skills: subSkillObjects,
   });
 
-  const contentData = await createContentData(contentInsertData);
+  const content = await createContentData(contentInsertData);
+
+  const users = new UserTransformer().transformList([loggedInUser] as User[]);
 
   logger.info({ apiId, requestBody, message: `Content Created Successfully with identifier` });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Content Successfully Created', identifier: contentData.identifier } });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Content Successfully Created', content, users } });
 };
 
 export default createContent;

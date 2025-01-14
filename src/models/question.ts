@@ -37,7 +37,7 @@ export class Question extends Model {
   declare question_body: QuestionBody;
   declare sub_skills?: Array<{ identifier: string; name: { [key: string]: string } }> | null;
   declare created_by: string;
-  declare updated_by?: string | null;
+  declare updated_by?: string;
   declare is_active: boolean;
 }
 

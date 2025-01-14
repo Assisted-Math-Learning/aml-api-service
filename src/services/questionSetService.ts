@@ -43,11 +43,12 @@ class QuestionSetService {
   async updateQuestionSet(identifier: string, updateData: any) {
     return QuestionSet.update(updateData, {
       where: { identifier: identifier },
+      returning: true,
     });
   }
 
-  async publishQuestionSetById(id: string) {
-    return QuestionSet.update({ status: Status.LIVE }, { where: { identifier: id }, returning: true });
+  async publishQuestionSetById(id: string, updatedBy: string) {
+    return QuestionSet.update({ status: Status.LIVE, updated_by: updatedBy }, { where: { identifier: id }, returning: true });
   }
 
   // Delete a question set (soft delete)

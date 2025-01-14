@@ -25,9 +25,8 @@ export const getContentMediaById = async (getObject: { contentId: number; mediaI
 };
 
 // Create a new content
-export const createContentData = async (req: Optional<any, string> | undefined): Promise<any> => {
-  const insertContent = await Content.create(req);
-  return insertContent.dataValues;
+export const createContentData = async (req: Optional<any, string> | undefined) => {
+  return Content.create(req);
 };
 
 // Get a single Content by ID
@@ -67,10 +66,11 @@ export const publishContentById = async (id: string): Promise<any> => {
 };
 
 // Update content by identifier
-export const updateContent = async (questionIdentifier: string, updatedata: any): Promise<any> => {
+export const updateContent = async (questionIdentifier: string, updateData: any) => {
   // Update the question in the database
-  return await Content.update(updatedata, {
+  return Content.update(updateData, {
     where: { identifier: questionIdentifier },
+    returning: true,
   });
 };
 

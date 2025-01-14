@@ -19,6 +19,7 @@ import { QuestionSetPurposeType } from '../../enums/questionSetPurposeType';
 import { Status } from '../../enums/status';
 import { User } from '../../models/users';
 import { getContentById } from '../../services/content';
+import { UserTransformer } from '../../transformers/entity/user.transformer';
 
 const createQuestionSet = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -197,10 +198,12 @@ const createQuestionSet = async (req: Request, res: Response) => {
     enable_feedback: dataBody?.purpose === QuestionSetPurposeType.MAIN_DIAGNOSTIC ? false : dataBody?.enable_feedback,
   });
 
-  const questionSetData = await questionSetService.createQuestionSetData(questionSetInsertData);
+  const questionSet = await questionSetService.createQuestionSetData(questionSetInsertData);
 
-  logger.info({ apiId, requestBody, message: `Question Set Created Successfully with identifier:${questionSetData.identifier}` });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Set Successfully Created', identifier: questionSetData.identifier } });
+  const users = new UserTransformer().transformList([loggedInUser] as User[]);
+
+  logger.info({ apiId, requestBody, message: `Question Set Created Successfully with identifier:${questionSet.identifier}` });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Set Successfully Created', question_set: questionSet, users } });
 };
 
 export default createQuestionSet;

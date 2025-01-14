@@ -63,7 +63,7 @@ const login = async (req: Request, res: Response) => {
   );
 
   const result = {
-    user: new UserTransformer(user).transform(),
+    user: new UserTransformer().transform(user),
     token,
   };
 

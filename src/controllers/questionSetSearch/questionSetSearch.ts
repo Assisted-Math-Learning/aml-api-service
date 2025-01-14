@@ -8,6 +8,8 @@ import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { questionSetService } from '../../services/questionSetService';
 import { boardService } from '../../services/boardService';
+import { getUsersByIdentifiers } from '../../services/user';
+import { UserTransformer } from '../../transformers/entity/user.transformer';
 
 export const searchQuestionSets = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -28,6 +30,17 @@ export const searchQuestionSets = async (req: Request, res: Response) => {
 
   const boards = await boardService.getBoardsByIdentifiers(boardIds);
 
+  const userIds = question_sets
+    .reduce((agg: string[], curr) => {
+      agg = [...agg, curr.created_by, curr?.updated_by as string];
+      return agg;
+    }, [])
+    .filter((v) => !!v);
+
+  const users = await getUsersByIdentifiers(userIds);
+
+  const transformedUsers = new UserTransformer().transformList(users);
+
   logger.info({ apiId, requestBody, message: `Question Sets are listed successfully` });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { question_sets, boards, meta } });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { question_sets, boards, meta, users: transformedUsers } });
 };

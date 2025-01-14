@@ -12,27 +12,28 @@ import { getFileUrlByFolderAndFileName } from '../../services/awsService';
 import { getContentByIds } from '../../services/content';
 import { Content } from '../../models/content';
 import { FIBType } from '../../enums/fibType';
-
-export const apiId = 'api.questionSet.read';
+import { getUsersByIdentifiers } from '../../services/user';
+import { UserTransformer } from '../../transformers/entity/user.transformer';
 
 const readQuestionSetById = async (req: Request, res: Response) => {
+  const apiId = _.get(req, 'id');
   const questionSet_id = _.get(req, 'params.question_set__id');
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const resmsgid = _.get(res, 'resmsgid');
 
-  const questionSetDetails = await questionSetService.getQuestionSetByIdAndStatus(questionSet_id);
+  const questionSet = await questionSetService.getQuestionSetByIdAndStatus(questionSet_id);
 
   // Validating if question set exists
-  if (_.isEmpty(questionSetDetails)) {
+  if (_.isEmpty(questionSet)) {
     const code = 'QUESTION_SET_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: `Question Set not exists` });
     throw amlError(code, 'Question Set not exists', 'NOT_FOUND', 404);
   }
 
-  const questionIds = questionSetDetails.questions.map((q: { identifier: any }) => q.identifier);
+  const questionIds = questionSet.questions.map((q: { identifier: any }) => q.identifier);
   const questionsDetails = await questionService.getQuestionsByIdentifiers(questionIds);
 
-  const contentIds = questionSetDetails.content_ids;
+  const contentIds = questionSet.content_ids;
   const contents = contentIds && contentIds?.length > 0 ? await getContentByIds(contentIds) : [];
 
   // Create a map of questions by their identifier for easy lookup
@@ -52,24 +53,28 @@ const readQuestionSetById = async (req: Request, res: Response) => {
 
   // Combine the question set details with the question details, sorted by sequence
   const questionSetWithQuestions = {
-    ...questionSetDetails,
+    ...questionSet,
     contents: (contents as Content[]).reduce((agg: string[], curr) => {
       const urls = (curr.media || [])?.map((media) => getFileUrlByFolderAndFileName(media.src, media.file_name));
       agg = [...agg, ...urls];
       return agg;
     }, []),
-    questions: questionSetDetails.questions
+    questions: questionSet.questions
       .map((q): Question => questionsMap.get(q.identifier))
       .filter(Boolean)
       .sort((a, b) => {
-        const sequenceA = questionSetDetails.questions.find((q: { identifier: any }) => q.identifier === a.identifier)?.sequence || 0;
-        const sequenceB = questionSetDetails.questions.find((q: { identifier: any }) => q.identifier === b.identifier)?.sequence || 0;
+        const sequenceA = questionSet.questions.find((q: { identifier: any }) => q.identifier === a.identifier)?.sequence || 0;
+        const sequenceB = questionSet.questions.find((q: { identifier: any }) => q.identifier === b.identifier)?.sequence || 0;
         return sequenceA - sequenceB;
       }),
   };
 
+  const users = await getUsersByIdentifiers(([questionSet?.created_by, questionSet?.updated_by] as any[]).filter((v) => !!v));
+
+  const transformedUsers = new UserTransformer().transformList(users);
+
   logger.info({ apiId, questionSet_id, message: `Question Set read successfully` });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: questionSetWithQuestions });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { question_set: questionSetWithQuestions, users: transformedUsers } });
 };
 
 export default readQuestionSetById;

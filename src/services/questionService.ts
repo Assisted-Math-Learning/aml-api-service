@@ -33,11 +33,12 @@ class QuestionService {
     // Update the question in the database
     return Question.update(updateData, {
       where: { identifier: questionIdentifier },
+      returning: true,
     });
   }
 
-  async publishQuestionById(id: string) {
-    return Question.update({ status: Status.LIVE }, { where: { identifier: id }, returning: true });
+  async publishQuestionById(id: string, updatedBy: string) {
+    return Question.update({ status: Status.LIVE, updated_by: updatedBy }, { where: { identifier: id }, returning: true });
   }
 
   async deleteQuestion(id: string) {

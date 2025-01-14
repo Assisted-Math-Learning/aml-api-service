@@ -36,7 +36,7 @@ export const userAuth = async (req: Request, res: Response, next: NextFunction) 
   }
 
   // Attach user object to the request
-  const transformedUser = new UserTransformer(user).transform();
+  const transformedUser = new UserTransformer().transform(user);
 
   lodash.set(req, 'user', transformedUser);
 

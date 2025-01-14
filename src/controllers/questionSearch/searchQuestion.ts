@@ -8,6 +8,8 @@ import { schemaValidation } from '../../services/validationService';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { getFileUrlByFolderAndFileName } from '../../services/awsService';
+import { getUsersByIdentifiers } from '../../services/user';
+import { UserTransformer } from '../../transformers/entity/user.transformer';
 
 export const searchQuestions = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -31,6 +33,17 @@ export const searchQuestions = async (req: Request, res: Response) => {
     return question;
   });
 
+  const userIds = questions
+    .reduce((agg: string[], curr) => {
+      agg = [...agg, curr.created_by, curr?.updated_by as string];
+      return agg;
+    }, [])
+    .filter((v) => !!v);
+
+  const users = await getUsersByIdentifiers(userIds);
+
+  const transformedUsers = new UserTransformer().transformList(users);
+
   logger.info({ apiId, requestBody, message: `Questions are listed successfully` });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { questions: updatedQuestions, meta } });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { questions: updatedQuestions, meta, users: transformedUsers } });
 };

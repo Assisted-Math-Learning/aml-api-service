@@ -15,6 +15,8 @@ import { SkillType } from '../../enums/skillType';
 import { getSubSkill } from '../../services/subSkill';
 import { getQuestionBody } from '../questionCreate/questionCreate.helper';
 import { User } from '../../models/users';
+import { UserTransformer } from '../../transformers/entity/user.transformer';
+import { getUserByIdentifier } from '../../services/user';
 
 const updateQuestionById = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -168,8 +170,13 @@ const updateQuestionById = async (req: Request, res: Response) => {
   updatedDataBody.updated_by = loggedInUser?.identifier ?? 'manual';
 
   // Update Question
-  await questionService.updateQuestionData(question_id, updatedDataBody);
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Updated' } });
+  const [, affectedRows] = await questionService.updateQuestionData(question_id, { ...dataBody, ...updatedDataBody });
+
+  const createdByUser = await getUserByIdentifier(affectedRows?.[0]?.created_by);
+
+  const users = new UserTransformer().transformList(_.uniqBy([createdByUser, loggedInUser], 'identifier').filter((v) => !!v));
+
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Updated', question: affectedRows?.[0] ?? {}, users } });
 };
 
 export default updateQuestionById;

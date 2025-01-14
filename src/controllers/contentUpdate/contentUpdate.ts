@@ -147,10 +147,10 @@ const contentUpdate = async (req: Request, res: Response) => {
   const mergedData = _.merge({}, content, dataBody, updatedDataBody);
 
   // Update Content
-  await updateContent(contentId, mergedData);
+  const [, affectedRows] = await updateContent(contentId, mergedData);
 
   logger.info({ apiId, msgid, resmsgid, contentId, message: 'Content successfully updated' });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Content successfully updated' } });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Content successfully updated', content: affectedRows?.[0] ?? {} } });
 };
 
 export default contentUpdate;

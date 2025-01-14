@@ -17,6 +17,8 @@ import { questionService } from '../../services/questionService';
 import { QuestionSetPurposeType } from '../../enums/questionSetPurposeType';
 import { User } from '../../models/users';
 import { getContentById } from '../../services/content';
+import { getUserByIdentifier } from '../../services/user';
+import { UserTransformer } from '../../transformers/entity/user.transformer';
 
 const updateQuestionSetById = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -214,8 +216,13 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
   updatedDataBody.updated_by = loggedInUser?.identifier ?? 'manual';
 
   // Update Question Set
-  await questionSetService.updateQuestionSet(questionSet_id, updatedDataBody);
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Set Successfully Updated' } });
+  const [, affectedRows] = await questionSetService.updateQuestionSet(questionSet_id, { ...dataBody, ...updatedDataBody });
+
+  const createdByUser = await getUserByIdentifier(affectedRows?.[0]?.created_by);
+
+  const users = new UserTransformer().transformList(_.uniqBy([createdByUser, loggedInUser], 'identifier').filter((v) => !!v));
+
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Set Successfully Updated', question_set: affectedRows?.[0] ?? {}, users } });
 };
 
 export default updateQuestionSetById;

@@ -17,6 +17,7 @@ import { getSubSkill } from '../../services/subSkill';
 import { getQuestionBody } from './questionCreate.helper';
 import { Status } from '../../enums/status';
 import { User } from '../../models/users';
+import { UserTransformer } from '../../transformers/entity/user.transformer';
 
 const createQuestion = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -153,10 +154,12 @@ const createQuestion = async (req: Request, res: Response) => {
   });
 
   // Create the question
-  const insertedQuestionData = await questionService.createQuestionData(questionData);
+  const question = await questionService.createQuestionData(questionData);
 
-  logger.info({ apiId, requestBody, message: `Question Created Successfully with identifier:${insertedQuestionData.identifier}` });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Created', identifier: insertedQuestionData.identifier } });
+  const users = new UserTransformer().transformList([loggedInUser] as User[]);
+
+  logger.info({ apiId, requestBody, message: `Question Created Successfully with identifier:${question.identifier}` });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Created', question, users } });
 };
 
 export default createQuestion;

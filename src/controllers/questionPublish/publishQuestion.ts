@@ -6,13 +6,16 @@ import { questionService } from '../../services/questionService';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { Status } from '../../enums/status';
-
-export const apiId = 'api.question.publish';
+import { User } from '../../models/users';
+import { getUserByIdentifier } from '../../services/user';
+import { UserTransformer } from '../../transformers/entity/user.transformer';
 
 const publishQuestion = async (req: Request, res: Response) => {
+  const apiId = _.get(req, 'id');
   const question_id = _.get(req, 'params.question_id');
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const resmsgid = _.get(res, 'resmsgid');
+  const loggedInUser: User | undefined = (req as any).user;
 
   const questionDetails = await questionService.getQuestionById(question_id, { status: Status.DRAFT });
 
@@ -23,10 +26,14 @@ const publishQuestion = async (req: Request, res: Response) => {
     throw amlError(code, 'Question not exists', 'NOT_FOUND', 404);
   }
 
-  await questionService.publishQuestionById(question_id);
+  const [, affectedRows] = await questionService.publishQuestionById(question_id, loggedInUser!.identifier);
+
+  const createdByUser = await getUserByIdentifier(affectedRows?.[0]?.created_by);
+
+  const users = new UserTransformer().transformList(_.uniqBy([createdByUser, loggedInUser], 'identifier').filter((v) => !!v));
 
   logger.info({ apiId, question_id, message: 'Question Published successfully' });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Published' } });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Published', question: affectedRows?.[0] ?? {}, users } });
 };
 
 export default publishQuestion;
