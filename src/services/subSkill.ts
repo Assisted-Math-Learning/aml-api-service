@@ -31,13 +31,12 @@ export const updateSubSkillData = async (subSkillId: string, data: any): Promise
 };
 
 // Get a sub-skill by ID
-export const getSubSkill = async (subSkillId: string): Promise<any> => {
-  const subSkill = await SubSkillMaster.findOne({
+export const getSubSkill = async (subSkillId: string) => {
+  return SubSkillMaster.findOne({
     where: { identifier: subSkillId, is_active: true },
     attributes: { exclude: ['id'] },
+    raw: true,
   });
-
-  return subSkill?.dataValues;
 };
 
 export const checkSubSkillsExist = async (subSkills: { name: { [key: string]: string } }[]): Promise<{ exists: boolean; foundSkills?: any[] }> => {

@@ -14,12 +14,12 @@ export class QuestionSet extends Model {
   declare identifier: string;
   declare title: { [key: string]: string };
   declare description?: { [key: string]: string } | null;
-  declare repository?: { id: number; name: { [key: string]: string } } | null;
+  declare repository: { identifier: number; name: { [key: string]: string } };
   declare questions: Question[]; // Updated to array of Question objects
   declare sequence: number;
   declare tenant?: { id: number; name: { [key: string]: string } } | null;
   declare taxonomy: Taxonomy; // Using the detailed Taxonomy interface
-  declare sub_skills?: Array<{ id: number; name: { [key: string]: string } }> | null;
+  declare sub_skills?: Array<{ identifier: number; name: { [key: string]: string } }> | null;
   declare purpose?: string | null;
   declare enable_feedback: boolean;
   declare is_atomic: boolean;

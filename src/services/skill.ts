@@ -40,6 +40,12 @@ export const getSkillById = async (skillId: string): Promise<any> => {
 
   return skill?.dataValues;
 };
+export const getSkillByIdAndType = async (skillId: string, type: SkillType) => {
+  return SkillMaster.findOne({
+    where: { identifier: skillId, is_active: true, status: 'live', type },
+    attributes: { exclude: ['id'] },
+  });
+};
 
 // Modify the function to check both ID and type (l1_skill)
 export const checkSkillsExistByIds = async (skillIds: number[]): Promise<boolean> => {

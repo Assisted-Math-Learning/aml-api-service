@@ -10,6 +10,12 @@ import { ResponseHandler } from '../../utils/responseHandler';
 import { getFileUrlByFolderAndFileName } from '../../services/awsService';
 import { getUsersByIdentifiers } from '../../services/user';
 import { UserTransformer } from '../../transformers/entity/user.transformer';
+import { getRepositoryById } from '../../services/repository';
+import { boardService } from '../../services/boardService';
+import { getClassById } from '../../services/class';
+import { getSkillByIdAndType } from '../../services/skill';
+import { SkillType } from '../../enums/skillType';
+import { getSubSkill } from '../../services/subSkill';
 
 export const searchQuestions = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -44,6 +50,97 @@ export const searchQuestions = async (req: Request, res: Response) => {
 
   const transformedUsers = new UserTransformer().transformList(users);
 
+  const repositories = {};
+  const boards = {};
+  const classes = {};
+  const l1_skills = {};
+  const l2_skills = {};
+  const l3_skills = {};
+  const sub_skills = {};
+
+  for (const question of questions) {
+    const { repository, taxonomy, sub_skills: sub_skill } = question;
+    const { board, class: questionClass, l1_skill, l2_skill, l3_skill } = taxonomy;
+    _.set(repositories, repository.identifier, repository);
+    _.set(boards, board.identifier, board);
+    _.set(classes, questionClass.identifier, questionClass);
+    _.set(l1_skills, l1_skill.identifier, l1_skill);
+
+    for (const skill of l2_skill) {
+      _.set(l2_skills, skill.identifier, skill);
+    }
+
+    for (const skill of l3_skill) {
+      _.set(l3_skills, skill.identifier, skill);
+    }
+
+    for (const skill of sub_skill || []) {
+      _.set(sub_skills, skill.identifier, skill);
+    }
+  }
+
+  if (!questions.length) {
+    const { filters } = requestBody.request;
+    if (filters) {
+      if (filters.repository_id) {
+        const repository = await getRepositoryById(filters.repository_id);
+        if (repository) {
+          _.set(repositories, repository.identifier, repository);
+        }
+      }
+      if (filters.board_id) {
+        const board = await boardService.getBoardByIdentifier(filters.board_id);
+        if (board) {
+          _.set(boards, board.identifier, board);
+        }
+      }
+      if (filters.class_id) {
+        const classObj = await getClassById(filters.class_id);
+        if (classObj) {
+          _.set(classes, classObj.identifier, classObj);
+        }
+      }
+      if (filters.l1_skill_id) {
+        const skill = await getSkillByIdAndType(filters.l1_skill_id, SkillType.L1_SKILL);
+        if (skill) {
+          _.set(l1_skills, skill.identifier, skill);
+        }
+      }
+      if (filters.l2_skill_id) {
+        const skill = await getSkillByIdAndType(filters.l2_skill_id, SkillType.L2_SKILL);
+        if (skill) {
+          _.set(l2_skills, skill.identifier, skill);
+        }
+      }
+      if (filters.l3_skill_id) {
+        const skill = await getSkillByIdAndType(filters.l3_skill_id, SkillType.L3_SKILL);
+        if (skill) {
+          _.set(l3_skills, skill.identifier, skill);
+        }
+      }
+      if (filters.sub_skill_id) {
+        const skill = await getSubSkill(filters.sub_skill_id);
+        if (skill) {
+          _.set(sub_skills, skill.identifier, skill);
+        }
+      }
+    }
+  }
+
   logger.info({ apiId, requestBody, message: `Questions are listed successfully` });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { questions: updatedQuestions, meta, users: transformedUsers } });
+  ResponseHandler.successResponse(req, res, {
+    status: httpStatus.OK,
+    data: {
+      questions: updatedQuestions,
+      meta,
+      users: transformedUsers,
+      repositories: Object.values(repositories),
+      boards: Object.values(repositories),
+      classes: Object.values(classes),
+      l1_skills: Object.values(l1_skills),
+      l2_skills: Object.values(l2_skills),
+      l3_skills: Object.values(l3_skills),
+      sub_skills: Object.values(sub_skills),
+    },
+  });
 };

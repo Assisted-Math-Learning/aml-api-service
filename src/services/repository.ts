@@ -29,19 +29,18 @@ export const createRepositoryData = async (req: Optional<any, string> | undefine
 };
 
 // Get a single repository by identifier
-export const getRepositoryById = async (id: string, additionalConditions: object = {}): Promise<any> => {
+export const getRepositoryById = async (id: string, additionalConditions: object = {}) => {
   // Combine base conditions with additional conditions
   const conditions = {
     identifier: id,
     ...additionalConditions,
   };
 
-  const contentDetails = await Repository.findOne({
+  return Repository.findOne({
     where: conditions,
     attributes: { exclude: ['id'] },
+    raw: true,
   });
-
-  return contentDetails?.dataValues;
 };
 
 //publish question

@@ -6,7 +6,7 @@ import { QuestionOperation } from '../enums/questionOperation';
 
 // Define interfaces for the structures used in the Question model
 interface Repository {
-  id: number;
+  identifier: number;
   name: { [key: string]: string };
 }
 
