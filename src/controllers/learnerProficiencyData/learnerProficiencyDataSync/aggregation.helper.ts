@@ -7,6 +7,7 @@ import { LearnerProficiencyQuestionLevelData } from '../../../models/learnerProf
 import { Learner } from '../../../models/learner';
 import { QuestionOperation } from '../../../enums/questionOperation';
 import { FIBType } from '../../../enums/fibType';
+import { replaceLeadingZeroes } from '../../../utils/string.util';
 
 export const getScoreForTheQuestion = (question: Question, learnerResponse: { result?: string; quotient?: string; remainder?: string; answerTopRow?: string; answerBottomRow?: string }): number => {
   const { question_type, question_body } = question;
@@ -35,14 +36,17 @@ export const getScoreForTheQuestion = (question: Question, learnerResponse: { re
       const fibType = _.get(answers, 'fib_type');
       if ([FIBType.FIB_STANDARD, FIBType.FIB_STANDARD_WITH_IMAGE].includes(fibType)) {
         const correctAnswer = _.get(answers, ['result'], '');
-        if (correctAnswer.toString() === result?.toString()) {
+        if (replaceLeadingZeroes(correctAnswer.toString()) === replaceLeadingZeroes(result?.toString())) {
           score = 1;
         }
       }
       if ([FIBType.FIB_QUOTIENT_REMAINDER, FIBType.FIB_QUOTIENT_REMAINDER_WITH_IMAGE].includes(fibType)) {
         const quotient = _.get(answers, ['result', 'quotient'], '');
         const remainder = _.get(answers, ['result', 'remainder'], '');
-        if (quotient?.toString() === lrQuotient?.toString() && remainder?.toString() === lrRemainder?.toString()) {
+        if (
+          replaceLeadingZeroes(quotient?.toString()) === replaceLeadingZeroes(lrQuotient?.toString()) &&
+          replaceLeadingZeroes(remainder?.toString()) === replaceLeadingZeroes(lrRemainder?.toString())
+        ) {
           score = 1;
         }
       }
