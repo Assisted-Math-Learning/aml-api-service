@@ -135,7 +135,7 @@ export const searchQuestions = async (req: Request, res: Response) => {
       meta,
       users: transformedUsers,
       repositories: Object.values(repositories),
-      boards: Object.values(repositories),
+      boards: Object.values(boards),
       classes: Object.values(classes),
       l1_skills: Object.values(l1_skills),
       l2_skills: Object.values(l2_skills),
