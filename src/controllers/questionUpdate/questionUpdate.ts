@@ -9,7 +9,6 @@ import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { getRepositoryById } from '../../services/repository';
 import { boardService } from '../../services/boardService';
-import { getClassById } from '../../services/class';
 import { getSkillById } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
 import { getSubSkill } from '../../services/subSkill';
@@ -17,6 +16,7 @@ import { getQuestionBody } from '../questionCreate/questionCreate.helper';
 import { User } from '../../models/users';
 import { UserTransformer } from '../../transformers/entity/user.transformer';
 import { getUserByIdentifier } from '../../services/user';
+import { classService } from '../../services/classService';
 
 const updateQuestionById = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -82,7 +82,7 @@ const updateQuestionById = async (req: Request, res: Response) => {
   // Check class
   if (dataBody.class_id) {
     const classId = dataBody.class_id;
-    const classEntity = await getClassById(classId);
+    const classEntity = await classService.getClassById(classId);
     if (!classEntity) {
       const code = 'CLASS_NOT_EXISTS';
       logger.error({ code, apiId, msgid, resmsgid, message: `Class not exists` });

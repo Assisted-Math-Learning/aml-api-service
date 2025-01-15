@@ -7,8 +7,8 @@ import logger from '../../utils/logger';
 import boardUpdateJson from './updateBoardValidationSchema.json';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { amlError } from '../../types/amlError';
-import { getClassById } from '../../services/class';
 import { checkSkillsExistByIds } from '../../services/skill';
+import { classService } from '../../services/classService';
 
 export const apiId = 'api.board.update';
 
@@ -52,7 +52,7 @@ const updateBoard = async (req: Request, res: Response) => {
       const updatedClassObj: any = {};
 
       if (id) {
-        const isExists = await getClassById(id);
+        const isExists = await classService.getClassById(id);
         if (!isExists) {
           const code = 'CLASS_ID_NOT_EXISTS';
           logger.error({ code, apiId, msgid, resmsgid, message: `Class ID ${id} does not exist` });

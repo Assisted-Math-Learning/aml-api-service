@@ -6,7 +6,7 @@ import logger from '../../utils/logger';
 import classUpdateJson from './updateClassValidationSchema.json';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { amlError } from '../../types/amlError';
-import { getClassById, updateClassData } from '../../services/class';
+import { classService } from '../../services/classService';
 
 export const apiId = 'api.class.update';
 
@@ -27,7 +27,7 @@ const updateClass = async (req: Request, res: Response) => {
   }
 
   // Check if the class id exists
-  const classData = await getClassById(class_id);
+  const classData = await classService.getClassById(class_id);
   if (_.isEmpty(classData)) {
     const code = 'CLASS_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: 'Class does not exist' });
@@ -40,7 +40,7 @@ const updateClass = async (req: Request, res: Response) => {
   };
 
   // Update the class
-  await updateClassData(class_id, updatedData);
+  await classService.updateClassData(class_id, updatedData);
 
   // Respond with a success message
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Class Successfully Updated' } });

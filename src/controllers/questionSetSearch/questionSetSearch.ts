@@ -11,10 +11,10 @@ import { boardService } from '../../services/boardService';
 import { getUsersByIdentifiers } from '../../services/user';
 import { UserTransformer } from '../../transformers/entity/user.transformer';
 import { getRepositoryById } from '../../services/repository';
-import { getClassById } from '../../services/class';
 import { getSkillByIdAndType } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
 import { getSubSkill } from '../../services/subSkill';
+import { classService } from '../../services/classService';
 
 export const searchQuestionSets = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -87,7 +87,7 @@ export const searchQuestionSets = async (req: Request, res: Response) => {
         }
       }
       if (filters.class_id) {
-        const classObj = await getClassById(filters.class_id);
+        const classObj = await classService.getClassById(filters.class_id);
         if (classObj) {
           _.set(classes, classObj.identifier, classObj);
         }

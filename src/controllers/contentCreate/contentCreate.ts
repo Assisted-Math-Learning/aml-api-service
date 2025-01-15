@@ -11,13 +11,13 @@ import { ResponseHandler } from '../../utils/responseHandler';
 import { createContentData } from '../../services/content';
 import { getRepositoryById } from '../../services/repository';
 import { boardService } from '../../services/boardService';
-import { getClassById } from '../../services/class';
 import { SkillType } from '../../enums/skillType';
 import { getSkillById } from '../../services/skill';
 import { getSubSkill } from '../../services/subSkill';
 import { Status } from '../../enums/status';
 import { User } from '../../models/users';
 import { UserTransformer } from '../../transformers/entity/user.transformer';
+import { classService } from '../../services/classService';
 
 const createContent = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -66,7 +66,7 @@ const createContent = async (req: Request, res: Response) => {
 
   // Check class
   const classId = dataBody.class_id;
-  const classEntity = await getClassById(classId);
+  const classEntity = await classService.getClassById(classId);
   if (!classEntity) {
     const code = 'CLASS_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: `Class not exists` });

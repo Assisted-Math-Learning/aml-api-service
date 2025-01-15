@@ -10,10 +10,10 @@ import { ResponseHandler } from '../../utils/responseHandler';
 import { checkTenantNameExists } from '../../services/tenant';
 import { checkRepositoryNameExists } from '../../services/repository';
 import { boardService } from '../../services/boardService';
-import { checkClassNameExists } from '../../services/class';
 import { checkSkillExists } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
 import { checkSubSkillsExist } from '../../services/subSkill';
+import { classService } from '../../services/classService';
 
 export const apiId = 'api.content.update';
 
@@ -83,7 +83,7 @@ const contentUpdate = async (req: Request, res: Response) => {
   // Check class
   if (dataBody.taxonomy && dataBody.taxonomy.class) {
     const className = dataBody.taxonomy.class.name;
-    const classExists = await checkClassNameExists(className);
+    const classExists = await classService.checkClassNameExists(className);
     if (!classExists.exists) {
       const code = 'CLASS_NOT_EXISTS';
       logger.error({ code, apiId, msgid, resmsgid, message: `Class not exists` });

@@ -6,7 +6,7 @@ import { schemaValidation } from '../../services/validationService';
 import listClassJson from './listClassesValidationSchema.json';
 import { amlError } from '../../types/amlError';
 import logger from '../../utils/logger';
-import { getClassList } from '../../services/class';
+import { classService } from '../../services/classService';
 
 const listClasses = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -19,7 +19,7 @@ const listClasses = async (req: Request, res: Response) => {
     logger.error({ code, apiId, msgid, resmsgid, requestBody, message: isRequestValid.message });
     throw amlError(code, isRequestValid.message, 'BAD_REQUEST', 400);
   }
-  const classData = await getClassList(requestBody.request);
+  const classData = await classService.getClassList(requestBody.request);
 
   logger.info({ apiId, requestBody, message: `Classes are listed successfully` });
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: classData });

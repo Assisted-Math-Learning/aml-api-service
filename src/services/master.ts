@@ -6,10 +6,10 @@ import { Op } from 'sequelize';
 import * as uuid from 'uuid';
 import _ from 'lodash';
 import { SkillMaster } from '../models/skill';
-import { getClassById } from './class';
 import { checkSkillTaxonomyIdExists } from './skillTaxonomy';
 import { amlError } from '../types/amlError';
 import { checkSkillsExistByIds } from './skill';
+import { classService } from './classService';
 
 // Helper to process insertions
 const processInsertionResults = (results: any[]) => {
@@ -116,7 +116,7 @@ const handleBoardInsertion = async (boardData: any[]) => {
           }
 
           // Validate class existence
-          const isClassIdExists = await getClassById(identifier);
+          const isClassIdExists = await classService.getClassById(identifier);
           if (!isClassIdExists) {
             const code = 'CLASS_ID_NOT_EXISTS';
             throw amlError(code, 'Class Id does not exist', 'NOT_FOUND', 404);
