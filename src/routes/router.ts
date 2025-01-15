@@ -15,6 +15,7 @@ import subSkillRouter from './entities/subSkillRouter';
 import { userAuthRouter } from './userAuth.route';
 import { userAuth } from '../middlewares/userAuth';
 import { portalRouter } from './portal.router';
+import { dataMigrations } from './dataMigration.route';
 
 export const router = express.Router();
 
@@ -45,6 +46,8 @@ router.use('/question-set', userAuth, questionSetRouter);
 router.use('/content', userAuth, contentRouter);
 
 router.use('/repository', userAuth, repositoryRouter);
+
+router.use('/migration', userAuth, dataMigrations);
 
 /**
  * ******************************

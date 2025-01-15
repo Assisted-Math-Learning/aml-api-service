@@ -40,8 +40,8 @@ const evaluateLearner = async (req: Request, res: Response) => {
     throw amlError(code, `Learner Journey already in progress`, 'BAD_REQUEST', 400);
   }
 
-  const learnerBoardId = _.get(learner, ['taxonomy', 'board', 'identifier']);
-  const learnerClassId = _.get(learner, ['taxonomy', 'class', 'identifier']);
+  const learnerBoardId = _.get(learner, ['board_id']);
+  const learnerClassId = _.get(learner, ['class_id']);
   const tenantId = _.get(learner, ['tenant_id']);
   /**
    * Validate learner board

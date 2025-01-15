@@ -2251,9 +2251,9 @@ create table telemetry_data
     created_on timestamp with time zone not null
 );
 
---------------------------------------------
+---------------------------------------
 -- Adding enable_telemetry to tenant --
---------------------------------------------
+---------------------------------------
 
 ALTER TABLE tenant ADD COLUMN enable_telemetry BOOLEAN DEFAULT FALSE;
 
@@ -2262,3 +2262,44 @@ ALTER TABLE tenant ADD COLUMN enable_telemetry BOOLEAN DEFAULT FALSE;
 ------------------------------------------------------------
 
 ALTER TABLE board_master ADD CONSTRAINT unique_identifier UNIQUE (identifier);
+
+---------------------------------------
+-- Creating school and section table --
+---------------------------------------
+
+create table school
+(
+    id         serial
+        primary key,
+    identifier varchar(255) not null unique,
+    tenant_id  varchar(255),
+    board_id   varchar(255) not null,
+    name       varchar(255) not null,
+    created_by varchar(255) not null,
+    updated_by varchar(255),
+    created_at timestamp with time zone not null,
+    updated_at timestamp with time zone not null
+);
+
+create table section_master
+(
+    id         serial
+        primary key,
+    identifier varchar(255) not null unique,
+    section    varchar(255) not null,
+    created_by varchar(255) not null,
+    updated_by varchar(255),
+    created_at timestamp with time zone not null,
+    updated_at timestamp with time zone not null
+);
+
+-------------------------------------------------------
+-- Adding board_id, school_id, class_id, section_id and name to learner --
+-------------------------------------------------------
+
+ALTER TABLE learner
+ADD COLUMN board_id VARCHAR(255),
+ADD COLUMN school_id VARCHAR(255),
+ADD COLUMN class_id VARCHAR(255),
+ADD COLUMN section_id VARCHAR(255),
+ADD COLUMN name VARCHAR(255);
