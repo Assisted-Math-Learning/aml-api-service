@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ResponseHandler } from '../../../utils/responseHandler';
 import httpStatus from 'http-status';
-import { getTenant } from '../../../services/tenant';
+import { tenantService } from '../../../services/tenantService';
 
 const fetchLoggedInLearner = async (req: Request, res: Response) => {
   const learner = (req as any).learner;
@@ -12,7 +12,7 @@ const fetchLoggedInLearner = async (req: Request, res: Response) => {
     taxonomy: learner!.taxonomy,
   };
 
-  const tenant = await getTenant(learner.tenant_id);
+  const tenant = await tenantService.getTenant(learner.tenant_id);
 
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Profile fetched successfully', data: { learner: result, tenant } } });
 };

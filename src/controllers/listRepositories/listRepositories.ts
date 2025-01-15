@@ -6,10 +6,10 @@ import { schemaValidation } from '../../services/validationService';
 import listRepositoryJson from './listRepositoriesValidationSchema.json';
 import { amlError } from '../../types/amlError';
 import logger from '../../utils/logger';
-import { getTenant } from '../../services/tenant';
 import { Repository } from '../../models/repository';
 import { getRepositoryIds } from '../../services/repositoryAssociation';
 import { getRepositoryListByIds } from '../../services/repository';
+import { tenantService } from '../../services/tenantService';
 
 interface RepositoryResponse {
   repositories: Repository[];
@@ -36,7 +36,7 @@ const listRepositories = async (req: Request, res: Response) => {
   }
 
   if (user.tenant_id) {
-    const tenant = await getTenant(user.tenant_id);
+    const tenant = await tenantService.getTenant(user.tenant_id);
     if (tenant) {
       const repositoryIdentifiers = await getRepositoryIds(tenant.identifier);
       repositoryData = await getRepositoryListByIds(requestBody.request, repositoryIdentifiers);

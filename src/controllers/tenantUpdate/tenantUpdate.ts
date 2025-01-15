@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import { getTenant, updateTenantData } from '../../services/tenant';
 import { schemaValidation } from '../../services/validationService';
 import logger from '../../utils/logger';
 import tenantUpdateJson from './updateTenantValidationSchema.json';
 import { boardService } from '../../services/boardService';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { amlError } from '../../types/amlError';
+import { tenantService } from '../../services/tenantService';
 
 export const apiId = 'api.tenant.update';
 
@@ -26,7 +26,7 @@ const updateTenant = async (req: Request, res: Response) => {
   }
 
   // Validate tenant existence
-  const tenant = await getTenant(tenant_id);
+  const tenant = await tenantService.getTenant(tenant_id);
   if (_.isEmpty(tenant)) {
     const code = 'TENANT_NOT_EXISTS';
     logger.error({ code, apiId, msgid, resmsgid, message: 'Tenant does not exist' });
@@ -47,7 +47,7 @@ const updateTenant = async (req: Request, res: Response) => {
   const mergedData = _.merge({}, tenant, dataBody);
 
   // Update the tenant
-  await updateTenantData(tenant_id, mergedData);
+  await tenantService.updateTenantData(tenant_id, mergedData);
 
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Tenant Successfully Updated' } });
 };

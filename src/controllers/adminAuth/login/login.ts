@@ -11,7 +11,7 @@ import httpStatus from 'http-status';
 import { getUserByEmail } from '../../../services/user';
 import { appConfiguration } from '../../../config';
 import { UserTransformer } from '../../../transformers/entity/user.transformer';
-import { getTenant } from '../../../services/tenant';
+import { tenantService } from '../../../services/tenantService';
 
 const { aml_jwt_secret_key } = appConfiguration;
 
@@ -68,7 +68,7 @@ const login = async (req: Request, res: Response) => {
   };
 
   if (user.tenant_id) {
-    const tenant = await getTenant(user.tenant_id);
+    const tenant = await tenantService.getTenant(user.tenant_id);
     if (tenant) {
       _.set(result, 'tenant', tenant);
     }

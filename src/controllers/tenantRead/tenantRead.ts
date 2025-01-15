@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import logger from '../../utils/logger';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import { getTenant } from '../../services/tenant';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { amlError } from '../../types/amlError';
+import { tenantService } from '../../services/tenantService';
 
 export const apiId = 'api.tenant.read';
 
@@ -13,7 +13,7 @@ const readTeantById = async (req: Request, res: Response) => {
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const resmsgid = _.get(res, 'resmsgid');
 
-  const tenantDetails = await getTenant(tenant_id);
+  const tenantDetails = await tenantService.getTenant(tenant_id);
 
   //validating tenant is exist
   if (_.isEmpty(tenantDetails)) {

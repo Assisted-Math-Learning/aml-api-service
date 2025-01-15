@@ -2256,3 +2256,9 @@ create table telemetry_data
 --------------------------------------------
 
 ALTER TABLE tenant ADD COLUMN enable_telemetry BOOLEAN DEFAULT FALSE;
+
+------------------------------------------------------------
+-- Altering table board_master to make identifier unique --
+------------------------------------------------------------
+
+ALTER TABLE board_master ADD CONSTRAINT unique_identifier UNIQUE (identifier);

@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
-import { getTenantSearch } from '../../services/tenant';
 import { schemaValidation } from '../../services/validationService';
 import logger from '../../utils/logger';
 import tenantSearchJson from './searchTenantValidationSchema.json';
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
+import { tenantService } from '../../services/tenantService';
 
 export const apiId = 'api.tenant.search';
 
@@ -24,7 +24,7 @@ const searchTenants = async (req: Request, res: Response) => {
   }
 
   // Search for tenants
-  const tenantData = await getTenantSearch(requestBody.request);
+  const tenantData = await tenantService.getTenantSearch(requestBody.request);
 
   logger.info({ apiId, requestBody, message: `Tenants are searched successfully` });
   ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: tenantData });

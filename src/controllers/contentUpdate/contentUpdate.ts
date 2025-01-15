@@ -7,13 +7,13 @@ import logger from '../../utils/logger';
 import contentUpdateSchema from './contentUpdateValidationSchema.json'; // Ensure this schema file is defined correctly
 import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
-import { checkTenantNameExists } from '../../services/tenant';
 import { checkRepositoryNameExists } from '../../services/repository';
 import { boardService } from '../../services/boardService';
 import { checkSkillExists } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
 import { checkSubSkillsExist } from '../../services/subSkill';
 import { classService } from '../../services/classService';
+import { tenantService } from '../../services/tenantService';
 
 export const apiId = 'api.content.update';
 
@@ -47,7 +47,7 @@ const contentUpdate = async (req: Request, res: Response) => {
   // Extract and check tenant
   if (dataBody.tenant) {
     const tenantName = dataBody.tenant.name;
-    const { exists: tenantExists, tenant } = await checkTenantNameExists(tenantName);
+    const { exists: tenantExists, tenant } = await tenantService.checkTenantNameExists(tenantName);
     if (!tenantExists || !tenant) {
       const code = 'TENANT_NOT_EXISTS';
       logger.error({ code, apiId, msgid, resmsgid, message: `Tenant not exists` });
