@@ -36,6 +36,7 @@ import { AppDataSource } from '../../../config';
 import { LearnerProficiencyQuestionLevelData } from '../../../models/learnerProficiencyQuestionLevelData';
 import { QuestionSetPurposeType } from '../../../enums/questionSetPurposeType';
 import { QuestionStatus } from '../../../enums/status';
+import { questionSetQuestionMappingService } from '../../../services/questionSetQuestionMappingService';
 
 const aggregateLearnerDataOnClassAndSkillLevel = async (transaction: any, learner: Learner, questionLevelData: any[]) => {
   const aggregateData = getLearnerAggregateDataForClassAndL1SkillPair(questionLevelData);
@@ -166,7 +167,8 @@ const learnerProficiencyDataSync = async (req: Request, res: Response) => {
      */
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: updating question set level data`);
     for (const questionSet of questionSets) {
-      const totalQuestionsCount = (questionSet.questions || []).length;
+      const questionMappings = await questionSetQuestionMappingService.getEntriesForQuestionSetId(questionSet.identifier);
+      const totalQuestionsCount = (questionMappings || []).length;
       const { learnerJourney } = await readLearnerJourneyByLearnerIdAndQuestionSetId(learner_id, questionSet.identifier);
       const pastAttemptedQuestions = learnerJourney && learnerJourney.status === LearnerJourneyStatus.IN_PROGRESS ? learnerJourney.completed_question_ids : [];
       const completedQuestionIds = _.uniq([...pastAttemptedQuestions, ...questionIds]);

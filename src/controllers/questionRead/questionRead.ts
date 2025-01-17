@@ -8,6 +8,8 @@ import { ResponseHandler } from '../../utils/responseHandler';
 import { getFileUrlByFolderAndFileName } from '../../services/awsService';
 import { getUsersByIdentifiers } from '../../services/user';
 import { UserTransformer } from '../../transformers/entity/user.transformer';
+import { questionSetQuestionMappingService } from '../../services/questionSetQuestionMappingService';
+import { questionSetService } from '../../services/questionSetService';
 
 const readQuestionById = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -33,7 +35,14 @@ const readQuestionById = async (req: Request, res: Response) => {
 
   const transformedUsers = new UserTransformer().transformList(users);
 
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { question, users: transformedUsers } });
+  const mappings = await questionSetQuestionMappingService.getEntriesForQuestionIds([question?.identifier]);
+  const questionSetIds = mappings.map((mapping) => mapping.question_set_id);
+
+  const questionSets = await questionSetService.getQuestionSetsByIdentifiers(questionSetIds);
+
+  _.set(question, 'question_set_ids', questionSetIds);
+
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { question, question_sets: questionSets, users: transformedUsers } });
 };
 
 export default readQuestionById;

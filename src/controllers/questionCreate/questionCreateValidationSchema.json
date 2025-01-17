@@ -24,6 +24,12 @@
     "request": {
       "type": "object",
       "properties": {
+        "question_set_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "question_type": {
           "type": "string",
           "enum": ["Grid-1", "Mcq", "Fib", "Grid-2"]

@@ -19,6 +19,7 @@ import { getContentById } from '../../services/content';
 import { getUserByIdentifier } from '../../services/user';
 import { UserTransformer } from '../../transformers/entity/user.transformer';
 import { classService } from '../../services/classService';
+import { questionSetQuestionMappingService } from '../../services/questionSetQuestionMappingService';
 
 const updateQuestionSetById = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -64,14 +65,16 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
     }; // Create repository object
   }
 
+  const mappingPromises = [];
   if (dataBody.questions) {
-    const questions = dataBody.questions.map((q: { identifier: string; sequence: number }) => ({
-      identifier: q.identifier,
-      sequence: q.sequence,
-    }));
+    const questionIdentifierSequenceMap = {};
+    for (const question of dataBody.questions) {
+      const { identifier, sequence } = question;
+      _.set(questionIdentifierSequenceMap, identifier, sequence);
+    }
 
-    const questionIdentifiers = questions.map((q: { identifier: any }) => q.identifier);
-    const { exists: questionsExist, foundQuestions } = await questionService.checkQuestionsExist(questionIdentifiers);
+    const questionIdentifiers = Object.keys(questionIdentifierSequenceMap);
+    const { exists: questionsExist } = await questionService.checkQuestionsExist(questionIdentifiers);
 
     if (!questionsExist) {
       const code = 'QUESTIONS_NOT_FOUND';
@@ -79,14 +82,30 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
       throw amlError(code, 'Some questions were not found', 'NOT_FOUND', 404);
     }
 
-    updatedDataBody.questions = foundQuestions?.map((foundQuestion: any) => {
-      const matchingRequestQuestion = questions.find((q: { identifier: any }) => q.identifier === foundQuestion.identifier);
-      return {
-        id: foundQuestion.id,
-        identifier: foundQuestion.identifier,
-        sequence: matchingRequestQuestion?.sequence,
-      };
-    });
+    const mappings = await questionSetQuestionMappingService.getEntriesForQuestionSetId(questionSet_id);
+    const existingQuestionIds = mappings.map((map) => map.question_id);
+    const removedQuestionIds = _.difference(existingQuestionIds, questionIdentifiers);
+    const addedQuestionIds = _.difference(questionIdentifiers, existingQuestionIds);
+
+    for (const mapping of mappings) {
+      const { question_id } = mapping;
+      if (removedQuestionIds.includes(question_id)) {
+        mappingPromises.push(mapping.update({ updated_by: loggedInUser?.identifier || 'manual' }, { where: { id: mapping.id } }));
+        mappingPromises.push(mapping.destroy());
+      } else {
+        mappingPromises.push(mapping.update({ sequence: _.get(questionIdentifierSequenceMap, question_id), updated_by: loggedInUser?.identifier || 'manual' }, { where: { id: mapping.id } }));
+      }
+    }
+    for (const questionId of addedQuestionIds) {
+      mappingPromises.push(
+        questionSetQuestionMappingService.create({
+          question_set_id: questionSet_id,
+          question_id: questionId,
+          sequence: _.get(questionIdentifierSequenceMap, questionId),
+          created_by: loggedInUser?.identifier || 'manual',
+        }),
+      );
+    }
   }
 
   // Check board

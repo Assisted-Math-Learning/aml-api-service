@@ -18,6 +18,8 @@ import { User } from '../../models/users';
 import { UserTransformer } from '../../transformers/entity/user.transformer';
 import { classService } from '../../services/classService';
 import { getSkillById } from '../../services/skill';
+import { questionSetService } from '../../services/questionSetService';
+import { questionSetQuestionMappingService } from '../../services/questionSetQuestionMappingService';
 
 const createQuestion = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -130,9 +132,21 @@ const createQuestion = async (req: Request, res: Response) => {
       throw amlError(code, 'sub Skill not exists', 'NOT_FOUND', 404);
     }
     subSkillObjects.push({
-      identifier: subSkill.id,
+      identifier: subSkill.identifier,
       name: subSkill.name,
     });
+  }
+
+  // Check question set
+  const questionSetObjects = [];
+  for (const questionSetId of dataBody.question_set_ids || []) {
+    const questionSet = await questionSetService.getQuestionSetById(questionSetId);
+    if (!questionSet) {
+      const code = 'QUESTION_SET_NOT_EXISTS';
+      logger.error({ code, message: `Missing question set` });
+      throw amlError(code, 'question set not exists', 'NOT_FOUND', 404);
+    }
+    questionSetObjects.push(questionSet);
   }
 
   // Construct the questionData object with all updated objects including sub-skills with IDs
@@ -156,10 +170,21 @@ const createQuestion = async (req: Request, res: Response) => {
   // Create the question
   const question = await questionService.createQuestionData(questionData);
 
+  for (const questionSet of questionSetObjects) {
+    const { identifier } = questionSet;
+    const sequence = await questionSetQuestionMappingService.getNextSequenceNumberForQuestionSet(identifier);
+    await questionSetQuestionMappingService.create({
+      question_set_id: identifier,
+      question_id: question.identifier,
+      sequence,
+      created_by: loggedInUser?.identifier ?? 'manual',
+    });
+  }
+
   const users = new UserTransformer().transformList([loggedInUser] as User[]);
 
   logger.info({ apiId, requestBody, message: `Question Created Successfully with identifier:${question.identifier}` });
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Created', question, users } });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Created', question, question_sets: questionSetObjects, users } });
 };
 
 export default createQuestion;

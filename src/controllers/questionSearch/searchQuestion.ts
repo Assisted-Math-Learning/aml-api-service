@@ -16,6 +16,8 @@ import { getSkillByIdAndType } from '../../services/skill';
 import { SkillType } from '../../enums/skillType';
 import { getSubSkill } from '../../services/subSkill';
 import { classService } from '../../services/classService';
+import { questionSetQuestionMappingService } from '../../services/questionSetQuestionMappingService';
+import { questionSetService } from '../../services/questionSetService';
 
 export const searchQuestions = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -57,6 +59,21 @@ export const searchQuestions = async (req: Request, res: Response) => {
   const l2_skills = {};
   const l3_skills = {};
   const sub_skills = {};
+  const questionIds = questions.map((question) => question.identifier);
+
+  const mappings = await questionSetQuestionMappingService.getEntriesForQuestionIds(questionIds);
+
+  const questionQuestionSetMapping: any = {};
+  const questionSetIds = [];
+  for (const mapping of mappings) {
+    questionSetIds.push(mapping.question_set_id);
+    if (!Object.prototype.hasOwnProperty.call(questionQuestionSetMapping, mapping.question_id)) {
+      _.set(questionQuestionSetMapping, mapping.question_id, []);
+    }
+    questionQuestionSetMapping[mapping.question_id].push(mapping.question_set_id);
+  }
+
+  const questionSets = await questionSetService.getQuestionSetsByIdentifiers(questionSetIds);
 
   for (const question of questions) {
     const { repository, taxonomy, sub_skills: sub_skill } = question;
@@ -77,6 +94,8 @@ export const searchQuestions = async (req: Request, res: Response) => {
     for (const skill of sub_skill || []) {
       _.set(sub_skills, skill.identifier, skill);
     }
+
+    _.set(question, 'question_set_ids', _.get(questionQuestionSetMapping, question.identifier, []));
   }
 
   if (!questions.length) {
@@ -132,6 +151,7 @@ export const searchQuestions = async (req: Request, res: Response) => {
     status: httpStatus.OK,
     data: {
       questions: updatedQuestions,
+      question_sets: questionSets,
       meta,
       users: transformedUsers,
       repositories: Object.values(repositories),

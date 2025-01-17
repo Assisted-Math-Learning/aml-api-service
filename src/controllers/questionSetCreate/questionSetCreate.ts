@@ -12,7 +12,6 @@ import { getRepositoryById } from '../../services/repository';
 import { boardService } from '../../services/boardService';
 import { SkillType } from '../../enums/skillType';
 import { getSubSkill } from '../../services/subSkill';
-import { questionService } from '../../services/questionService';
 import { QuestionSetPurposeType } from '../../enums/questionSetPurposeType';
 import { Status } from '../../enums/status';
 import { User } from '../../models/users';
@@ -51,33 +50,6 @@ const createQuestionSet = async (req: Request, res: Response) => {
     identifier: repository.identifier,
     name: repository.name,
   };
-
-  // Extract question identifiers and sequences
-  const questions = (dataBody.questions || []).map((q: { identifier: any; sequence: any }) => ({
-    identifier: q.identifier,
-    sequence: q.sequence,
-  }));
-
-  const questionIdentifiers: string[] = questions.map((q: { identifier: any }) => q.identifier);
-
-  // Check if the questions exist
-  const { exists: questionsExist, foundQuestions } = await questionService.checkQuestionsExist(questionIdentifiers);
-
-  if (!questionsExist) {
-    const code = 'QUESTIONS_NOT_FOUND';
-    logger.error({ code, apiId, msgid, resmsgid, message: 'Some questions were not found' });
-    throw amlError(code, 'Some questions were not found', 'NOT_FOUND', 404);
-  }
-
-  // Map the found questions with their sequence
-  const mappedQuestions = foundQuestions?.map((foundQuestion: any) => {
-    const matchingRequestQuestion = questions.find((q: { identifier: any }) => q.identifier === foundQuestion.identifier);
-    return {
-      id: foundQuestion.id,
-      identifier: foundQuestion.identifier,
-      sequence: matchingRequestQuestion?.sequence, // Add the sequence from the request
-    };
-  });
 
   // Check board
   const boardId = dataBody.board_id;
@@ -185,7 +157,7 @@ const createQuestionSet = async (req: Request, res: Response) => {
     identifier: uuid.v4(),
     created_by: loggedInUser?.identifier ?? 'manual',
     repository: repositoryObject,
-    questions: mappedQuestions,
+    questions: [],
     content_ids: contentIds,
     taxonomy: {
       board: boardObject,

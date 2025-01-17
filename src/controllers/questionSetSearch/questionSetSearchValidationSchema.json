@@ -24,6 +24,15 @@
     "request": {
       "type": "object",
       "properties": {
+        "sort_by": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
         "filters": {
           "type": "object",
           "properties": {

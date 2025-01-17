@@ -25,6 +25,7 @@ export const learnerTaxonomyToColumns = async (req: Request, res: Response) => {
     const updateData = {
       board_id: taxonomyData?.board?.identifier ?? null,
       class_id: taxonomyData?.class?.identifier ?? null,
+      name: learner.username,
     };
     return updateLearner(learner.id, updateData);
   });

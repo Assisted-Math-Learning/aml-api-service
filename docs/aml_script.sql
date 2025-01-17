@@ -2240,7 +2240,7 @@ UPDATE question_set SET enable_feedback = FALSE WHERE question_set.purpose = 'Ma
 -- Adding table telemetry_data --
 --------------------------------------------
 
-create table telemetry_data
+create table if not exists telemetry_data
 (
     id         serial
         primary key,
@@ -2303,3 +2303,22 @@ ADD COLUMN school_id VARCHAR(255),
 ADD COLUMN class_id VARCHAR(255),
 ADD COLUMN section_id VARCHAR(255),
 ADD COLUMN name VARCHAR(255);
+
+
+------------------------------------------------------------
+-- CREATE TABLE question_set_question_mapping  --
+------------------------------------------------------------
+
+create table if not exists question_set_question_mapping
+(
+    id              serial
+        primary key,
+    question_set_id varchar(255)             not null,
+    question_id     varchar(255)             not null,
+    sequence        integer                  not null,
+    created_by      varchar(255)             not null,
+    updated_by      varchar(255),
+    created_at      timestamp with time zone not null,
+    updated_at      timestamp with time zone not null,
+    deleted_at      timestamp with time zone
+);

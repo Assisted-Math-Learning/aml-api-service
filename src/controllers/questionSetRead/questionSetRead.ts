@@ -14,6 +14,7 @@ import { Content } from '../../models/content';
 import { FIBType } from '../../enums/fibType';
 import { getUsersByIdentifiers } from '../../services/user';
 import { UserTransformer } from '../../transformers/entity/user.transformer';
+import { questionSetQuestionMappingService } from '../../services/questionSetQuestionMappingService';
 
 const readQuestionSetById = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -30,7 +31,8 @@ const readQuestionSetById = async (req: Request, res: Response) => {
     throw amlError(code, 'Question Set not exists', 'NOT_FOUND', 404);
   }
 
-  const questionIds = questionSet.questions.map((q: { identifier: any }) => q.identifier);
+  const mappings = await questionSetQuestionMappingService.getEntriesForQuestionSetId(questionSet_id);
+  const questionIds = mappings.map((mapping) => mapping.question_id);
   const questionsDetails = await questionService.getQuestionsByIdentifiers(questionIds);
 
   const contentIds = questionSet.content_ids;
@@ -59,12 +61,12 @@ const readQuestionSetById = async (req: Request, res: Response) => {
       agg = [...agg, ...urls];
       return agg;
     }, []),
-    questions: questionSet.questions
-      .map((q): Question => questionsMap.get(q.identifier))
+    questions: mappings
+      .map((mapping): Question => questionsMap.get(mapping.question_id))
       .filter(Boolean)
       .sort((a, b) => {
-        const sequenceA = questionSet.questions.find((q: { identifier: any }) => q.identifier === a.identifier)?.sequence || 0;
-        const sequenceB = questionSet.questions.find((q: { identifier: any }) => q.identifier === b.identifier)?.sequence || 0;
+        const sequenceA = mappings.find((mapping) => mapping.question_id === a.identifier)?.sequence || 0;
+        const sequenceB = mappings.find((mapping) => mapping.question_id === b.identifier)?.sequence || 0;
         return sequenceA - sequenceB;
       }),
   };

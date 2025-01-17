@@ -3,8 +3,8 @@ import * as _ from 'lodash';
 import { Question } from '../models/question';
 import { Status } from '../enums/status';
 import { DEFAULT_LIMIT } from '../constants/constants';
-import { questionSetService } from './questionSetService';
 import { Sequelize } from 'sequelize-typescript';
+import { questionSetQuestionMappingService } from './questionSetQuestionMappingService';
 
 class QuestionService {
   static getInstance() {
@@ -68,10 +68,11 @@ class QuestionService {
     };
     limit?: number;
     offset?: number;
+    sort_by?: string[][];
   }) {
-    const limit: any = _.get(req, 'limit');
-    const offset: any = _.get(req, 'offset');
-    const { filters = {} } = req || {};
+    const limit: any = _.get(req, 'limit', DEFAULT_LIMIT);
+    const offset: any = _.get(req, 'offset', 0);
+    const { filters = {}, sort_by } = req || {};
 
     let whereClause: any = {
       is_active: true,
@@ -109,6 +110,27 @@ class QuestionService {
       WHERE LOWER(kv.value) LIKE '%${filters.search_query.toLowerCase()}%'
     )
   `),
+          Sequelize.literal(`question_body->'numbers'->>'n1' LIKE '%${filters.search_query}%'`),
+          Sequelize.literal(`question_body->'numbers'->>'n2' LIKE '%${filters.search_query}%'`),
+          Sequelize.literal(`CONCAT(question_body->'numbers'->>'n1', ', ', question_body->'numbers'->>'n2') LIKE '%${filters.search_query}%'`),
+          Sequelize.literal(`CONCAT(question_body->'numbers'->>'n1', ',', question_body->'numbers'->>'n2') LIKE '%${filters.search_query}%'`),
+          Sequelize.literal(`
+    EXISTS (
+      SELECT 1 
+      FROM jsonb_array_elements_text(question_body->'options') AS option
+      WHERE option LIKE '%${filters.search_query}%'
+    )
+  `),
+          Sequelize.literal(`
+    (SELECT string_agg(option, ', ')
+     FROM jsonb_array_elements_text(question_body->'options') AS option
+    ) LIKE '%${filters.search_query}%'
+  `),
+          Sequelize.literal(`
+    (SELECT string_agg(option, ',')
+     FROM jsonb_array_elements_text(question_body->'options') AS option
+    ) LIKE '%${filters.search_query}%'
+  `),
         ],
       };
     }
@@ -122,10 +144,9 @@ class QuestionService {
     }
 
     if (filters.question_set_id) {
-      const questionSet = await questionSetService.getQuestionSetById(filters.question_set_id);
-      if (questionSet) {
-        const { questions } = questionSet;
-        const questionIds = questions.map((question) => question.identifier);
+      const mappings = await questionSetQuestionMappingService.getEntriesForQuestionSetId(filters.question_set_id);
+      if (mappings.length) {
+        const questionIds = mappings.map((mapping) => mapping.question_id);
         whereClause = _.set(whereClause, ['identifier'], questionIds);
       }
     }
@@ -164,23 +185,40 @@ class QuestionService {
       };
     }
 
-    const finalLimit = limit || DEFAULT_LIMIT;
-    const finalOffset = offset || 0;
+    const order: any[] = [];
+    if (sort_by && sort_by.length) {
+      for (const sortOrder of sort_by) {
+        const [column, direction] = sortOrder;
+        switch (column) {
+          case 'description': {
+            order.push([Sequelize.literal(`description->>'en'`), direction]);
+            break;
+          }
+          case 'repository': {
+            order.push([Sequelize.literal(`repository->'name'->>'en'`), direction]);
+            break;
+          }
+          default: {
+            order.push([column, direction]);
+          }
+        }
+      }
+    }
 
     const { rows, count } = await Question.findAndCountAll({
       where: whereClause,
-      limit: finalLimit,
-      offset: finalOffset,
+      limit,
+      offset,
       attributes: { exclude: ['id'] },
       raw: true,
-      order: [['updated_at', 'desc']],
+      order: order.length ? order : [['updated_at', 'desc']],
     });
 
     return {
       questions: rows,
       meta: {
-        offset: finalOffset,
-        limit: finalLimit,
+        offset,
+        limit,
         total: count,
       },
     };
