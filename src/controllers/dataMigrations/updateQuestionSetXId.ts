@@ -15,7 +15,7 @@ import { Question } from '../../models/question';
 import { QuestionSetQuestionMapping } from '../../models/questionSetQuestionMapping';
 
 const getCSVEntries = (csvFile: any) => {
-  const filePath = path.join(appRootPath.path, 'tmp', `data.csv`);
+  const filePath = path.join(appRootPath.path, 'temporary', `data.csv`);
   fs.writeFileSync(filePath, csvFile.data);
   const localCSVFile = fs.readFileSync(filePath, 'utf-8');
   const csvRows = papaparse.parse(localCSVFile)?.data;
