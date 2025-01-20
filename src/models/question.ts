@@ -39,6 +39,7 @@ export class Question extends Model {
   declare created_by: string;
   declare updated_by?: string;
   declare is_active: boolean;
+  declare x_id: string;
 }
 
 // Initialize the Question model
@@ -121,6 +122,10 @@ Question.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true,
+    },
+    x_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

@@ -2322,3 +2322,12 @@ create table if not exists question_set_question_mapping
     updated_at      timestamp with time zone not null,
     deleted_at      timestamp with time zone
 );
+
+
+------------------------------------------------------------
+-- Add column x_id to tables: question, question_set & content  --
+------------------------------------------------------------
+
+alter table question add column x_id varchar;
+alter table question_set add column x_id varchar;
+alter table content add column x_id varchar;

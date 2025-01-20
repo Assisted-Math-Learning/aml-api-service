@@ -10,6 +10,7 @@ import path from 'path';
 import RateLimit from 'express-rate-limit';
 import { cronProvider } from './providers/cron.provider';
 import { AppEnv } from './enums/appEnv';
+import fileUpload from 'express-fileupload';
 
 const { envPort, applicationEnv } = appConfiguration;
 
@@ -50,6 +51,8 @@ const initializeServer = (): void => {
 
     // Middleware for parsing urlencoded request body
     app.use(express.urlencoded({ extended: true }));
+
+    app.use(fileUpload());
 
     // Middleware to enable CORS
     app.use(

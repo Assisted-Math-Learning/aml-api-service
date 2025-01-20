@@ -17,6 +17,7 @@ export class Content extends Model {
   declare created_by: string;
   declare updated_by?: string | null;
   declare is_active: boolean;
+  declare x_id: string;
 }
 
 Content.init(
@@ -79,6 +80,10 @@ Content.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true,
+    },
+    x_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

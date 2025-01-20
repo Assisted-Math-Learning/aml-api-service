@@ -29,6 +29,7 @@ export class QuestionSet extends Model {
   declare instruction_text?: string | null;
   declare status: 'draft' | 'live';
   declare is_active: boolean;
+  declare x_id: string;
   declare created_by: string;
   declare updated_by?: string | null;
 }
@@ -116,6 +117,10 @@ QuestionSet.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true,
+    },
+    x_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     created_by: {
       type: DataTypes.STRING,
