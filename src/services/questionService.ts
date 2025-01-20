@@ -131,6 +131,11 @@ class QuestionService {
      FROM jsonb_array_elements_text(question_body->'options') AS option
     ) LIKE '%${filters.search_query}%'
   `),
+          {
+            x_id: {
+              [Op.like]: `%${filters.search_query}%`,
+            },
+          },
         ],
       };
     }

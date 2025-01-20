@@ -121,6 +121,11 @@ class QuestionSetService {
       WHERE LOWER(kv.value) LIKE '%${filters.search_query.toLowerCase()}%'
     )
   `),
+          {
+            x_id: {
+              [Op.like]: `%${filters.search_query}%`,
+            },
+          },
         ],
       };
     }
