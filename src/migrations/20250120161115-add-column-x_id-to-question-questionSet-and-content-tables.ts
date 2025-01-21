@@ -1,7 +1,7 @@
 import { QueryInterface, DataTypes } from 'sequelize';
 import { AppDataSource } from '../config';
 
-const tableNames = ['question', 'question_set', 'content', 'question_stage', 'question_set_stage', 'content_stage'];
+const tableNames = ['question', 'question_set', 'content'];
 const columnName = 'x_id';
 
 export = {

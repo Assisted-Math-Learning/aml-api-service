@@ -2332,10 +2332,6 @@ alter table question add column x_id varchar;
 alter table question_set add column x_id varchar;
 alter table content add column x_id varchar;
 
-alter table question_stage add column x_id varchar;
-alter table question_set_stage add column x_id varchar;
-alter table content_stage add column x_id varchar;
-
 alter table question add unique(identifier);
 alter table question_set add unique(identifier);
 alter table content add unique(identifier);
