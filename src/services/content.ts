@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { DEFAULT_LIMIT } from '../constants/constants';
 
 // Get a media Content by ID
-export const getContentMediaById = async (getObject: { contentId: number; mediaIds: string[] }): Promise<any> => {
+export const getContentMediaById = async (getObject: { contentId: number; mediaIds: string[] }) => {
   const whereClause: any = { identifier: getObject.contentId };
   if (getObject.mediaIds) {
     const mediaConditions = getObject.mediaIds.map((id) => ({ id }));
@@ -15,13 +15,11 @@ export const getContentMediaById = async (getObject: { contentId: number; mediaI
     };
   }
 
-  const mediaMetaData = await Content.findOne({
+  return Content.findOne({
     where: whereClause,
     attributes: ['id', 'media'],
     raw: true,
   });
-
-  return mediaMetaData;
 };
 
 // Create a new content

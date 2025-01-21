@@ -16,7 +16,7 @@ interface QuestionBody {
   correct_option: string; // This holds the correct answer option
   answers: { [key: string]: any }; // Dynamic structure for the answer
   wrong_answer: { value: number[]; subskillname: string }[]; // Array of objects with 'value' and 'subskillname'
-  question_image: { [key: string]: string };
+  question_image: { src: string; fileName: string; mimeType: string; mediaType: string };
 }
 
 export class Question extends Model {

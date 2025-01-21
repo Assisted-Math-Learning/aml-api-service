@@ -32,7 +32,7 @@ export const searchContents = async (req: Request, res: Response) => {
       ?.filter((v) => !!v)
       ?.map((media) => ({
         ...media,
-        url: getFileUrlByFolderAndFileName(media?.src, media?.file_name),
+        url: getFileUrlByFolderAndFileName(media?.src, media?.fileName),
       }));
     agg = [...agg, curr];
     return agg;

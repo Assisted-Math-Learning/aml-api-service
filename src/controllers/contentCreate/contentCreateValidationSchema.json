@@ -78,7 +78,7 @@
           "items": {
             "type": "object",
             "properties": {
-              "file_name": {
+              "fileName": {
                 "type": "string"
               },
               "mediaType": {
@@ -91,7 +91,7 @@
                 "type": "string"
               }
             },
-            "required": ["file_name", "mediaType", "mimeType", "src"],
+            "required": ["fileName", "mediaType", "mimeType", "src"],
             "additionalProperties": false
           },
           "uniqueItems": true

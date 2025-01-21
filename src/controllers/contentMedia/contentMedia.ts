@@ -24,16 +24,16 @@ const getContentMediaReadURL = async (req: Request, res: Response) => {
     throw amlError(code, isRequestValid.message, 'BAD_REQUEST', httpStatus.BAD_REQUEST);
   }
 
-  const contentsMedia = await getContentMediaById(dataBody);
+  const contentWithMedia = await getContentMediaById(dataBody);
 
-  if (_.isEmpty(contentsMedia)) {
+  if (!contentWithMedia) {
     const code = 'MEDIA_NOT_EXIST';
     logger.error({ code, apiId, msgid, resmsgid, requestBody, message: 'Media not found for the given content id' });
     throw amlError(code, 'Media not found for the given content id', 'NOT_FOUND', httpStatus.NOT_FOUND);
   }
   const signedUrls = await Promise.all(
-    contentsMedia.media.map(async (media: any) => {
-      const getSignedUrl = await getPresignedUrl(`${media.src}/${media.file_name}`);
+    (contentWithMedia?.media || []).map(async (media) => {
+      const getSignedUrl = await getPresignedUrl(`${media.src}/${media.fileName}`);
       if (getSignedUrl.error) {
         const code = 'SERVER_ERROR';
         logger.error({ code, apiId, msgid, resmsgid, message: getSignedUrl.message });

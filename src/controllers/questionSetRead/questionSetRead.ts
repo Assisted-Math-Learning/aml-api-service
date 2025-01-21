@@ -46,8 +46,8 @@ const readQuestionSetById = async (req: Request, res: Response) => {
           (q.question_type === QuestionType.FIB && [FIBType.FIB_STANDARD_WITH_IMAGE, FIBType.FIB_QUOTIENT_REMAINDER_WITH_IMAGE].includes(q.question_body.answers?.fib_type))) &&
         q?.question_body?.question_image
       ) {
-        const { src, file_name } = q.question_body.question_image;
-        return [q.identifier, { ...q, question_body: { ...q.question_body, question_image_url: getFileUrlByFolderAndFileName(src, file_name) } }];
+        const { src, fileName } = q.question_body.question_image;
+        return [q.identifier, { ...q, question_body: { ...q.question_body, question_image_url: getFileUrlByFolderAndFileName(src, fileName) } }];
       }
       return [q.identifier, q];
     }),
@@ -57,7 +57,7 @@ const readQuestionSetById = async (req: Request, res: Response) => {
   const questionSetWithQuestions = {
     ...questionSet,
     contents: (contents as Content[]).reduce((agg: string[], curr) => {
-      const urls = (curr.media || [])?.map((media) => getFileUrlByFolderAndFileName(media.src, media.file_name));
+      const urls = (curr.media || [])?.map((media) => getFileUrlByFolderAndFileName(media.src, media.fileName));
       agg = [...agg, ...urls];
       return agg;
     }, []),

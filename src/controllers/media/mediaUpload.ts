@@ -37,7 +37,7 @@ const getMediaUploadURL = async (req: Request, res: Response) => {
       }
       const mediaMetaData = getMediaMetaData(file.fileName);
       return {
-        media: { file_name: file.fileName, src: `${mediaFolder}/${file.category}/${timeStamp}`, mimeType: mediaMetaData.mimeTye, mediaType: mediaMetaData.mediaType },
+        media: { fileName: file.fileName, src: `${mediaFolder}/${file.category}/${timeStamp}`, mimeType: mediaMetaData.mimeTye, mediaType: mediaMetaData.mediaType },
         url: getSignedUrl.url,
         expiresInSec: getSignedUrl.expiresInSec,
       };

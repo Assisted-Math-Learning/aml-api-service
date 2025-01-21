@@ -36,7 +36,7 @@ export const searchQuestions = async (req: Request, res: Response) => {
 
   const updatedQuestions = questions.map((question) => {
     if (question.question_body.question_image) {
-      _.set(question.question_body, 'question_image_url', getFileUrlByFolderAndFileName(question.question_body.question_image.src, question.question_body.question_image.file_name));
+      _.set(question.question_body, 'question_image_url', getFileUrlByFolderAndFileName(question.question_body.question_image.src, question.question_body.question_image.fileName));
     }
     return question;
   });

@@ -293,7 +293,7 @@
                           "src": {
                             "type": "string"
                           },
-                          "file_name": {
+                          "fileName": {
                             "type": "string"
                           },
                           "mediaType": {
@@ -303,7 +303,7 @@
                             "type": "string"
                           }
                         },
-                        "required": ["src", "file_name", "mediaType", "mimeType"],
+                        "required": ["src", "fileName", "mediaType", "mimeType"],
                         "additionalProperties": false
                       }
                     },
@@ -338,7 +338,7 @@
                             "src": {
                               "type": "string"
                             },
-                            "file_name": {
+                            "fileName": {
                               "type": "string"
                             },
                             "mediaType": {
@@ -348,7 +348,7 @@
                               "type": "string"
                             }
                           },
-                          "required": ["src", "file_name", "mediaType", "mimeType"],
+                          "required": ["src", "fileName", "mediaType", "mimeType"],
                           "additionalProperties": false
                         },
                         "fib_type": {

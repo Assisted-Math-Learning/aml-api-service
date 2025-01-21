@@ -28,7 +28,7 @@ const readQuestionById = async (req: Request, res: Response) => {
   logger.info({ apiId, question_id, message: `question read Successfully` });
 
   if (question?.question_body.question_image) {
-    _.set(question.question_body, 'question_image_url', getFileUrlByFolderAndFileName(question.question_body.question_image.src, question.question_body.question_image.file_name));
+    _.set(question.question_body, 'question_image_url', getFileUrlByFolderAndFileName(question.question_body.question_image.src, question.question_body.question_image.fileName));
   }
 
   const users = await getUsersByIdentifiers(([question?.created_by, question?.updated_by] as any[]).filter((v) => !!v));

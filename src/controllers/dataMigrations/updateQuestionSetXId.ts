@@ -104,7 +104,7 @@ const updateQuestionSetXId = async (req: Request, res: Response) => {
               },
             },
             media: {
-              [Op.contains]: [{ file_name: mediaFileName }],
+              [Op.contains]: [{ fileName: mediaFileName }],
             },
           },
         });
