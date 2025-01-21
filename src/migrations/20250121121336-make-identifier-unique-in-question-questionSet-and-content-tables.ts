@@ -2,7 +2,7 @@ import { QueryInterface, DataTypes } from 'sequelize';
 import { AppDataSource } from '../config';
 
 const tableNames = ['question', 'question_set', 'content', 'question_stage', 'question_set_stage', 'content_stage'];
-const columnName = 'x_id';
+const columnName = 'identifier';
 
 export = {
   /**
@@ -14,12 +14,13 @@ export = {
     const transaction = await AppDataSource.transaction();
     try {
       for (const tableName of tableNames) {
-        await queryInterface.addColumn(
+        await queryInterface.changeColumn(
           tableName,
           columnName,
           {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: false,
+            unique: true,
           },
           { transaction },
         );
@@ -39,7 +40,16 @@ export = {
     const transaction = await AppDataSource.transaction();
     try {
       for (const tableName of tableNames) {
-        await queryInterface.removeColumn(tableName, columnName, { transaction });
+        await queryInterface.changeColumn(
+          tableName,
+          columnName,
+          {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: false,
+          },
+          { transaction },
+        );
       }
       await transaction.commit();
     } catch (e) {
