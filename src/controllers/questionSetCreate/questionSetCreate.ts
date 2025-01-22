@@ -150,8 +150,16 @@ const createQuestionSet = async (req: Request, res: Response) => {
     }
   }
 
+  const nextSetSequence = await questionSetService.getNextSetSequence({
+    board_id: boardObject.identifier,
+    class_id: classObject.identifier,
+    l1_skill_id: l1SkillObject.identifier,
+    repository_id: repositoryObject.identifier,
+  });
+
   // Creating a new question set
   const questionSetInsertData = _.assign(dataBody, {
+    sequence: nextSetSequence,
     is_active: true,
     status: Status.DRAFT,
     identifier: uuid.v4(),

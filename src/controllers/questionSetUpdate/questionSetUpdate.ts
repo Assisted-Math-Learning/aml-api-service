@@ -20,6 +20,8 @@ import { getUserByIdentifier } from '../../services/user';
 import { UserTransformer } from '../../transformers/entity/user.transformer';
 import { classService } from '../../services/classService';
 import { questionSetQuestionMappingService } from '../../services/questionSetQuestionMappingService';
+import { QuestionSet } from '../../models/questionSet';
+import { Op } from 'sequelize';
 
 const updateQuestionSetById = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -50,6 +52,7 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
   // Initialize an updated body
   const updatedDataBody: any = {};
 
+  let moveToLastInSequence = false;
   // Check repository
   if (dataBody.repository_id) {
     const repositoryId = dataBody.repository_id;
@@ -63,49 +66,48 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
       identifier: repository.identifier,
       name: repository.name,
     }; // Create repository object
+    moveToLastInSequence = questionSet?.repository.identifier !== dataBody.repository_id;
   }
 
   const mappingPromises = [];
-  if (dataBody.questions) {
-    const questionIdentifierSequenceMap = {};
-    for (const question of dataBody.questions) {
-      const { identifier, sequence } = question;
-      _.set(questionIdentifierSequenceMap, identifier, sequence);
-    }
+  const questionIdentifierSequenceMap = {};
+  for (const question of dataBody.questions || []) {
+    const { identifier, sequence } = question;
+    _.set(questionIdentifierSequenceMap, identifier, sequence);
+  }
 
-    const questionIdentifiers = Object.keys(questionIdentifierSequenceMap);
-    const { exists: questionsExist } = await questionService.checkQuestionsExist(questionIdentifiers);
+  const questionIdentifiers = Object.keys(questionIdentifierSequenceMap);
+  const { exists: questionsExist } = await questionService.checkQuestionsExist(questionIdentifiers);
 
-    if (!questionsExist) {
-      const code = 'QUESTIONS_NOT_FOUND';
-      logger.error({ code, apiId, msgid, resmsgid, message: 'Some questions were not found' });
-      throw amlError(code, 'Some questions were not found', 'NOT_FOUND', 404);
-    }
+  if (!questionsExist) {
+    const code = 'QUESTIONS_NOT_FOUND';
+    logger.error({ code, apiId, msgid, resmsgid, message: 'Some questions were not found' });
+    throw amlError(code, 'Some questions were not found', 'NOT_FOUND', 404);
+  }
 
-    const mappings = await questionSetQuestionMappingService.getEntriesForQuestionSetId(questionSet_id);
-    const existingQuestionIds = mappings.map((map) => map.question_id);
-    const removedQuestionIds = _.difference(existingQuestionIds, questionIdentifiers);
-    const addedQuestionIds = _.difference(questionIdentifiers, existingQuestionIds);
+  const mappings = await questionSetQuestionMappingService.getEntriesForQuestionSetId(questionSet_id);
+  const existingQuestionIds = mappings.map((map) => map.question_id);
+  const removedQuestionIds = _.difference(existingQuestionIds, questionIdentifiers);
+  const addedQuestionIds = _.difference(questionIdentifiers, existingQuestionIds);
 
-    for (const mapping of mappings) {
-      const { question_id } = mapping;
-      if (removedQuestionIds.includes(question_id)) {
-        mappingPromises.push(mapping.update({ updated_by: loggedInUser?.identifier || 'manual' }, { where: { id: mapping.id } }));
-        mappingPromises.push(mapping.destroy());
-      } else {
-        mappingPromises.push(mapping.update({ sequence: _.get(questionIdentifierSequenceMap, question_id), updated_by: loggedInUser?.identifier || 'manual' }, { where: { id: mapping.id } }));
-      }
+  for (const mapping of mappings) {
+    const { question_id } = mapping;
+    if (removedQuestionIds.includes(question_id)) {
+      mappingPromises.push(questionSetQuestionMappingService.updateById(mapping.id, { updated_by: loggedInUser?.identifier || 'manual' }));
+      mappingPromises.push(questionSetQuestionMappingService.destroyById(mapping.id));
+    } else {
+      mappingPromises.push(questionSetQuestionMappingService.updateById(mapping.id, { sequence: _.get(questionIdentifierSequenceMap, question_id), updated_by: loggedInUser?.identifier || 'manual' }));
     }
-    for (const questionId of addedQuestionIds) {
-      mappingPromises.push(
-        questionSetQuestionMappingService.create({
-          question_set_id: questionSet_id,
-          question_id: questionId,
-          sequence: _.get(questionIdentifierSequenceMap, questionId),
-          created_by: loggedInUser?.identifier || 'manual',
-        }),
-      );
-    }
+  }
+  for (const questionId of addedQuestionIds) {
+    mappingPromises.push(
+      questionSetQuestionMappingService.create({
+        question_set_id: questionSet_id,
+        question_id: questionId,
+        sequence: _.get(questionIdentifierSequenceMap, questionId),
+        created_by: loggedInUser?.identifier || 'manual',
+      }),
+    );
   }
 
   // Check board
@@ -123,6 +125,7 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
       name: board.name,
     };
     updatedDataBody.taxonomy = { ...updatedDataBody.taxonomy, board: boardObject }; // Create board object
+    moveToLastInSequence = questionSet?.taxonomy.board.identifier !== dataBody.board_id;
   }
 
   // Check class
@@ -140,6 +143,7 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
       name: classEntity.name,
     };
     updatedDataBody.taxonomy = { ...updatedDataBody.taxonomy, class: classObject }; // Create class object
+    moveToLastInSequence = questionSet?.taxonomy.class.identifier !== dataBody.class_id;
   }
 
   // Check l1_skill
@@ -156,6 +160,7 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
       name: l1Skill.name,
     };
     updatedDataBody.taxonomy = { ...updatedDataBody.taxonomy, l1_skill: l1SkillObject }; // Create l1_skill object
+    moveToLastInSequence = questionSet?.taxonomy.l1_skill.identifier !== dataBody.l1_skill_id;
   }
 
   // Check l2_skill
@@ -232,10 +237,68 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
     updatedDataBody.enable_feedback = purpose === QuestionSetPurposeType.MAIN_DIAGNOSTIC ? false : dataBody?.enable_feedback;
   }
 
+  const questionSetUpdatePromises: any[] = [];
+  let sequence = questionSet.sequence;
+  if (Object.prototype.hasOwnProperty.call(dataBody, 'sequence') && dataBody.sequence !== questionSet.sequence && !moveToLastInSequence) {
+    const operation = dataBody.sequence < questionSet.sequence ? 'increment' : 'decrement';
+    let sequenceWhereClause: any = {
+      [Op.and]: {
+        [Op.gt]: questionSet.sequence,
+        [Op.lte]: dataBody.sequence,
+      },
+    };
+
+    if (operation === 'increment') {
+      sequenceWhereClause = {
+        [Op.and]: {
+          [Op.gte]: dataBody.sequence,
+          [Op.lt]: questionSet.sequence,
+        },
+      };
+    }
+    const questionSetsToBeUpdated = await QuestionSet.findAll({
+      where: {
+        taxonomy: {
+          board: {
+            identifier: questionSet?.taxonomy.board.identifier,
+          },
+          class: {
+            identifier: questionSet?.taxonomy.class.identifier,
+          },
+          l1_skill: {
+            identifier: questionSet?.taxonomy.l1_skill.identifier,
+          },
+        },
+        repository: {
+          identifier: questionSet?.repository.identifier,
+        },
+        sequence: sequenceWhereClause,
+      },
+    });
+    for (const questionSetToBeUpdated of questionSetsToBeUpdated) {
+      questionSetUpdatePromises.push(questionSetToBeUpdated.update({ sequence: operation === 'increment' ? questionSetToBeUpdated.sequence + 1 : questionSetToBeUpdated.sequence - 1 }));
+    }
+    sequence = dataBody.sequence;
+  } else if (moveToLastInSequence) {
+    const boardId = dataBody?.board_id ?? questionSet?.taxonomy?.board.identifier;
+    const classId = dataBody?.class_id ?? questionSet?.taxonomy?.class.identifier;
+    const l1SkillId = dataBody?.l1_skill_id ?? questionSet?.taxonomy?.l1_skill.identifier;
+    const repositoryId = dataBody?.repository_id ?? questionSet?.repository?.identifier;
+    sequence = await questionSetService.getNextSetSequence({
+      board_id: boardId,
+      class_id: classId,
+      l1_skill_id: l1SkillId,
+      repository_id: repositoryId,
+    });
+  }
+
+  updatedDataBody.sequence = sequence;
   updatedDataBody.updated_by = loggedInUser?.identifier ?? 'manual';
 
   // Update Question Set
   const [, affectedRows] = await questionSetService.updateQuestionSet(questionSet_id, { ...dataBody, ...updatedDataBody });
+  await Promise.all(mappingPromises);
+  await Promise.all(questionSetUpdatePromises);
 
   const createdByUser = await getUserByIdentifier(affectedRows?.[0]?.created_by);
 

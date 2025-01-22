@@ -349,6 +349,32 @@ class QuestionSetService {
       order: [['sequence', 'ASC']],
     });
   }
+
+  async getNextSetSequence(data: { board_id: string; class_id: string; l1_skill_id: string; repository_id: string }) {
+    const whereClause = {
+      taxonomy: {
+        board: {
+          identifier: data.board_id,
+        },
+        class: {
+          identifier: data.class_id,
+        },
+        l1_skill: {
+          identifier: data.l1_skill_id,
+        },
+      },
+      repository: {
+        identifier: data.repository_id,
+      },
+    };
+
+    const lastSet = await QuestionSet.findOne({
+      where: whereClause,
+      order: [['sequence', 'desc']],
+    });
+
+    return (lastSet?.sequence || 0) + 1;
+  }
 }
 
 export const questionSetService = QuestionSetService.getInstance();

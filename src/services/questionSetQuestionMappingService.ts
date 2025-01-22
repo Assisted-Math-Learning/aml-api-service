@@ -48,6 +48,18 @@ class QuestionSetQuestionMappingService {
       raw: true,
     });
   }
+
+  async updateById(id: number, body: any) {
+    return QuestionSetQuestionMapping.update(body, {
+      where: { id },
+    });
+  }
+
+  async destroyById(id: number) {
+    return QuestionSetQuestionMapping.destroy({
+      where: { id },
+    });
+  }
 }
 
 export const questionSetQuestionMappingService = QuestionSetQuestionMappingService.getInstance();

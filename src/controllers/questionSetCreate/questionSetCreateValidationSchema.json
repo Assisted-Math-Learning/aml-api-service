@@ -70,10 +70,6 @@
             "type": "string"
           }
         },
-        "sequence": {
-          "type": "integer",
-          "description": "The sequence order of the question set."
-        },
         "purpose": {
           "type": "string",
           "description": "The purpose of the question set."
@@ -124,7 +120,7 @@
           "uniqueItems": true
         }
       },
-      "required": ["title", "description", "repository_id", "sequence", "board_id", "class_id", "l1_skill_id", "purpose", "is_atomic", "enable_feedback"],
+      "required": ["title", "description", "repository_id", "board_id", "class_id", "l1_skill_id", "purpose", "is_atomic", "enable_feedback"],
       "additionalProperties": false
     }
   },

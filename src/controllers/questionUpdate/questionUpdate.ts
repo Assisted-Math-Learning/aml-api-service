@@ -188,36 +188,39 @@ const updateQuestionById = async (req: Request, res: Response) => {
   // Update Question
   const [, affectedRows] = await questionService.updateQuestionData(question_id, { ...dataBody, ...updatedDataBody });
 
-  const updatedQuestion = affectedRows[0];
+  const updatedQuestion = affectedRows[0].dataValues;
   const questionId = updatedQuestion.identifier;
 
-  if (questionSetObjects.length) {
-    const promises = [];
-    const mappings = await questionSetQuestionMappingService.getEntriesForQuestionIds([questionId]);
-    const existingQuestionSetIds = mappings.map((map) => map.question_set_id);
-    const removedQuestionSetIds = _.difference(existingQuestionSetIds, dataBody.question_set_ids);
-    const addedQuestionSetIds = _.difference(dataBody.question_set_ids, existingQuestionSetIds);
-    for (const mapping of mappings) {
-      const { question_set_id } = mapping;
-      if (removedQuestionSetIds.includes(question_set_id)) {
-        promises.push(mapping.update({ updated_by: loggedInUser?.identifier || 'manual' }, { where: { id: mapping.id } }));
-        promises.push(mapping.destroy());
-      }
+  // CHECKING MAPPINGS
+  const promises = [];
+  const mappings = await questionSetQuestionMappingService.getEntriesForQuestionIds([questionId]);
+  const existingQuestionSetIds = mappings.map((map) => map.question_set_id);
+  const removedQuestionSetIds = _.difference(existingQuestionSetIds, dataBody.question_set_ids);
+  const addedQuestionSetIds = _.difference(dataBody.question_set_ids, existingQuestionSetIds);
+  for (const mapping of mappings) {
+    const { question_set_id } = mapping;
+    if (removedQuestionSetIds.includes(question_set_id)) {
+      promises.push(questionSetQuestionMappingService.updateById(mapping.id, { updated_by: loggedInUser?.identifier || 'manual' }));
+      promises.push(questionSetQuestionMappingService.destroyById(mapping.id));
     }
-    for (const questionSetId of addedQuestionSetIds) {
-      const sequence = await questionSetQuestionMappingService.getNextSequenceNumberForQuestionSet(questionSetId);
-      promises.push(questionSetQuestionMappingService.create({ question_set_id: questionSetId, question_id: questionId, sequence, created_by: loggedInUser?.identifier || 'manual' }));
-    }
-    await Promise.all(promises);
   }
+  for (const questionSetId of addedQuestionSetIds) {
+    const sequence = await questionSetQuestionMappingService.getNextSequenceNumberForQuestionSet(questionSetId);
+    promises.push(questionSetQuestionMappingService.create({ question_set_id: questionSetId, question_id: questionId, sequence, created_by: loggedInUser?.identifier || 'manual' }));
+  }
+  await Promise.all(promises);
 
   const createdByUser = await getUserByIdentifier(affectedRows?.[0]?.created_by);
 
   const users = new UserTransformer().transformList(_.uniqBy([createdByUser, loggedInUser], 'identifier').filter((v) => !!v));
 
-  _.set(updatedQuestion, 'question_set_ids', dataBody.question_set_ids);
+  const updatedMappings = await questionSetQuestionMappingService.getEntriesForQuestionIds([questionId]);
+  const questionSetIds = updatedMappings.map((mapping) => mapping.question_set_id);
+  const questionSets = await questionSetService.getQuestionSetsByIdentifiers(questionSetIds);
 
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Updated', question: updatedQuestion, users } });
+  _.set(updatedQuestion, 'question_set_ids', questionSetIds);
+
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Question Successfully Updated', question: updatedQuestion, question_sets: questionSets, users } });
 };
 
 export default updateQuestionById;

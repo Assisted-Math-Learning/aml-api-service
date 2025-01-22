@@ -132,7 +132,7 @@
               "grid1_pre_fills_top": { "type": "string" },
               "grid1_pre_fills_result": { "type": "string" }
             },
-            "required": ["numbers", "grid1_show_carry", "grid1_pre_fills_top", "grid1_pre_fills_result"],
+            "required": ["numbers", "grid1_show_carry", "grid1_pre_fills_result"],
             "additionalProperties": false
           }
         }
@@ -162,7 +162,7 @@
                 "grid1_pre_fills_top": { "type": "string" },
                 "grid1_pre_fills_result": { "type": "string" }
               },
-              "required": ["numbers", "grid1_show_regroup", "grid1_pre_fills_top", "grid1_pre_fills_result"],
+              "required": ["numbers", "grid1_show_regroup", "grid1_pre_fills_result"],
               "additionalProperties": false
             }
           }
@@ -191,7 +191,7 @@
                   "grid1_multiply_intermediate_steps_prefills": { "type": "string" },
                   "grid1_pre_fills_result": { "type": "string" }
                 },
-                "required": ["numbers", "grid1_multiply_intermediate_steps_prefills", "grid1_pre_fills_result"],
+                "required": ["numbers", "grid1_pre_fills_result"],
                 "additionalProperties": false
               }
             }
