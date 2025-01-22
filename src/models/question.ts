@@ -17,6 +17,9 @@ interface QuestionBody {
   answers: { [key: string]: any }; // Dynamic structure for the answer
   wrong_answer: { value: number[]; subskillname: string }[]; // Array of objects with 'value' and 'subskillname'
   question_image: { src: string; fileName: string; mimeType: string; mediaType: string };
+  grid1_pre_fills_top: string;
+  grid1_pre_fills_result: string;
+  grid1_show_carry: string;
 }
 
 export class Question extends Model {

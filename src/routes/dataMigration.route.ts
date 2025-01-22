@@ -3,6 +3,7 @@ import { learnerTaxonomyToColumns } from '../controllers/dataMigrations/learnerT
 import createQuestionSetQuestionMapping from '../controllers/dataMigrations/createQuestionSetQuestionMapping';
 import updateQuestionSetXId from '../controllers/dataMigrations/updateQuestionSetXId';
 import standardiseMediaKeys from '../controllers/dataMigrations/standardiseMediaKeys';
+import updateGrid1MetaData from '../controllers/dataMigrations/updateGrid1MetaData';
 
 export const dataMigrations = express.Router();
 
@@ -13,3 +14,5 @@ dataMigrations.post('/question-set-question-mapping', createQuestionSetQuestionM
 dataMigrations.post('/update-qs-x_id', updateQuestionSetXId);
 
 dataMigrations.post('/media-keys-fix', standardiseMediaKeys);
+
+dataMigrations.post('/grid-1-metadata', updateGrid1MetaData);
