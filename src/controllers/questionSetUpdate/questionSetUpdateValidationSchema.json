@@ -123,6 +123,7 @@
           "uniqueItems": true
         }
       },
+      "required": ["sequence"],
       "additionalProperties": false
     }
   },
