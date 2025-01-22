@@ -120,7 +120,7 @@
           "uniqueItems": true
         }
       },
-      "required": ["title", "description", "repository_id", "board_id", "class_id", "l1_skill_id", "purpose", "is_atomic", "enable_feedback"],
+      "required": ["title", "repository_id", "board_id", "class_id", "l1_skill_id", "purpose", "is_atomic", "enable_feedback"],
       "additionalProperties": false
     }
   },
