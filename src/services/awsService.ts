@@ -1,4 +1,4 @@
-import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand, CopyObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { appConfiguration } from '../config';
 
@@ -50,4 +50,39 @@ export const uploadUrl = async (folderName: string, category: string, fileName: 
 
 export const getFileUrlByFolderAndFileName = (folderName: string, fileName: string) => {
   return `https://${appConfiguration.bucketName}.s3.${appConfiguration.aws.bucketRegion}.amazonaws.com/${folderName}/${fileName}`;
+};
+
+export const getFileUrlByFilePath = (filePath: string) => {
+  return `https://${appConfiguration.bucketName}.s3.${appConfiguration.aws.bucketRegion}.amazonaws.com/${filePath}`;
+};
+
+export const uploadBufferToS3 = async (buffer: Buffer, filePath: string, mimeType: string) => {
+  const command = new PutObjectCommand({
+    Bucket: bucketName,
+    Key: filePath,
+    Body: buffer,
+    ContentType: mimeType,
+  });
+
+  await s3Client.send(command);
+};
+
+export const deleteFileFromS3 = async (filePath: string) => {
+  const command = new DeleteObjectCommand({
+    Bucket: bucketName,
+    Key: filePath,
+  });
+
+  await s3Client.send(command);
+};
+
+export const moveFileFromS3 = async (sourceFilePath: string, destinationFilePath: string) => {
+  const copyCommand = new CopyObjectCommand({
+    Bucket: bucketName,
+    CopySource: `${bucketName}/${sourceFilePath}`,
+    Key: destinationFilePath,
+  });
+
+  await s3Client.send(copyCommand);
+  await deleteFileFromS3(sourceFilePath);
 };

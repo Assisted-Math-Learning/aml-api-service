@@ -9,6 +9,7 @@ import pg from 'pg';
 import ConnectPgSimple from 'connect-pg-simple';
 import csrf from 'csurf';
 import { learnerAuth } from '../middlewares/learnerAuth';
+import ttsRouter from './entities/ttsRouter';
 
 export const portalRouter = express.Router();
 
@@ -51,3 +52,5 @@ portalRouter.use('/question-set', learnerAuth, questionSetRouter);
 portalRouter.use('/auth', learnerAuthRouter);
 
 portalRouter.use('/learner', learnerAuth, learnerRouter);
+
+portalRouter.use('/tts', learnerAuth, ttsRouter);

@@ -95,6 +95,12 @@
         "benchmark_time": {
           "type": "integer"
         },
+        "audio_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "question_body": {
           "type": "object",
           "properties": {
@@ -104,6 +110,12 @@
             "answers": { "type": "object" },
             "wrong_answer": { "type": "array" },
             "question_image": { "type": "object" }
+          }
+        },
+        "question_audio_description": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
           }
         }
       },

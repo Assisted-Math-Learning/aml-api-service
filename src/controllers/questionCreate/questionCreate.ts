@@ -20,6 +20,7 @@ import { classService } from '../../services/classService';
 import { getSkillById } from '../../services/skill';
 import { questionSetService } from '../../services/questionSetService';
 import { questionSetQuestionMappingService } from '../../services/questionSetQuestionMappingService';
+import { AudioManager } from '../../services/AudioManager';
 
 const createQuestion = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -180,6 +181,10 @@ const createQuestion = async (req: Request, res: Response) => {
       created_by: loggedInUser?.identifier ?? 'manual',
     });
   }
+
+  const audioManager = new AudioManager(apiId!, msgid, resmsgid!);
+
+  await audioManager.handleAudioMappingUpdates(question.identifier, dataBody.audio_ids || [], loggedInUser);
 
   const users = new UserTransformer().transformList([loggedInUser] as User[]);
 

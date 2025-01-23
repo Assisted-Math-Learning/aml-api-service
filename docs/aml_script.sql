@@ -2338,3 +2338,40 @@ alter table content add unique(identifier);
 alter table question_stage add unique(identifier);
 alter table question_set_stage add unique(identifier);
 alter table content_stage add unique(identifier);
+
+-------------------------------------------------------
+-- Creating audio_master and audio_mapping tables --
+-------------------------------------------------------
+
+create table audio_master
+(
+    id         serial
+        primary key,
+    identifier VARCHAR(255) not null unique,
+    description_hash VARCHAR(255),
+    language VARCHAR(255) not null,
+    audio_path VARCHAR(255) not null,
+    created_by VARCHAR(255) not null,
+    updated_by VARCHAR(255),
+    created_at TIMESTAMP with time zone not null,
+    updated_at TIMESTAMP with time zone not null
+);
+
+create table audio_question_mapping
+(
+    id         serial
+        primary key,
+    audio_id VARCHAR(255) not null,
+    question_id VARCHAR(255) not null,
+    language VARCHAR(255) not null,
+    created_by VARCHAR(255) not null,
+    updated_by VARCHAR(255),
+    created_at TIMESTAMP with time zone not null,
+    updated_at TIMESTAMP with time zone not null
+);
+
+-------------------------------------------------------
+-- Adding audio_description in question table --
+-------------------------------------------------------
+
+ALTER TABLE question ADD COLUMN question_audio_description JSONB;

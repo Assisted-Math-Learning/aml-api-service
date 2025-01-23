@@ -1,6 +1,7 @@
 import { Schedule } from '../jobs/job';
 import { clearApiLogs } from '../jobs/clearApiLogs';
 import logger from '../utils/logger';
+import { clearTempAudioFiles } from '../jobs/clearTempAudioFiles';
 
 export class CronProvider {
   private registered = false;
@@ -21,6 +22,7 @@ export class CronProvider {
 
   private scheduleJobs() {
     Schedule('0 0 * * 7', clearApiLogs);
+    Schedule('0 0 * * 7', clearTempAudioFiles);
   }
 }
 

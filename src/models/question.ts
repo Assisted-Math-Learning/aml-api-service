@@ -36,6 +36,7 @@ export class Question extends Model {
   declare media?: Array<{ src: string; fileName: string; mimeType: string; mediaType: string }> | null;
   declare question_body: QuestionBody;
   declare sub_skills?: Array<{ identifier: string; name: { [key: string]: string } }> | null;
+  declare question_audio_description?: Record<string, string> | null;
   declare created_by: string;
   declare updated_by?: string;
   declare is_active: boolean;
@@ -107,6 +108,10 @@ Question.init(
       allowNull: false,
     },
     sub_skills: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+    },
+    question_audio_description: {
       type: DataTypes.JSONB,
       allowNull: true,
     },

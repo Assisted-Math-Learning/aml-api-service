@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "enum": ["api.translate"]
+    },
+    "ver": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "msgid": {
+          "type": "string"
+        }
+      },
+      "required": ["msgid"],
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "input_string": {
+          "type": "string"
+        },
+        "target_language": {
+          "type": "string",
+          "enum": ["hi", "mr", "as", "pa", "gu", "or", "bn", "te", "ta", "kn", "ml", "mni", "brx", "en"]
+        },
+        "source_language": {
+          "type": "string",
+          "enum": ["hi", "mr", "as", "pa", "gu", "or", "bn", "te", "ta", "kn", "ml", "mni", "brx", "en"]
+        }
+      },
+      "required": ["input_string", "target_language"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["id", "ver", "ts", "params", "request"],
+  "additionalProperties": false
+}

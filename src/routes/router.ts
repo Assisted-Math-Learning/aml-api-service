@@ -16,6 +16,9 @@ import { userAuthRouter } from './userAuth.route';
 import { userAuth } from '../middlewares/userAuth';
 import { portalRouter } from './portal.router';
 import { dataMigrations } from './dataMigration.route';
+import ttsRouter from './entities/ttsRouter';
+import textTranslation from '../controllers/textTranslation/textTranslation';
+import { setDataToRequestObject } from '../middlewares/setDataToReqObj';
 
 export const router = express.Router();
 
@@ -48,6 +51,10 @@ router.use('/content', userAuth, contentRouter);
 router.use('/repository', userAuth, repositoryRouter);
 
 router.use('/migration', userAuth, dataMigrations);
+
+router.use('/tts', userAuth, ttsRouter);
+
+router.post('/translate', setDataToRequestObject('api.translate'), userAuth, textTranslation);
 
 /**
  * ******************************

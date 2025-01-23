@@ -19,6 +19,7 @@ import { getUserByIdentifier } from '../../services/user';
 import { classService } from '../../services/classService';
 import { questionSetService } from '../../services/questionSetService';
 import { questionSetQuestionMappingService } from '../../services/questionSetQuestionMappingService';
+import { AudioManager } from '../../services/AudioManager';
 
 const updateQuestionById = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -184,6 +185,10 @@ const updateQuestionById = async (req: Request, res: Response) => {
 
   updatedDataBody.question_body = getQuestionBody(_.cloneDeep(dataBody));
   updatedDataBody.updated_by = loggedInUser?.identifier ?? 'manual';
+
+  const audioManager = new AudioManager(apiId!, msgid, resmsgid!);
+
+  await audioManager.handleAudioMappingUpdates(question.identifier, dataBody.audio_ids || [], loggedInUser);
 
   // Update Question
   const [, affectedRows] = await questionService.updateQuestionData(question_id, { ...dataBody, ...updatedDataBody });
