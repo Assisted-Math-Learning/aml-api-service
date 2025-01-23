@@ -107,7 +107,7 @@
           }
         }
       },
-      "required": ["name", "description", "question_type", "operation", "question_body", "benchmark_time", "repository_id", "board_id", "class_id", "l1_skill_id"],
+      "required": ["description", "question_type", "operation", "question_body", "benchmark_time", "repository_id", "board_id", "class_id", "l1_skill_id"],
       "if": {
         "properties": {
           "operation": { "const": "Addition" },
