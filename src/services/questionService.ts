@@ -150,10 +150,8 @@ class QuestionService {
 
     if (filters.question_set_id) {
       const mappings = await questionSetQuestionMappingService.getEntriesForQuestionSetId(filters.question_set_id);
-      if (mappings.length) {
-        const questionIds = mappings.map((mapping) => mapping.question_id);
-        whereClause = _.set(whereClause, ['identifier'], questionIds);
-      }
+      const questionIds = mappings.map((mapping) => mapping.question_id);
+      whereClause = _.set(whereClause, ['identifier'], questionIds);
     }
 
     if (filters.board_id) {

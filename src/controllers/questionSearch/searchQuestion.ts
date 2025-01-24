@@ -60,6 +60,7 @@ export const searchQuestions = async (req: Request, res: Response) => {
   const l3_skills = {};
   const sub_skills = {};
   const questionIds = questions.map((question) => question.identifier);
+  let questionSets = [];
 
   const mappings = await questionSetQuestionMappingService.getEntriesForQuestionIds(questionIds);
 
@@ -73,7 +74,7 @@ export const searchQuestions = async (req: Request, res: Response) => {
     questionQuestionSetMapping[mapping.question_id].push(mapping.question_set_id);
   }
 
-  const questionSets = await questionSetService.getQuestionSetsByIdentifiers(questionSetIds);
+  questionSets = await questionSetService.getQuestionSetsByIdentifiers(questionSetIds);
 
   for (const question of questions) {
     const { repository, taxonomy, sub_skills: sub_skill } = question;
@@ -141,6 +142,12 @@ export const searchQuestions = async (req: Request, res: Response) => {
         const skill = await getSubSkill(filters.sub_skill_id);
         if (skill) {
           _.set(sub_skills, skill.identifier, skill);
+        }
+      }
+      if (filters.question_set_id) {
+        const questionSet = await questionSetService.getQuestionSetByIdAndStatus(filters.question_set_id);
+        if (questionSet) {
+          questionSets.push(questionSet);
         }
       }
     }
