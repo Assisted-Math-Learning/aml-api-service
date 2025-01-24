@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
-import { supportedLanguages_TTS } from '../enums/traslationAndTTS';
+import { appConfiguration } from '../../config';
+import { supportedLanguages_TTS } from '../../enums/traslationAndTTS';
+
+const { translate_api_url } = appConfiguration;
 
 class TranslationService {
-  static url = 'https://admin.models.ai4bharat.org/inference/translate';
-
   static getInstance() {
     return new TranslationService();
   }
@@ -13,6 +14,12 @@ class TranslationService {
       accept: 'application/json, text/plain, */*',
       'content-type': 'application/json',
     };
+
+    if (!translate_api_url)
+      return {
+        data: null,
+        error: 'Translation API URL not found',
+      };
 
     const body = JSON.stringify({
       sourceLanguage: sourceLanguage,
@@ -24,7 +31,7 @@ class TranslationService {
     });
 
     try {
-      const response = await fetch(TranslationService.url, {
+      const response = await fetch(translate_api_url, {
         method: 'POST',
         headers: headers,
         body: body,
@@ -32,12 +39,12 @@ class TranslationService {
 
       if (response.status === 200) {
         const data = await response.json();
-        return [data, null];
+        return { data, error: null };
       }
 
-      return [null, null];
+      return { data: null, error: null };
     } catch (error: any) {
-      return [null, error];
+      return { data: null, error };
     }
   }
 }

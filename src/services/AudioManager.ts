@@ -14,15 +14,16 @@ export class AudioManager {
   ) {}
 
   async handleAudioMappingUpdates(questionId: string, audioIds: string[], loggedInUser: any) {
-    const existingAudioIds = await audioQuestionService.getAudioIdsByQuestionId(questionId);
+    const existingAudioIdsObj = await audioQuestionService.getAudioIdsByQuestionId(questionId);
 
-    const audioIdsToDelete = _.difference(
-      existingAudioIds.map(({ audio_id }) => audio_id),
-      audioIds,
-    );
+    const existingAudioIds = existingAudioIdsObj.map(({ audio_id }) => audio_id);
+
+    const audioIdsToDelete = _.difference(existingAudioIds, audioIds);
+
+    const newAudioIds = _.difference(audioIds, existingAudioIds);
 
     await this.deleteAudioMappings(questionId, audioIdsToDelete);
-    await this.updateAudioMappings(questionId, audioIds, loggedInUser);
+    await this.updateAudioMappings(questionId, newAudioIds, loggedInUser);
   }
 
   private async deleteAudioMappings(questionId: string, audioIdsToDelete: string[]) {
@@ -71,7 +72,7 @@ export class AudioManager {
 
       try {
         const updatedAudio = await audioService.makeAudioPermanent(audio);
-        await this.ensureAudioQuestionMapping(questionId, updatedAudio, loggedInUser);
+        await this.createAudioQuestionMapping(questionId, updatedAudio, loggedInUser);
       } catch (error: any) {
         const code = 'AUDIO_UPDATE_FAILED';
         logger.error({ code, apiId: this.apiId, msgid: this.msgid, resmsgid: this.resmsgid, message: error });
@@ -80,19 +81,12 @@ export class AudioManager {
     }
   }
 
-  private async ensureAudioQuestionMapping(questionId: any, updatedAudio: any, loggedInUser: any) {
-    const audioQuestionMapping = await audioQuestionService.getAudioQuestionMapping({
+  private async createAudioQuestionMapping(questionId: any, updatedAudio: any, loggedInUser: any) {
+    await audioQuestionService.createAudioQuestionMappingData({
       question_id: questionId,
       audio_id: updatedAudio.identifier,
+      created_by: loggedInUser?.identifier ?? 'manual',
+      language: updatedAudio.language,
     });
-
-    if (!audioQuestionMapping) {
-      await audioQuestionService.createAudioQuestionMappingData({
-        question_id: questionId,
-        audio_id: updatedAudio.identifier,
-        created_by: loggedInUser?.identifier ?? 'manual',
-        language: updatedAudio.language,
-      });
-    }
   }
 }

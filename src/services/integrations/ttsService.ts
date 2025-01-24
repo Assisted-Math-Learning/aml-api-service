@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
-import { supportedLanguages_TTS } from '../enums/traslationAndTTS';
+import { appConfiguration } from '../../config';
+import { supportedLanguages_TTS } from '../../enums/traslationAndTTS';
+
+const { tts_api_url } = appConfiguration;
 
 class TTSService {
-  static url = 'https://admin.models.ai4bharat.org/inference/convert';
-
   static getInstance() {
     return new TTSService();
   }
@@ -13,6 +14,12 @@ class TTSService {
       accept: 'application/json, text/plain, */*',
       'content-type': 'application/json',
     };
+
+    if (!tts_api_url)
+      return {
+        data: null,
+        error: 'TTS API URL not found',
+      };
 
     const body = JSON.stringify({
       sourceLanguage: language,
@@ -25,7 +32,7 @@ class TTSService {
     });
 
     try {
-      const response = await fetch(TTSService.url, {
+      const response = await fetch(tts_api_url, {
         method: 'POST',
         headers: headers,
         body: body,
@@ -33,12 +40,12 @@ class TTSService {
 
       if (response.status === 200) {
         const data = await response.json();
-        return [data, null];
+        return { data, error: null };
       }
 
-      return [null, null];
-    } catch (error) {
-      return [null, error];
+      return { data: null, error: null };
+    } catch (error: any) {
+      return { data: null, error };
     }
   }
 }

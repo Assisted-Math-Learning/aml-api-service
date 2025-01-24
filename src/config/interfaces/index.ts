@@ -33,4 +33,6 @@ export interface IConfiguration {
     bucketOutput: string;
   };
   aml_jwt_secret_key: string;
+  tts_api_url: string;
+  translate_api_url: string;
 }

@@ -2343,7 +2343,7 @@ alter table content_stage add unique(identifier);
 -- Creating audio_master and audio_mapping tables --
 -------------------------------------------------------
 
-create table audio_master
+create table if not exists audio_master
 (
     id         serial
         primary key,
@@ -2357,7 +2357,7 @@ create table audio_master
     updated_at TIMESTAMP with time zone not null
 );
 
-create table audio_question_mapping
+create table if not exists audio_question_mapping
 (
     id         serial
         primary key,
@@ -2375,3 +2375,21 @@ create table audio_question_mapping
 -------------------------------------------------------
 
 ALTER TABLE question ADD COLUMN question_audio_description JSONB;
+
+------------------------------
+-- Adding Audio Stage Table --
+------------------------------
+
+CREATE TABLE IF NOT EXISTS audio_stage (
+    id SERIAL PRIMARY KEY,
+    process_id UUID NOT NULL,
+    question_id VARCHAR NOT NULL,
+    audio_description VARCHAR NOT NULL,
+    language VARCHAR NOT NULL,
+    status VARCHAR(10) CHECK (status IN ('progress', 'errored', 'success')),
+    error_info JSON,
+    created_by VARCHAR NOT NULL,
+    updated_by VARCHAR,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import httpStatus from 'http-status';
 import ttsValidationSchema from './ttsValidationSchema.json';
-import { ttsService } from '../../../services/ttsService';
+import { ttsService } from '../../../services/integrations/ttsService';
 import { schemaValidation } from '../../../services/validationService';
 import logger from '../../../utils/logger';
 import { amlError } from '../../../types/amlError';
@@ -40,7 +40,7 @@ const generateAudio = async (req: Request, res: Response) => {
   let audioRecord = await audioService.getAudioByHash(textHash);
 
   if (!audioRecord) {
-    const [speechData, error] = await ttsService.generateSpeech(input_string, target_language);
+    const { data: speechData, error } = await ttsService.generateSpeech(input_string, target_language);
 
     if (error) {
       const code = 'TTS_FAILED';

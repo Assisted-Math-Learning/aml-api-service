@@ -7,9 +7,8 @@ import logger from '../../utils/logger';
 import { audioService } from '../../services/audioService';
 import { getFileUrlByFilePath } from '../../services/awsService';
 
-const apiId = 'api.tts.list';
-
 const getAudioRecords = async (req: Request, res: Response) => {
+  const apiId = _.get(req, 'id');
   const msgid = _.get(req, ['body', 'params', 'msgid']);
   const resmsgid = _.get(res, 'resmsgid');
   const questionId = _.get(req, 'params.question_id');

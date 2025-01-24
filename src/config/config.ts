@@ -36,6 +36,8 @@ const appConfiguration: IConfiguration = {
     bucketOutput: get(envVars, 'AML_AWS_BUCKET_OUTPUT', 'table'),
   },
   aml_jwt_secret_key: get(envVars, 'AML_JWT_SECRET_KEY', 'your-secret-key'),
+  tts_api_url: get(envVars, 'TTS_API_URL', 'https://admin.models.ai4bharat.org/inference/convert'),
+  translate_api_url: get(envVars, 'TRANSLATE_API_URL', 'https://admin.models.ai4bharat.org/inference/translate'),
 };
 
 export default appConfiguration;

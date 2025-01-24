@@ -6,7 +6,7 @@ import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { schemaValidation } from '../../services/validationService';
 import textTranslationValidationSchema from './textTranslationValidationSchema.json';
-import { translationService } from '../../services/translationService';
+import { translationService } from '../../services/integrations/translationService';
 
 const textTranslation = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -27,7 +27,7 @@ const textTranslation = async (req: Request, res: Response) => {
   const target_language = _.get(dataBody, 'target_language');
   const source_language = _.get(dataBody, 'source_language', 'en');
 
-  const [translatedData, error] = await translationService.generateTranslation(input_string, source_language, target_language);
+  const { data: translatedData, error } = await translationService.generateTranslation(input_string, source_language, target_language);
 
   if (error) {
     const code = 'TEXT_TRANSLATION_FAILED';
