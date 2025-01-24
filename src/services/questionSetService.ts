@@ -283,7 +283,7 @@ class QuestionSetService {
     });
   }
 
-  async getPracticeQuestionSet(filters: { repositoryIds: string[]; boardId: string; classId: string; l1SkillId: string }) {
+  async getPracticeQuestionSet(filters: { repositoryIds: string[]; classId: string; l1SkillId: string }) {
     const whereClause: any = {
       status: Status.LIVE,
       is_active: true,
@@ -291,9 +291,6 @@ class QuestionSetService {
         [Op.ne]: QuestionSetPurposeType.MAIN_DIAGNOSTIC,
       },
       taxonomy: {
-        board: {
-          identifier: filters.boardId,
-        },
         class: {
           identifier: filters.classId,
         },
@@ -314,7 +311,7 @@ class QuestionSetService {
     });
   }
 
-  async getNextPracticeQuestionSetInSequence(filters: { repositoryIds: string[]; boardId: string; classIds: string[]; l1SkillId: string; lastSetSequence: number }) {
+  async getNextPracticeQuestionSetInSequence(filters: { repositoryIds: string[]; classIds: string[]; l1SkillId: string; lastSetSequence: number }) {
     const whereClause: any = {
       status: Status.LIVE,
       is_active: true,
@@ -325,9 +322,6 @@ class QuestionSetService {
         [Op.ne]: QuestionSetPurposeType.MAIN_DIAGNOSTIC,
       },
       taxonomy: {
-        board: {
-          identifier: filters.boardId,
-        },
         class: {
           identifier: {
             [Op.in]: filters.classIds,

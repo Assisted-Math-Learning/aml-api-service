@@ -111,7 +111,6 @@ const evaluateLearner = async (req: Request, res: Response) => {
       if (learnerJourneyQuestionSet!.purpose !== QuestionSetPurposeType.MAIN_DIAGNOSTIC && learnerJourneyQuestionSet!.taxonomy.l1_skill?.identifier === skillIdentifier) {
         const nextPracticeQuestionSet = await questionSetService.getNextPracticeQuestionSetInSequence({
           repositoryIds,
-          boardId: learnerJourneyQuestionSet!.taxonomy.board?.identifier,
           classIds: allApplicableGradeIds,
           l1SkillId: learnerJourneyQuestionSet!.taxonomy.l1_skill?.identifier,
           lastSetSequence: learnerJourneyQuestionSet!.sequence,
@@ -138,7 +137,6 @@ const evaluateLearner = async (req: Request, res: Response) => {
      */
     const mainDiagnosticQS = await questionSetService.getMainDiagnosticQuestionSet({
       repositoryIds,
-      boardId: boardEntity?.[0]?.identifier,
       classId: highestApplicableGradeMapping?.identifier,
       l1SkillId: skillIdentifier,
     });
@@ -176,7 +174,7 @@ const evaluateLearner = async (req: Request, res: Response) => {
     }
 
     if (lowestApplicableGradeForPractice) {
-      const practiceQuestionSet = await questionSetService.getPracticeQuestionSet({ repositoryIds, boardId: learnerBoardId, classId: lowestApplicableGradeForPractice, l1SkillId: skillIdentifier });
+      const practiceQuestionSet = await questionSetService.getPracticeQuestionSet({ repositoryIds, classId: lowestApplicableGradeForPractice, l1SkillId: skillIdentifier });
       if (practiceQuestionSet) {
         questionSetId = practiceQuestionSet?.identifier;
         break;
@@ -188,7 +186,6 @@ const evaluateLearner = async (req: Request, res: Response) => {
   if (!questionSetId && requiredL1Skills.length && !allQuestionsAttempted) {
     const practiceQuestionSet = await questionSetService.getPracticeQuestionSet({
       repositoryIds,
-      boardId: learnerBoardId,
       classId: highestApplicableGradeMapping.identifier,
       l1SkillId: requiredL1Skills[requiredL1Skills.length - 1].identifier,
     });
