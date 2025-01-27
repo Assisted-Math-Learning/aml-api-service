@@ -10,7 +10,7 @@ export class LearnerProficiencyQuestionLevelData extends Model {
   declare question_set_id: string;
   declare taxonomy: Taxonomy;
   declare sub_skills: { [skillId: number]: number };
-  declare learner_response: { result?: string; answerTop?: string; answerBottom?: string };
+  declare learner_response: { result?: string; answerTop?: string; answerBottom?: string; quotient?: string; remainder?: string };
   declare score: number;
   declare attempts_count: number;
   declare created_by: string;
