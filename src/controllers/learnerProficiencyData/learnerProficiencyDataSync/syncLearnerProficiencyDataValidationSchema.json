@@ -45,7 +45,13 @@
                   "result": {
                     "type": "string"
                   },
-                  "answer_top": {
+                  "answerTop": {
+                    "type": "string"
+                  },
+                  "answerTopRow": {
+                    "type": "string"
+                  },
+                  "answerBottomRow": {
                     "type": "string"
                   },
                   "quotient": {
