@@ -197,7 +197,8 @@ const updateQuestionById = async (req: Request, res: Response) => {
   const questionId = updatedQuestion.identifier;
 
   // CHECKING MAPPINGS
-  const promises = [];
+  const mappingPromises1 = [];
+  const mappingPromises2 = [];
   const mappings = await questionSetQuestionMappingService.getEntriesForQuestionIds([questionId]);
   const existingQuestionSetIds = mappings.map((map) => map.question_set_id);
   const removedQuestionSetIds = _.difference(existingQuestionSetIds, dataBody.question_set_ids);
@@ -205,15 +206,16 @@ const updateQuestionById = async (req: Request, res: Response) => {
   for (const mapping of mappings) {
     const { question_set_id } = mapping;
     if (removedQuestionSetIds.includes(question_set_id)) {
-      promises.push(questionSetQuestionMappingService.updateById(mapping.id, { updated_by: loggedInUser?.identifier || 'manual' }));
-      promises.push(questionSetQuestionMappingService.destroyById(mapping.id));
+      mappingPromises1.push(questionSetQuestionMappingService.updateById(mapping.id, { updated_by: loggedInUser?.identifier || 'manual' }));
+      mappingPromises2.push(questionSetQuestionMappingService.destroyById(mapping.id));
     }
   }
   for (const questionSetId of addedQuestionSetIds) {
     const sequence = await questionSetQuestionMappingService.getNextSequenceNumberForQuestionSet(questionSetId);
-    promises.push(questionSetQuestionMappingService.create({ question_set_id: questionSetId, question_id: questionId, sequence, created_by: loggedInUser?.identifier || 'manual' }));
+    mappingPromises1.push(questionSetQuestionMappingService.create({ question_set_id: questionSetId, question_id: questionId, sequence, created_by: loggedInUser?.identifier || 'manual' }));
   }
-  await Promise.all(promises);
+  await Promise.all(mappingPromises1);
+  await Promise.all(mappingPromises2);
 
   const createdByUser = await getUserByIdentifier(affectedRows?.[0]?.created_by);
 

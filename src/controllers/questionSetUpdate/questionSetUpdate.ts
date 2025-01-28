@@ -69,7 +69,8 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
     moveToLastInSequence = questionSet?.repository.identifier !== dataBody.repository_id;
   }
 
-  const mappingPromises = [];
+  const mappingPromises1 = [];
+  const mappingPromises2 = [];
   const questionIdentifierSequenceMap = {};
   for (const question of dataBody.questions || []) {
     const { identifier, sequence } = question;
@@ -93,14 +94,16 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
   for (const mapping of mappings) {
     const { question_id } = mapping;
     if (removedQuestionIds.includes(question_id)) {
-      mappingPromises.push(questionSetQuestionMappingService.updateById(mapping.id, { updated_by: loggedInUser?.identifier || 'manual' }));
-      mappingPromises.push(questionSetQuestionMappingService.destroyById(mapping.id));
+      mappingPromises1.push(questionSetQuestionMappingService.updateById(mapping.id, { updated_by: loggedInUser?.identifier || 'manual' }));
+      mappingPromises2.push(questionSetQuestionMappingService.destroyById(mapping.id));
     } else {
-      mappingPromises.push(questionSetQuestionMappingService.updateById(mapping.id, { sequence: _.get(questionIdentifierSequenceMap, question_id), updated_by: loggedInUser?.identifier || 'manual' }));
+      mappingPromises1.push(
+        questionSetQuestionMappingService.updateById(mapping.id, { sequence: _.get(questionIdentifierSequenceMap, question_id), updated_by: loggedInUser?.identifier || 'manual' }),
+      );
     }
   }
   for (const questionId of addedQuestionIds) {
-    mappingPromises.push(
+    mappingPromises1.push(
       questionSetQuestionMappingService.create({
         question_set_id: questionSet_id,
         question_id: questionId,
@@ -297,7 +300,8 @@ const updateQuestionSetById = async (req: Request, res: Response) => {
 
   // Update Question Set
   const [, affectedRows] = await questionSetService.updateQuestionSet(questionSet_id, { ...dataBody, ...updatedDataBody });
-  await Promise.all(mappingPromises);
+  await Promise.all(mappingPromises1);
+  await Promise.all(mappingPromises2);
   await Promise.all(questionSetUpdatePromises);
 
   const createdByUser = await getUserByIdentifier(affectedRows?.[0]?.created_by);

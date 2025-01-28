@@ -5,16 +5,28 @@ class QuestionSetQuestionMappingService {
     return new QuestionSetQuestionMappingService();
   }
 
-  async find(questionSetId: string, questionId: string) {
+  async find(questionSetId: string, questionId: string, hideDeleted = true) {
     return QuestionSetQuestionMapping.findOne({
       where: {
         question_set_id: questionSetId,
         question_id: questionId,
       },
+      paranoid: hideDeleted,
     });
   }
 
   async create(data: { question_set_id: string; question_id: string; sequence: number; created_by: string }) {
+    const mappingExists = await this.find(data.question_set_id, data.question_id, false);
+    if (mappingExists) {
+      if (mappingExists.isSoftDeleted()) {
+        await mappingExists.restore();
+      }
+      await mappingExists.update({
+        sequence: data.sequence,
+        updated_by: data.created_by,
+      });
+      return mappingExists.dataValues;
+    }
     return QuestionSetQuestionMapping.create(data, { raw: true });
   }
 
