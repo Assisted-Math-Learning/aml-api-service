@@ -19,7 +19,7 @@ import { dataMigrations } from './dataMigration.route';
 import ttsRouter from './entities/ttsRouter';
 import textTranslation from '../controllers/textTranslation/textTranslation';
 import { setDataToRequestObject } from '../middlewares/setDataToReqObj';
-import { dashboardLearnerRouter } from './entities/dashboardLearnerRouter';
+import { learnerRouter } from './entities/learnerRouter';
 
 export const router = express.Router();
 
@@ -55,7 +55,7 @@ router.use('/migration', userAuth, dataMigrations);
 
 router.use('/tts', userAuth, ttsRouter);
 
-router.use('/learner', userAuth, dashboardLearnerRouter);
+router.use('/learner', userAuth, learnerRouter);
 
 router.post('/translate', setDataToRequestObject('api.translate'), userAuth, textTranslation);
 /**
