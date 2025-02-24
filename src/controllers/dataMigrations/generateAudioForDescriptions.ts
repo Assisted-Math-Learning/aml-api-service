@@ -78,7 +78,7 @@ const generateAudioForDescriptions = async (req: Request, res: Response) => {
       throw amlError(code, synthesisError, 'INTERNAL_SERVER_ERROR', httpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { success: true } });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { success: true, new_descriptions: newDescriptions } });
 };
 
 export default generateAudioForDescriptions;

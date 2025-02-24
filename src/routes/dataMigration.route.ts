@@ -9,6 +9,7 @@ import updateLearnerNamesAndSchool from '../controllers/dataMigrations/updateLea
 import updateQuestionAudioDescription from '../controllers/dataMigrations/updateQuestionAudioDescription';
 import generateAudioForDescriptions from '../controllers/dataMigrations/generateAudioForDescriptions';
 import createAudioQuestionMapping from '../controllers/dataMigrations/createAudioQuestionMapping';
+import updateQuestionTextAndDescription from '../controllers/dataMigrations/updateQuestionTextAndDescription';
 
 export const dataMigrations = express.Router();
 
@@ -31,3 +32,5 @@ dataMigrations.post('/update-audio-description', updateQuestionAudioDescription)
 dataMigrations.post('/generate-audio-for-descriptions', generateAudioForDescriptions);
 
 dataMigrations.post('/create-audio-question-mapping', createAudioQuestionMapping);
+
+dataMigrations.post('/update-question-text-and-description', updateQuestionTextAndDescription);
