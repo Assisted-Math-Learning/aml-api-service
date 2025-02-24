@@ -8,6 +8,7 @@ import { AppDataSource } from '../../config';
 import { Learner } from '../../models/learner';
 import bcrypt from 'bcrypt';
 import * as uuid from 'uuid';
+import { learnerService } from '../../services/learnerService';
 
 const createTelanganaLearners = async (req: Request, res: Response) => {
   const csvFile = _.get(req, ['files', 'document'], {});
@@ -30,9 +31,17 @@ const createTelanganaLearners = async (req: Request, res: Response) => {
   const boardId = '9b50a7e7-fdec-4fd7-bf63-84b3e62e334g';
   const tenantId = '9811db1e-e7e8-46d1-8a7b-86e32d45999d';
 
+  const usernames = rows.slice(1).map((row) => row[0]);
+
+  const existingLearners = await learnerService.getLearnersByUserNamesAndTenantId(usernames, tenantId);
+
+  const usernamesOfExistingLearners = existingLearners.map((l) => l.username);
   try {
     for (const row of rows.slice(1)) {
       const [username, password, grade] = row;
+      if (usernamesOfExistingLearners.includes(username)) {
+        continue;
+      }
       const classId = _.get(classMapping, grade);
       if (!classId) {
         throw new Error(`Invalid grade: ${grade}`);

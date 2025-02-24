@@ -15,6 +15,15 @@ class LearnerService {
     });
   }
 
+  async getLearnersByUserNamesAndTenantId(usernames: string[], tenantId: string) {
+    return Learner.findAll({
+      where: {
+        username: usernames,
+        tenant_id: tenantId,
+      },
+    });
+  }
+
   async getLearnerByIdentifier(identifier: string): Promise<Learner | null> {
     return Learner.findOne({
       where: {
