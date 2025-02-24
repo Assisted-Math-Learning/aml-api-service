@@ -9,6 +9,7 @@ import { ResponseHandler } from '../../../utils/responseHandler';
 import httpStatus from 'http-status';
 import { tenantService } from '../../../services/tenantService';
 import { learnerService } from '../../../services/learnerService';
+import { LearnerTransformer } from '../../../transformers/entity/learner.transformer';
 
 const login = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -47,11 +48,7 @@ const login = async (req: Request, res: Response) => {
 
   _.set(req, ['session', 'learnerId'], learner.identifier);
 
-  const result = {
-    username: learner.username,
-    identifier: learner.identifier,
-    taxonomy: learner.taxonomy,
-  };
+  const result = new LearnerTransformer().transform(learner);
 
   const tenant = await tenantService.getTenant(learner.tenant_id);
 
