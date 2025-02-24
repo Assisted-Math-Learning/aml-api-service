@@ -10,6 +10,7 @@ import updateQuestionAudioDescription from '../controllers/dataMigrations/update
 import generateAudioForDescriptions from '../controllers/dataMigrations/generateAudioForDescriptions';
 import createAudioQuestionMapping from '../controllers/dataMigrations/createAudioQuestionMapping';
 import updateQuestionTextAndDescription from '../controllers/dataMigrations/updateQuestionTextAndDescription';
+import createTelanganaLearners from '../controllers/dataMigrations/createTelanganaLearners';
 
 export const dataMigrations = express.Router();
 
@@ -34,3 +35,5 @@ dataMigrations.post('/generate-audio-for-descriptions', generateAudioForDescript
 dataMigrations.post('/create-audio-question-mapping', createAudioQuestionMapping);
 
 dataMigrations.post('/update-question-text-and-description', updateQuestionTextAndDescription);
+
+dataMigrations.post('/create-telangana-learners', createTelanganaLearners);
