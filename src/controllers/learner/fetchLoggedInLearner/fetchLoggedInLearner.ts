@@ -3,6 +3,8 @@ import { ResponseHandler } from '../../../utils/responseHandler';
 import httpStatus from 'http-status';
 import { tenantService } from '../../../services/tenantService';
 import { LearnerTransformer } from '../../../transformers/entity/learner.transformer';
+import _ from 'lodash';
+import { TENANT_ID_MAPPING } from '../../auth/signIn/signin.helper';
 
 const fetchLoggedInLearner = async (req: Request, res: Response) => {
   const learner = (req as any).learner;
@@ -11,7 +13,23 @@ const fetchLoggedInLearner = async (req: Request, res: Response) => {
 
   const tenant = await tenantService.getTenant(learner.tenant_id);
 
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Profile fetched successfully', data: { learner: result, tenant } } });
+  let loginPage = '/login';
+
+  if (tenant) {
+    const tenantName = tenant?.name.en;
+    const tenantNameTokens = tenantName?.split(' ').map((t) => _.lowerCase(t));
+    const tenantNameSlug = tenantNameTokens[0].concat(
+      tenantNameTokens
+        .slice(1)
+        .map((t) => _.capitalize(t))
+        .join(''),
+    );
+    if (Object.keys(TENANT_ID_MAPPING).includes(tenantNameSlug)) {
+      loginPage = `/signin/${tenantNameSlug}}`;
+    }
+  }
+
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Profile fetched successfully', data: { learner: result, tenant, login_in_page: loginPage } } });
 };
 
 export default fetchLoggedInLearner;

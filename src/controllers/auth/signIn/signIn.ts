@@ -88,7 +88,7 @@ const signIn = async (req: Request, res: Response) => {
 
   const result = new LearnerTransformer().transform(learner);
 
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Login successful', data: { learner: result, tenant } } });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Login successful', data: { learner: result, tenant, login_in_page: `/signin/${tenant_name}` } } });
 };
 
 export default signIn;
