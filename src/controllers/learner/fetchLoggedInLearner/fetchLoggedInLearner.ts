@@ -25,7 +25,7 @@ const fetchLoggedInLearner = async (req: Request, res: Response) => {
         .join(''),
     );
     if (Object.keys(TENANT_ID_MAPPING).includes(tenantNameSlug)) {
-      loginPage = `/signin/${tenantNameSlug}}`;
+      loginPage = `/signin/${tenantNameSlug}`;
     }
   }
 
