@@ -48,7 +48,7 @@ portalRouter.use(csrfProtection);
 
 portalRouter.use('/board', learnerAuth, boardRouter);
 
-portalRouter.use('/class', learnerAuth, classRouter);
+portalRouter.use('/class', classRouter);
 
 portalRouter.use('/question-set', learnerAuth, questionSetRouter);
 

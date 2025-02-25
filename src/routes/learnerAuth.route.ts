@@ -3,6 +3,7 @@ import { setDataToRequestObject } from '../middlewares/setDataToReqObj';
 import login from '../controllers/auth/login/login';
 import { learnerAuth } from '../middlewares/learnerAuth';
 import logout from '../controllers/auth/logout/logout';
+import signIn from '../controllers/auth/signIn/signIn';
 
 export const learnerAuthRouter = express.Router();
 
@@ -21,5 +22,7 @@ learnerAuthRouter.get('/csrf-token', setDataToRequestObject('api.learner.auth.cs
 });
 
 learnerAuthRouter.post('/login', setDataToRequestObject('api.learner.auth.login'), login);
+
+learnerAuthRouter.post('/signin', setDataToRequestObject('api.learner.auth.sigin'), signIn);
 
 learnerAuthRouter.post('/logout', setDataToRequestObject('api.learner.auth.logout'), learnerAuth, logout);

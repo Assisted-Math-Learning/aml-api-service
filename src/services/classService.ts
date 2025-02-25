@@ -37,11 +37,11 @@ class ClassService {
 
   // Get class by identifier
   async getClassById(class_id: string) {
-    const classData = await classMaster.findOne({
+    return classMaster.findOne({
       where: { identifier: class_id, is_active: true, status: Status.LIVE },
       attributes: { exclude: ['id'] },
+      raw: true,
     });
-    return classData?.dataValues;
   }
 
   async checkClassNameExists(classNames: { [key: string]: string }) {

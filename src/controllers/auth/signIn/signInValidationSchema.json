@@ -1,0 +1,50 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "enum": ["api.learner.auth.signin"]
+    },
+    "ver": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string"
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "msgid": {
+          "type": "string"
+        }
+      },
+      "required": ["msgid"],
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "must be a string and is required"
+        },
+        "password": {
+          "type": "string",
+          "description": "must be a string and is required"
+        },
+        "class_id": {
+          "type": "string",
+          "description": "must be a string and is required"
+        },
+        "tenant_name": {
+          "type": "string",
+          "description": "must be a string and is required"
+        }
+      },
+      "required": ["username", "password"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["id", "ver", "ts", "params", "request"],
+  "additionalProperties": false
+}

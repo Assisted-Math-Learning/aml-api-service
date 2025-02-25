@@ -35,4 +35,6 @@ export interface IConfiguration {
   aml_jwt_secret_key: string;
   tts_api_url: string;
   translate_api_url: string;
+  TENANT_ID: any;
+  BOARD_ID: any;
 }

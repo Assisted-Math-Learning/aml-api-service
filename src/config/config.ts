@@ -38,6 +38,12 @@ const appConfiguration: IConfiguration = {
   aml_jwt_secret_key: get(envVars, 'AML_JWT_SECRET_KEY', 'your-secret-key'),
   tts_api_url: get(envVars, 'TTS_API_URL', 'https://admin.models.ai4bharat.org/inference/convert'),
   translate_api_url: get(envVars, 'TRANSLATE_API_URL', 'https://admin.models.ai4bharat.org/inference/translate'),
+  TENANT_ID: {
+    TELANGANA: get(envVars, 'TELANGANA_TENANT_ID', '9811db1e-e7e8-46d1-8a7b-86e32d45999d'),
+  },
+  BOARD_ID: {
+    TELANGANA: get(envVars, 'TELANGANA_BOARD_ID', '9b50a7e7-fdec-4fd7-bf63-84b3e62e334g'),
+  },
 };
 
 export default appConfiguration;

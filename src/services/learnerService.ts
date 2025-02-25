@@ -7,11 +7,26 @@ class LearnerService {
     return new LearnerService();
   }
 
-  async getLearnerByUserName(username: string): Promise<Learner | null> {
+  async create(data: { identifier: string; username: string; password: string; tenant_id: string; board_id: string; class_id: string; created_by: string }) {
+    return Learner.create(data, { raw: true });
+  }
+
+  async getLearnerByUserName(username: string) {
     return Learner.findOne({
       where: {
         username,
       },
+      raw: true,
+    });
+  }
+
+  async getLearnerByUserNameAndTenantId(username: string, tenant_id: string) {
+    return Learner.findOne({
+      where: {
+        username,
+        tenant_id,
+      },
+      raw: true,
     });
   }
 
