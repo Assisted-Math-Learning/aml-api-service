@@ -52,7 +52,7 @@ const login = async (req: Request, res: Response) => {
 
   const tenant = await tenantService.getTenant(learner.tenant_id);
 
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Login successful', data: { learner: result, tenant, login_in_page: '/login' } } });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Login successful', data: { learner: result, tenant, login_page_url: '/login' } } });
 };
 
 export default login;

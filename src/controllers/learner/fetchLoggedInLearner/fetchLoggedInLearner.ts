@@ -29,7 +29,7 @@ const fetchLoggedInLearner = async (req: Request, res: Response) => {
     }
   }
 
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Profile fetched successfully', data: { learner: result, tenant, login_in_page: loginPage } } });
+  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Profile fetched successfully', data: { learner: result, tenant, login_page_url: loginPage } } });
 };
 
 export default fetchLoggedInLearner;
