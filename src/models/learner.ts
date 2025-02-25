@@ -7,10 +7,6 @@ export class Learner extends Model {
   declare username: string;
   declare password: string;
   declare name: string | null;
-  declare taxonomy: {
-    board: { identifier: string; name: { [key: string]: string } };
-    class: { identifier: string; name: { [key: string]: string } };
-  };
   declare tenant_id: string;
   declare board_id: string | null;
   declare school_id: string | null;
@@ -44,11 +40,6 @@ Learner.init(
     name: {
       type: DataTypes.STRING,
       allowNull: true,
-    },
-    taxonomy: {
-      type: DataTypes.JSONB,
-      allowNull: false,
-      unique: true,
     },
     tenant_id: {
       type: DataTypes.STRING,

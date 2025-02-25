@@ -58,7 +58,6 @@ const createTelanganaLearners = async (req: Request, res: Response) => {
           class_id: classId,
           tenant_id: tenantId,
           created_by: 'createTelanganaLearners-api',
-          taxonomy: {},
         },
         { transaction },
       );

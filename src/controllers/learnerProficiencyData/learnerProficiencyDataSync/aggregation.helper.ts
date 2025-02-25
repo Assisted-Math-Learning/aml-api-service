@@ -218,7 +218,10 @@ export const aggregateLearnerData = async (
     bulkCreateData.push({
       identifier: uuid.v4(),
       learner_id: learner.identifier,
-      taxonomy: learner.taxonomy,
+      taxonomy: {
+        board_id: learner.board_id,
+        class_id: learner.class_id,
+      },
       class_id: datum.class_id,
       l1_skill_id: datum.l1_skill_id,
       questions_count: datum.questionsCount,

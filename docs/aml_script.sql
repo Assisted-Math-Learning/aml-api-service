@@ -2431,3 +2431,9 @@ ADD COLUMN identifier VARCHAR(255);
 
 ALTER TABLE repository_associations
 ADD CONSTRAINT repository_associations_identifier_unique UNIQUE (identifier);
+
+------------------------------------------------------------------
+-- Drop column taxonomy from learner table --
+------------------------------------------------------------------
+
+ALTER TABLE learner drop column taxonomy;
