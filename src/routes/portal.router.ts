@@ -37,7 +37,7 @@ portalRouter.use(
       sameSite: 'strict',
       // secure: process.env.AML_SERVICE_APPLICATION_ENV === 'production',
       secure: false, // TODO: needs to be addressed ASAP
-      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+      maxAge: 1000 * 60 * 40, // 40 minutes
       httpOnly: false, // Mitigate XSS attacks
     },
   }),
