@@ -10,7 +10,6 @@ import httpStatus from 'http-status';
 import { tenantService } from '../../../services/tenantService';
 import { learnerService } from '../../../services/learnerService';
 import { LearnerTransformer } from '../../../transformers/entity/learner.transformer';
-import { learnerSessionService } from '../../../services/learnerSessionService';
 
 const login = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -53,11 +52,9 @@ const login = async (req: Request, res: Response) => {
 
   const tenant = await tenantService.getTenant(learner.tenant_id);
 
-  const learnerSession = await learnerSessionService.findLearnerSession(learner.identifier);
-
   ResponseHandler.successResponse(req, res, {
     status: httpStatus.OK,
-    data: { message: 'Login successful', data: { learner: result, tenant, session_expires_at: learnerSession?.expire, login_page_url: '/login' } },
+    data: { message: 'Login successful', data: { learner: result, tenant, session_expires_at: req.session.cookie.expires, login_page_url: '/login' } },
   });
 };
 

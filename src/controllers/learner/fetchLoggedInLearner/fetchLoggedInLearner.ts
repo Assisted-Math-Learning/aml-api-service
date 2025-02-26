@@ -5,7 +5,6 @@ import { tenantService } from '../../../services/tenantService';
 import { LearnerTransformer } from '../../../transformers/entity/learner.transformer';
 import _ from 'lodash';
 import { TENANT_ID_MAPPING } from '../../auth/signIn/signin.helper';
-import { learnerSessionService } from '../../../services/learnerSessionService';
 
 const fetchLoggedInLearner = async (req: Request, res: Response) => {
   const learner = (req as any).learner;
@@ -13,7 +12,6 @@ const fetchLoggedInLearner = async (req: Request, res: Response) => {
   const result = new LearnerTransformer().transform(learner);
 
   const tenant = await tenantService.getTenant(learner.tenant_id);
-  const learnerSession = await learnerSessionService.findLearnerSession(learner.identifier);
 
   let loginPage = '/login';
 
@@ -33,7 +31,7 @@ const fetchLoggedInLearner = async (req: Request, res: Response) => {
 
   ResponseHandler.successResponse(req, res, {
     status: httpStatus.OK,
-    data: { message: 'Profile fetched successfully', data: { learner: result, tenant, session_expires_at: learnerSession?.expire, login_page_url: loginPage } },
+    data: { message: 'Profile fetched successfully', data: { learner: result, tenant, session_expires_at: req.session.cookie.expires, login_page_url: loginPage } },
   });
 };
 
