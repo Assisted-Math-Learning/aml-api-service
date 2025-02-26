@@ -31,10 +31,9 @@ const fetchLoggedInLearner = async (req: Request, res: Response) => {
     }
   }
 
-  ResponseHandler.successResponse(req, res, { status: httpStatus.OK, data: { message: 'Profile fetched successfully', data: { learner: result, tenant, login_page_url: loginPage } } });
   ResponseHandler.successResponse(req, res, {
     status: httpStatus.OK,
-    data: { message: 'Profile fetched successfully', data: { learner: result, tenant, session_expires_at: learnerSession?.expire } },
+    data: { message: 'Profile fetched successfully', data: { learner: result, tenant, session_expires_at: learnerSession?.expire, login_page_url: loginPage } },
   });
 };
 
