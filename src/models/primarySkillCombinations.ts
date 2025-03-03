@@ -2,18 +2,19 @@ import { DataTypes, Model } from 'sequelize';
 import { AppDataSource } from '../config';
 import { QuestionOperation } from '../enums/questionOperation';
 
-export class SubSkillMaster extends Model {
+export class PrimarySkillCombinations extends Model {
   declare id: number;
   declare identifier: string;
   declare topic: QuestionOperation;
-  declare skill_name: string;
-  declare skill_type: string;
-  declare sequence: number;
+  declare sub_topic_id: string;
+  declare priority_level: number;
+  declare level: number[];
+  declare sub_skill_value_ids: string[];
   declare created_by: string;
-  declare updated_by?: string | null;
+  declare updated_by: string;
 }
 
-SubSkillMaster.init(
+PrimarySkillCombinations.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -23,23 +24,26 @@ SubSkillMaster.init(
     },
     identifier: {
       type: DataTypes.STRING,
-      unique: true,
       allowNull: false,
     },
     topic: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    skill_name: {
+    sub_topic_id: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    skill_type: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    sequence: {
+    priority_level: {
       type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    level: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      allowNull: false,
+    },
+    sub_skill_value_ids: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
     },
     created_by: {
@@ -61,11 +65,10 @@ SubSkillMaster.init(
   },
   {
     sequelize: AppDataSource,
-    modelName: 'SubSkillMaster',
-    tableName: 'sub_skill_master',
+    modelName: 'PrimarySkillCombinations',
+    tableName: 'primary_skill_combinations',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    comment: 'Table to store sub-skill related data',
   },
 );
