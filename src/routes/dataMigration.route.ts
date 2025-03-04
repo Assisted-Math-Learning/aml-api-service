@@ -44,9 +44,9 @@ dataMigrations.post('/update-question-text-and-description', updateQuestionTextA
 dataMigrations.post('/create-telangana-learners', createTelanganaLearners);
 
 // ******** NQL APIS **********
-dataMigrations.post('/initialize-question-meta-table', initializeQuestionMetaTable);
-
 dataMigrations.post('/initialize-sub-topic-master-table', initializeSubTopicMasterTable);
+
+dataMigrations.post('/initialize-question-meta-table', initializeQuestionMetaTable);
 
 dataMigrations.post('/initialize-sub-topic-hierarchy-table', initializeSubTopicHierarchyTable);
 
