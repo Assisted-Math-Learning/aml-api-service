@@ -1,19 +1,15 @@
 import { DataTypes, Model } from 'sequelize';
 import { AppDataSource } from '../config';
-import { QuestionOperation } from '../enums/questionOperation';
 
-export class SubSkillMaster extends Model {
+export class SubTopicMaster extends Model {
   declare id: number;
   declare identifier: string;
-  declare topic: QuestionOperation;
-  declare skill_name: string;
-  declare skill_type: string;
-  declare sequence: number;
+  declare name: string;
   declare created_by: string;
-  declare updated_by?: string | null;
+  declare updated_by: string;
 }
 
-SubSkillMaster.init(
+SubTopicMaster.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -26,20 +22,9 @@ SubSkillMaster.init(
       unique: true,
       allowNull: false,
     },
-    topic: {
+    name: {
       type: DataTypes.STRING,
-      allowNull: false,
-    },
-    skill_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    skill_type: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    sequence: {
-      type: DataTypes.INTEGER,
+      unique: true,
       allowNull: false,
     },
     created_by: {
@@ -61,11 +46,10 @@ SubSkillMaster.init(
   },
   {
     sequelize: AppDataSource,
-    modelName: 'SubSkillMaster',
-    tableName: 'sub_skill_master',
+    modelName: 'SubTopicMaster',
+    tableName: 'sub_topic_master',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    comment: 'Table to store sub-skill related data',
   },
 );

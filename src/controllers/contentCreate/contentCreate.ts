@@ -11,7 +11,6 @@ import { ResponseHandler } from '../../utils/responseHandler';
 import { createContentData } from '../../services/content';
 import { boardService } from '../../services/boardService';
 import { SkillType } from '../../enums/skillType';
-import { getSubSkill } from '../../services/subSkill';
 import { Status } from '../../enums/status';
 import { User } from '../../models/users';
 import { UserTransformer } from '../../transformers/entity/user.transformer';
@@ -121,19 +120,19 @@ const createContent = async (req: Request, res: Response) => {
     });
   }
 
-  const subSkillObjects = [];
-  for (const subSkillId of dataBody.sub_skill_ids || []) {
-    const subSkill = await getSubSkill(subSkillId);
-    if (!subSkill) {
-      const code = 'SUB_SKILL_NOT_EXISTS';
-      logger.error({ code, message: `Missing sub-skills` });
-      throw amlError(code, 'sub Skill not exists', 'NOT_FOUND', 404);
-    }
-    subSkillObjects.push({
-      identifier: subSkill.id,
-      name: subSkill.name,
-    });
-  }
+  const subSkillObjects: any = [];
+  // for (const subSkillId of dataBody.sub_skill_ids || []) {
+  //   const subSkill = await getSubSkill(subSkillId);
+  //   if (!subSkill) {
+  //     const code = 'SUB_SKILL_NOT_EXISTS';
+  //     logger.error({ code, message: `Missing sub-skills` });
+  //     throw amlError(code, 'sub Skill not exists', 'NOT_FOUND', 404);
+  //   }
+  //   subSkillObjects.push({
+  //     identifier: subSkill.id,
+  //     name: subSkill.name,
+  //   });
+  // }
 
   //creating a new content
   const contentInsertData = _.assign(dataBody, {

@@ -44,6 +44,7 @@ export class Question extends Model {
   declare updated_by?: string;
   declare is_active: boolean;
   declare x_id: string;
+  declare question_group_id: string;
 }
 
 // Initialize the Question model
@@ -132,6 +133,10 @@ Question.init(
       defaultValue: true,
     },
     x_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    question_group_id: {
       type: DataTypes.STRING,
       allowNull: true,
     },

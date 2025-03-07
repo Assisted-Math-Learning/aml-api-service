@@ -9,7 +9,6 @@ import { amlError } from '../../types/amlError';
 import { ResponseHandler } from '../../utils/responseHandler';
 import { boardService } from '../../services/boardService';
 import { SkillType } from '../../enums/skillType';
-import { getSubSkill } from '../../services/subSkill';
 import { classService } from '../../services/classService';
 import { tenantService } from '../../services/tenantService';
 import { User } from '../../models/users';
@@ -160,22 +159,22 @@ const contentUpdate = async (req: Request, res: Response) => {
   }
 
   // Validate sub_skills
-  if (dataBody.sub_skills_ids) {
-    const subSkillObjects = [];
-    for (const subSkillId of dataBody.sub_skill_ids || []) {
-      const subSkill = await getSubSkill(subSkillId);
-      if (!subSkill) {
-        const code = 'SUB_SKILL_NOT_EXISTS';
-        logger.error({ code, message: `Missing sub-skills` });
-        throw amlError(code, 'sub Skill not exists', 'NOT_FOUND', 404);
-      }
-      subSkillObjects.push({
-        identifier: subSkill.identifier,
-        name: subSkill.name,
-      });
-    }
-    updatedDataBody.sub_skills = subSkillObjects; // Add found sub-skills
-  }
+  // if (dataBody.sub_skills_ids) {
+  //   const subSkillObjects = [];
+  //   for (const subSkillId of dataBody.sub_skill_ids || []) {
+  //     const subSkill = await getSubSkill(subSkillId);
+  //     if (!subSkill) {
+  //       const code = 'SUB_SKILL_NOT_EXISTS';
+  //       logger.error({ code, message: `Missing sub-skills` });
+  //       throw amlError(code, 'sub Skill not exists', 'NOT_FOUND', 404);
+  //     }
+  //     subSkillObjects.push({
+  //       identifier: subSkill.identifier,
+  //       name: subSkill.name,
+  //     });
+  //   }
+  //   updatedDataBody.sub_skills = subSkillObjects; // Add found sub-skills
+  // }
 
   updatedDataBody.updated_by = loggedInUser?.identifier ?? 'manual';
 
