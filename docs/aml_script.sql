@@ -1682,16 +1682,16 @@ INSERT INTO skill_master (
 
  -- Table for managing sub-skills
 CREATE TABLE IF NOT EXISTS sub_skill_master (
-    id SERIAL PRIMARY KEY,
-    identifier VARCHAR(255) NOT NULL,
-    name JSONB NOT NULL UNIQUE,  -- Multilingual field for sub-skill name, must be unique
-    description JSONB,  -- Optional: multilingual description
-    status VARCHAR(10) NOT NULL CHECK (status IN ('draft', 'live')),  -- Enum for status
-    is_active BOOLEAN NOT NULL,
-    created_by VARCHAR(255) NOT NULL,
-    updated_by VARCHAR(255),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id         serial                   primary key,
+    identifier varchar(255)             not null unique,
+    topic      varchar(255)             not null,
+    skill_name varchar(255)             not null,
+    skill_type varchar(255)             not null,
+    sequence   integer                  not null,
+    created_by varchar(255)             not null,
+    updated_by varchar(255),
+    created_at timestamp with time zone not null,
+    updated_at timestamp with time zone not null
 );
 
 INSERT INTO sub_skill_master (
@@ -2443,3 +2443,134 @@ ALTER TABLE learner drop column taxonomy;
 ------------------------------------------------------------------
 
 ALTER TABLE learner ADD COLUMN preferred_language VARCHAR(255) DEFAULT 'en' not null;
+
+
+
+------------------------------------------------------------------
+-- NQL related tables --
+------------------------------------------------------------------
+
+create table if not exists question_meta
+(
+    id            serial
+        primary key,
+    question_group_id varchar(255)             not null
+        unique,
+    meta          jsonb                    not null,
+    created_by    varchar(255)             not null,
+    updated_by    varchar(255),
+    created_at    timestamp with time zone not null,
+    updated_at    timestamp with time zone not null
+);
+
+create table if not exists sub_topic_master
+(
+    id         serial
+        primary key,
+    identifier varchar(255)             not null
+        unique,
+    name       varchar(255)             not null
+        unique,
+    created_by varchar(255)             not null,
+    updated_by varchar(255),
+    created_at timestamp with time zone not null,
+    updated_at timestamp with time zone not null
+);
+
+create table if not exists sub_topic_hierarchy
+(
+    id                    serial
+    primary key,
+    topic                 varchar(255)             not null,
+    sub_topic_id          varchar(255)             not null,
+    class_id              varchar(255)             not null,
+    sequence              integer                  not null,
+    question_types        jsonb                    not null,
+    include_in_diagnostic boolean                  not null,
+    board_id              varchar(255),
+    created_by            varchar(255)             not null,
+    updated_by            varchar(255),
+    created_at            timestamp with time zone not null,
+    updated_at            timestamp with time zone not null
+);
+
+create table if not exists primary_skill_combinations
+(
+    id             serial
+        primary key,
+    identifier     varchar(255)             not null,
+    topic          varchar(255)             not null,
+    sub_topic_id   varchar(255)             not null,
+    priority_level integer                  not null,
+    level          integer[]                not null,
+    sub_skill_value_ids  varchar(255)[]           not null,
+    created_by     varchar(255)             not null,
+    updated_by     varchar(255),
+    created_at     timestamp with time zone not null,
+    updated_at     timestamp with time zone not null
+);
+
+create table if not exists sub_topic_nql_type_mapping
+(
+    id            serial
+    primary key,
+    identifier     varchar(255)             not null,
+    topic         varchar(255)             not null,
+    sub_topic_id  varchar(255)             not null,
+    nql_type      varchar(255)             not null,
+    question_type varchar(255)             not null,
+    created_by    varchar(255)             not null,
+    updated_by    varchar(255),
+    created_at    timestamp with time zone not null,
+    updated_at    timestamp with time zone not null
+);
+
+create table if not exists accuracy_thresholds
+(
+    id                   serial
+        primary key,
+    topic                varchar(255)             not null,
+    sub_topic_id         varchar(255)             not null,
+    question_type        varchar(255)             not null,
+    threshold     jsonb                    not null,
+    created_by           varchar(255)             not null,
+    updated_by           varchar(255),
+    created_at           timestamp with time zone not null,
+    updated_at           timestamp with time zone not null
+);
+
+create table if not exists learner_mastery_data
+(
+    id                            serial
+        primary key,
+    learner_id                    varchar(255)             not null,
+    topic                         varchar(255)             not null,
+    sub_topic_id                  varchar(255)             not null,
+    skill_combination_id          varchar(255)             not null,
+    mastery_score                 double precision         not null,
+    accuracy                      double precision         not null,
+    total_recent_attempts         integer                  not null,
+    complexity_score_percentile   double precision         not null,
+    max_complexity_score          double precision         not null,
+    updated_for_question_set_type varchar(255)             not null,
+    updated_for_question_set_id   varchar(255)             not null,
+    created_by                    varchar(255)             not null,
+    updated_by                    varchar(255),
+    created_at                    timestamp with time zone not null,
+    updated_at                    timestamp with time zone not null
+);
+
+create table if not exists sub_skill_values
+(
+    id               serial                   primary key,
+    identifier       varchar(255)             not null unique,
+    sub_skill_id     varchar(255)             not null,
+    skill_value_name varchar(255),
+    sequence         integer                  not null,
+    created_by       varchar(255)             not null,
+    updated_by       varchar(255),
+    created_at       timestamp with time zone not null,
+    updated_at       timestamp with time zone not null
+);
+
+ALTER TABLE question ADD COLUMN question_group_id VARCHAR(255);

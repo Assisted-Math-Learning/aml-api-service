@@ -1,19 +1,19 @@
 import { DataTypes, Model } from 'sequelize';
 import { AppDataSource } from '../config';
 import { QuestionOperation } from '../enums/questionOperation';
+import { QuestionType } from '../enums/questionType';
 
-export class SubSkillMaster extends Model {
+export class AccuracyThresholds extends Model {
   declare id: number;
-  declare identifier: string;
   declare topic: QuestionOperation;
-  declare skill_name: string;
-  declare skill_type: string;
-  declare sequence: number;
+  declare sub_topic_id: string;
+  declare question_type: QuestionType;
+  declare threshold: any;
   declare created_by: string;
-  declare updated_by?: string | null;
+  declare updated_by: string;
 }
 
-SubSkillMaster.init(
+AccuracyThresholds.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -21,25 +21,20 @@ SubSkillMaster.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    identifier: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
     topic: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    skill_name: {
+    sub_topic_id: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    skill_type: {
+    question_type: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    sequence: {
-      type: DataTypes.INTEGER,
+    threshold: {
+      type: DataTypes.JSONB,
       allowNull: false,
     },
     created_by: {
@@ -61,11 +56,10 @@ SubSkillMaster.init(
   },
   {
     sequelize: AppDataSource,
-    modelName: 'SubSkillMaster',
-    tableName: 'sub_skill_master',
+    modelName: 'AccuracyThresholds',
+    tableName: 'accuracy_thresholds',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    comment: 'Table to store sub-skill related data',
   },
 );

@@ -1,19 +1,17 @@
 import { DataTypes, Model } from 'sequelize';
 import { AppDataSource } from '../config';
-import { QuestionOperation } from '../enums/questionOperation';
 
-export class SubSkillMaster extends Model {
+export class SequentialNQLDetails extends Model {
   declare id: number;
-  declare identifier: string;
-  declare topic: QuestionOperation;
-  declare skill_name: string;
-  declare skill_type: string;
+  declare nql_type_mapping_id: string;
+  declare class_id: string;
+  declare question_set_x_id: string;
   declare sequence: number;
   declare created_by: string;
-  declare updated_by?: string | null;
+  declare updated_by: string;
 }
 
-SubSkillMaster.init(
+SequentialNQLDetails.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -21,25 +19,20 @@ SubSkillMaster.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    identifier: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
-    topic: {
+    nql_type_mapping_id: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    skill_name: {
+    class_id: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    skill_type: {
+    question_set_x_id: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     sequence: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
     created_by: {
@@ -61,11 +54,10 @@ SubSkillMaster.init(
   },
   {
     sequelize: AppDataSource,
-    modelName: 'SubSkillMaster',
-    tableName: 'sub_skill_master',
+    modelName: 'SequentialNQLDetails',
+    tableName: 'sequential_nql_details',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    comment: 'Table to store sub-skill related data',
   },
 );

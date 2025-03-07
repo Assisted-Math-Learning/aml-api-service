@@ -21,7 +21,9 @@
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "prepare": "husky install",
-    "gen:migration": "./migration-generate.sh"
+    "gen:migration": "./migration-generate.sh",
+    "migrate": "sequelize db:migrate",
+    "migrate:undo": "sequelize db:migrate:undo"
   },
   "keywords": [],
   "author": "",

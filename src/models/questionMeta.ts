@@ -1,19 +1,17 @@
 import { DataTypes, Model } from 'sequelize';
 import { AppDataSource } from '../config';
-import { QuestionOperation } from '../enums/questionOperation';
 
-export class SubSkillMaster extends Model {
+export class QuestionMeta extends Model {
   declare id: number;
-  declare identifier: string;
-  declare topic: QuestionOperation;
-  declare skill_name: string;
-  declare skill_type: string;
-  declare sequence: number;
+  declare question_group_id: string;
+  declare complexity_score: number;
+  declare sub_skill_value_ids: string[];
+  declare meta: any;
   declare created_by: string;
-  declare updated_by?: string | null;
+  declare updated_by: string;
 }
 
-SubSkillMaster.init(
+QuestionMeta.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -21,25 +19,21 @@ SubSkillMaster.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    identifier: {
+    question_group_id: {
       type: DataTypes.STRING,
       unique: true,
       allowNull: false,
     },
-    topic: {
-      type: DataTypes.STRING,
+    complexity_score: {
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
-    skill_name: {
-      type: DataTypes.STRING,
+    sub_skill_value_ids: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
     },
-    skill_type: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    sequence: {
-      type: DataTypes.INTEGER,
+    meta: {
+      type: DataTypes.JSONB,
       allowNull: false,
     },
     created_by: {
@@ -61,11 +55,10 @@ SubSkillMaster.init(
   },
   {
     sequelize: AppDataSource,
-    modelName: 'SubSkillMaster',
-    tableName: 'sub_skill_master',
+    modelName: 'QuestionMeta',
+    tableName: 'question_meta',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    comment: 'Table to store sub-skill related data',
   },
 );
