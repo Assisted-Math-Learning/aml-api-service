@@ -20,6 +20,7 @@ import initializeSubSkillValuesTable from '../controllers/dataMigrations/initial
 import initializePrimarySkillCombinationsTable from '../controllers/dataMigrations/initializePrimarySkillCombinationsTable';
 import initializeSequentialNQLDetailsTable from '../controllers/dataMigrations/initializeSequentialNQLDetailsTable';
 import initializeAccuracyThresholdBasedNQLDetailsTable from '../controllers/dataMigrations/initializeAccuracyThresholdBasedNQLDetailsTable';
+import initializeSubTopicIdsAndQuestionGroupId from '../controllers/dataMigrations/initializeSubTopicIdsAndQuestionGroupId';
 
 export const dataMigrations = express.Router();
 
@@ -65,3 +66,5 @@ dataMigrations.post('/initialize-sub-skill-values-table', initializeSubSkillValu
 dataMigrations.post('/initialize-primary-skill-combinations-table', initializePrimarySkillCombinationsTable);
 
 dataMigrations.post('/initialize-question-meta-table', initializeQuestionMetaTable);
+
+dataMigrations.post('/initialize-sub-topic-ids-and-question-group-id', initializeSubTopicIdsAndQuestionGroupId);
