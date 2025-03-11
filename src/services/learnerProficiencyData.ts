@@ -1,4 +1,4 @@
-import { Optional } from 'sequelize';
+import { Optional, Op } from 'sequelize';
 import { LearnerProficiencyQuestionLevelData } from '../models/learnerProficiencyQuestionLevelData';
 import { LearnerProficiencyAggregateData } from '../models/learnerProficiencyAggregateData';
 import { LearnerProficiencyQuestionSetLevelData } from '../models/learnerProficiencyQuestionSetLevelData';
@@ -20,6 +20,26 @@ export const getQuestionLevelDataByLearnerIdQuestionIdQuestionSetIdAndAttemptNum
   return LearnerProficiencyQuestionLevelData.findOne({
     where: { learner_id: learnerId, question_id: questionId, question_set_id: questionSetId, attempt_number },
     order: [['attempt_number', 'desc']],
+    raw: true,
+  });
+};
+
+export const bulkReadLearnerProficiencyData = async (data: { learnerId: string; questionId: string; questionSetId: string; attemptNumber: number }[]) => {
+  const queryData = data.map((datum) => ({
+    learner_id: datum.learnerId,
+    question_id: datum.questionId,
+    question_set_id: datum.questionSetId,
+    attempt_number: datum.attemptNumber,
+  }));
+  const whereClause: any = {
+    [Op.or]: queryData,
+  };
+
+  // Fetching records
+  return LearnerProficiencyQuestionLevelData.findAll({
+    where: whereClause,
+    attributes: ['id', 'identifier', 'learner_id', 'question_id', 'question_set_id', 'attempt_number', 'taxonomy'], // Select only required fields
+    order: [['attempt_number', 'DESC']], // Order by attempt_number
     raw: true,
   });
 };

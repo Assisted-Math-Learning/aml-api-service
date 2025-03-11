@@ -8,8 +8,8 @@ import { ResponseHandler } from '../../../utils/responseHandler';
 import { amlError } from '../../../types/amlError';
 import {
   bulkCreateLearnerProficiencyQuestionLevelData,
+  bulkReadLearnerProficiencyData,
   createLearnerProficiencyQuestionSetLevelData,
-  getQuestionLevelDataByLearnerIdQuestionIdQuestionSetIdAndAttemptNumber,
   getRecordsForLearnerByQuestionSetId,
   updateLearnerProficiencyQuestionLevelData,
 } from '../../../services/learnerProficiencyData';
@@ -95,7 +95,7 @@ const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
   }
 
   for (const question of questions) {
-    _.set(questionMap, question.identifier, question);
+    questionMap[question.identifier] = question;
   }
 
   const { learnerJourney } = await readLearnerJourneyByLearnerIdAndQuestionSetId(learner_id, questionSetId);
@@ -111,6 +111,21 @@ const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
 
   const questionLevelBulkCreateData = [];
   const questionLevelDataUpdatePromises = [];
+
+  const queryData = questions_data.map((datum: any) => ({
+    learnerId: learner_id,
+    questionId: datum.question_id,
+    questionSetId: datum.question_set_id,
+    attemptNumber: attemptNumber,
+  }));
+
+  const existingAttempts = await bulkReadLearnerProficiencyData(queryData);
+
+  const existingAttemptsMap = existingAttempts.reduce((agg: any, curr) => {
+    const key = `${curr.question_id}_${curr.question_set_id}_${curr.attempt_number}`;
+    agg[key] = curr;
+    return agg;
+  }, {});
 
   logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} transaction started`);
   const transaction = await AppDataSource.transaction();
@@ -140,17 +155,18 @@ const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
       const subSkillScores = calculateSubSkillScoresForQuestion(question, learner_response);
 
       if (start_time && moment(start_time).isValid()) {
-        _.set(questionSetTimestampMap, [question_set_id, 'start_time'], start_time);
+        questionSetTimestampMap[question_set_id]['start_time'] = start_time;
       }
 
       if (end_time && moment(end_time).isValid()) {
-        _.set(questionSetTimestampMap, [question_set_id, 'end_time'], end_time);
+        questionSetTimestampMap[question_set_id]['end_time'] = end_time;
       }
 
       /**
        * If an entry already exists for the (learner_id, question_id, question_set_id) pair, then we increment the attempt count & update the new values
        */
-      const learnerDataExists = await getQuestionLevelDataByLearnerIdQuestionIdQuestionSetIdAndAttemptNumber(learner_id, question_id, question_set_id, attemptNumber);
+      const key = `${question_id}_${question_set_id}_${attemptNumber}`;
+      const learnerDataExists = existingAttemptsMap[key];
       if (learnerDataExists && !_.isEmpty(learnerDataExists)) {
         if (status === QuestionStatus.REVISITED) {
           const updateData = {
@@ -160,7 +176,7 @@ const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
             updated_by: learner_id,
           };
           questionLevelDataUpdatePromises.push(updateLearnerProficiencyQuestionLevelData(transaction, learnerDataExists.identifier, updateData));
-          _.set(newLearnerAttempts, learnerDataExists?.id, { ...learnerDataExists, ...updateData });
+          newLearnerAttempts[learnerDataExists.id] = { ...learnerDataExists, ...updateData };
         }
         continue;
       }
@@ -216,7 +232,7 @@ const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
     }
 
     for (const datum of newData) {
-      _.set(newLearnerAttempts, datum.dataValues.id, datum.dataValues);
+      newLearnerAttempts[datum.dataValues.id] = datum.dataValues;
     }
 
     /**
@@ -248,21 +264,21 @@ const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
     const end_time = _.get(questionSetTimestampMap, [questionSet.identifier, 'end_time']);
     const journeyStatus = totalQuestionsCount === completedQuestionIds.length ? LearnerJourneyStatus.COMPLETED : LearnerJourneyStatus.IN_PROGRESS;
     if (learnerJourney && learnerJourney.status === LearnerJourneyStatus.IN_PROGRESS) {
-      const payload = {
+      const payload: any = {
         status: journeyStatus,
         completed_question_ids: completedQuestionIds,
         updated_by: learner_id,
         end_time: journeyStatus === LearnerJourneyStatus.IN_PROGRESS ? null : learnerJourney.end_time,
       };
       if (start_time) {
-        _.set(payload, 'start_time', start_time);
+        payload['start_time'] = start_time;
       }
       if (end_time) {
-        _.set(payload, 'end_time', end_time);
+        payload['end_time'] = end_time;
       }
       await updateLearnerJourney(transaction, learnerJourney.identifier, payload);
     } else {
-      const payload = {
+      const payload: any = {
         identifier: uuid.v4(),
         learner_id,
         question_set_id: questionSet.identifier,
@@ -272,10 +288,10 @@ const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
         attempt_number: attemptNumber,
       };
       if (start_time) {
-        _.set(payload, 'start_time', start_time);
+        payload['start_time'] = start_time;
       }
       if (end_time) {
-        _.set(payload, 'end_time', end_time);
+        payload['end_time'] = end_time;
       }
       await createLearnerJourney(transaction, payload);
     }
@@ -310,7 +326,7 @@ const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: COMMIT TRANSACTION DONE`);
     const transactionEndTime = Date.now();
     logger.info(`transactionEndTime: ${transactionEndTime}`);
-    logger.info(`transaction ran for: ${transactionStartTime - transactionEndTime}`);
+    logger.info(`transaction ran for: ${transactionEndTime - transactionStartTime}`);
   } catch (e: any) {
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: ROLLING BACK TRANSACTION`);
     await transaction.rollback();
