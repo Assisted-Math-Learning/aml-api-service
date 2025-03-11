@@ -10,11 +10,11 @@ import { Question } from '../../models/question';
 import { QuestionType } from '../../enums/questionType';
 import { getFileUrlByFolderAndFileName } from '../../services/awsService';
 import { getContentByIds } from '../../services/content';
-import { Content } from '../../models/content';
 import { FIBType } from '../../enums/fibType';
 import { UserTransformer } from '../../transformers/entity/user.transformer';
 import { questionSetQuestionMappingService } from '../../services/questionSetQuestionMappingService';
 import { userService } from '../../services/userService';
+import { ContentTransformer } from '../../transformers/entity/contentTransformer';
 
 const readQuestionSetById = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -53,14 +53,23 @@ const readQuestionSetById = async (req: Request, res: Response) => {
     }),
   );
 
+  const contentTransformer = new ContentTransformer();
+
   // Combine the question set details with the question details, sorted by sequence
   const questionSetWithQuestions = {
     ...questionSet,
-    contents: (contents as Content[]).reduce((agg: string[], curr) => {
-      const urls = (curr.media || [])?.map((media) => getFileUrlByFolderAndFileName(media.src, media.fileName));
-      agg = [...agg, ...urls];
+    contents: contentTransformer.transformList(contents).reduce((agg: Record<string, string[]>, curr) => {
+      (curr.media || []).forEach((media) => {
+        const url = getFileUrlByFolderAndFileName(media.src, media.fileName);
+        const lang = media.language; // `language` is always present due to transformer
+
+        if (!agg[lang]) {
+          agg[lang] = [];
+        }
+        agg[lang].push(url);
+      });
       return agg;
-    }, []),
+    }, {}),
     questions: mappings
       .map((mapping): Question => questionsMap.get(mapping.question_id))
       .filter(Boolean)

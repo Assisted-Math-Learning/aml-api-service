@@ -25,7 +25,7 @@ const contentReadById = async (req: Request, res: Response) => {
     throw amlError(code, 'Content not exists', 'NOT_FOUND', httpStatus.NOT_FOUND);
   }
 
-  const mediaWithUrls = content?.media?.filter((v) => !!v)?.map((media) => ({ ...media, url: getFileUrlByFolderAndFileName(media?.src, media?.fileName) }));
+  const mediaWithUrls = content?.media?.filter((v) => !!v)?.map((media) => ({ ...media, url: getFileUrlByFolderAndFileName(media?.src, media?.fileName), language: media?.language || 'en' }));
 
   _.set(content, 'media', mediaWithUrls);
 

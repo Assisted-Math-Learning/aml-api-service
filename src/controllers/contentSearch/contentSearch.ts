@@ -38,6 +38,7 @@ export const searchContents = async (req: Request, res: Response) => {
       ?.map((media) => ({
         ...media,
         url: getFileUrlByFolderAndFileName(media?.src, media?.fileName),
+        language: media?.language || 'en',
       }));
     agg = [...agg, curr];
     return agg;

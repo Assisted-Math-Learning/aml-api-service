@@ -13,7 +13,7 @@ export class Content extends Model {
   declare sub_skills?: Array<{ id: number; name: { [key: string]: string } }> | null;
   declare gradient?: string | null;
   declare status: 'draft' | 'live';
-  declare media: Array<{ src: string; fileName: string; mimeType: string; mediaType: string }> | null;
+  declare media: Array<{ src: string; fileName: string; mimeType: string; mediaType: string; language?: string }> | null;
   declare created_by: string;
   declare updated_by?: string | null;
   declare is_active: boolean;

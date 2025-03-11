@@ -92,6 +92,11 @@
               },
               "src": {
                 "type": "string"
+              },
+              "language": {
+                "type": "string",
+                "enum": ["en", "kn", "hi", "ta", "te"],
+                "description": "must be one of the allowed languages"
               }
             },
             "required": ["fileName", "mediaType", "mimeType", "src"],
