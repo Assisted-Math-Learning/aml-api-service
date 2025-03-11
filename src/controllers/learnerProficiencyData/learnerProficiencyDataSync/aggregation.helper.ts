@@ -8,6 +8,7 @@ import { Learner } from '../../../models/learner';
 import { QuestionOperation } from '../../../enums/questionOperation';
 import { FIBType } from '../../../enums/fibType';
 import { replaceLeadingZeroes } from '../../../utils/string.util';
+import { Transaction } from 'sequelize';
 
 export const getScoreForTheQuestion = (question: Question, learnerResponse: { result?: string; quotient?: string; remainder?: string; answerTopRow?: string; answerBottomRow?: string }): number => {
   const { question_type, question_body } = question;
@@ -199,7 +200,7 @@ export const getLearnerAggregateDataForClassAndL1SkillPair = (
 };
 
 export const aggregateLearnerData = async (
-  transaction: any,
+  transaction: Transaction,
   learner: Learner,
   reqData: { class_id: string; l1_skill_id: string; total: number; questionsCount: number; sub_skills: { [skillType: string]: number } }[],
 ) => {
@@ -215,12 +216,13 @@ export const aggregateLearnerData = async (
   for (const datum of reqData) {
     const key = `${datum.class_id}_${datum.l1_skill_id}`;
     const existingEntry = existingEntriesMap[key];
-    if (existingEntry) {
+    const score = +(datum.total / datum.questionsCount).toFixed(2);
+    if (existingEntry && existingEntry.score !== score) {
       bulkUpdateData.push({
         identifier: existingEntry.identifier,
         questions_count: datum.questionsCount,
         sub_skills: datum.sub_skills,
-        score: +(datum.total / datum.questionsCount).toFixed(2),
+        score,
         updated_by: learner.identifier,
       });
       continue;

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import httpStatus from 'http-status';
 import { schemaValidation } from '../../../services/validationService';
 import learnerProficiencyDataSyncJSON from './syncLearnerProficiencyDataValidationSchema.json';
@@ -16,29 +16,15 @@ import {
 import { questionSetService } from '../../../services/questionSetService';
 import { questionService } from '../../../services/questionService';
 import * as uuid from 'uuid';
-import {
-  aggregateLearnerData,
-  calculateAverageScoreForQuestionSet,
-  calculateSubSkillScoresForQuestion,
-  calculateSubSkillScoresForQuestionSet,
-  getLearnerAggregateDataForClassAndL1SkillPair,
-  getScoreForTheQuestion,
-} from './aggregation.helper';
+import { calculateAverageScoreForQuestionSet, calculateSubSkillScoresForQuestion, calculateSubSkillScoresForQuestionSet, getScoreForTheQuestion } from './aggregation.helper';
 import { createLearnerJourney, readLearnerJourney, readLearnerJourneyByLearnerIdAndQuestionSetId, updateLearnerJourney } from '../../../services/learnerJourney';
 import { LearnerJourneyStatus } from '../../../enums/learnerJourneyStatus';
 import moment from 'moment';
-import { Learner } from '../../../models/learner';
 import { ApiLogs } from '../../../models/apiLogs';
 import { AppDataSource } from '../../../config';
 import { LearnerProficiencyQuestionLevelData } from '../../../models/learnerProficiencyQuestionLevelData';
-import { QuestionSetPurposeType } from '../../../enums/questionSetPurposeType';
 import { QuestionStatus } from '../../../enums/status';
 import { questionSetQuestionMappingService } from '../../../services/questionSetQuestionMappingService';
-
-const aggregateLearnerDataOnClassAndSkillLevel = async (transaction: any, learner: Learner, questionLevelData: any[]) => {
-  const aggregateData = getLearnerAggregateDataForClassAndL1SkillPair(questionLevelData);
-  await aggregateLearnerData(transaction, learner, aggregateData);
-};
 
 const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -310,30 +296,6 @@ const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
     }
 
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: learner journey updated`);
-
-    // aggregating learner data only for MAIN DIAGNOSTIC question sets & only when the question set is completed
-    if (questionSet.purpose === QuestionSetPurposeType.MAIN_DIAGNOSTIC && totalQuestionsCount === completedQuestionIds.length && totalQuestionsCount > 0) {
-      /**
-       * Updating grade/skill level data in the following block (only for Main Diagnostic Question Set)
-       */
-      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: reading learner attempts`);
-      const existingLearnerAttempts = await getRecordsForLearnerByQuestionSetId(learner_id, questionSet.identifier, attemptNumber);
-      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: learner attempts read`);
-
-      const unUpdatedExistingAttempts = existingLearnerAttempts
-        .map((attempt) => {
-          if (Object.prototype.hasOwnProperty.call(newLearnerAttempts, attempt.id)) {
-            return undefined;
-          }
-          return attempt;
-        })
-        .filter((v) => !!v);
-      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: aggregating learner data`);
-      await aggregateLearnerDataOnClassAndSkillLevel(transaction, learner, [...unUpdatedExistingAttempts, ...Object.values(newLearnerAttempts)]);
-      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: learner data aggregated`);
-    } else {
-      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: skipped learner data aggregation`);
-    }
 
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: COMMITING TRANSACTION`);
     await transaction.commit();

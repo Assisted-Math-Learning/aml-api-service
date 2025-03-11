@@ -15,6 +15,17 @@ import { BoardMaster } from '../../../models/boardMaster';
 import { classMaster } from '../../../models/classMaster';
 import { findRepositoryAssociations } from '../../../services/repositoryAssociation';
 import { skillService } from '../../../services/skillService';
+import moment from 'moment/moment';
+import { getRecordsForLearnerByQuestionSetId } from '../../../services/learnerProficiencyData';
+import { Learner } from '../../../models/learner';
+import { aggregateLearnerData, getLearnerAggregateDataForClassAndL1SkillPair } from '../../learnerProficiencyData/learnerProficiencyDataSync/aggregation.helper';
+import { Transaction } from 'sequelize';
+import { AppDataSource } from '../../../config';
+
+const aggregateLearnerDataOnClassAndSkillLevel = async (transaction: Transaction, learner: Learner, questionLevelData: any[]) => {
+  const aggregateData = getLearnerAggregateDataForClassAndL1SkillPair(questionLevelData);
+  await aggregateLearnerData(transaction, learner, aggregateData);
+};
 
 const evaluateLearner = async (req: Request, res: Response) => {
   const apiId = _.get(req, 'id');
@@ -38,6 +49,34 @@ const evaluateLearner = async (req: Request, res: Response) => {
     const code = 'LEARNER_JOURNEY_IN_PROGRESS';
     logger.error({ code, apiId, msgid, resmsgid, message: `Learner Journey already in progress` });
     throw amlError(code, `Learner Journey already in progress`, 'BAD_REQUEST', 400);
+  }
+
+  if (learnerJourney) {
+    const { question_set_id: lastAttemptedQSID } = learnerJourney;
+    const lastAttemptedQS = await questionSetService.getQuestionSetById(lastAttemptedQSID);
+    if (lastAttemptedQS && lastAttemptedQS.purpose === QuestionSetPurposeType.MAIN_DIAGNOSTIC) {
+      /**
+       * Updating grade/skill level data in the following block (only for Main Diagnostic Question Set)
+       */
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: reading learner attempts`);
+      const learnerAttempts = await getRecordsForLearnerByQuestionSetId(learner_id, lastAttemptedQS.identifier, learnerJourney.attempt_number);
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: learner attempts read`);
+      const transaction = await AppDataSource.transaction();
+      try {
+        logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: aggregating learner data`);
+        await aggregateLearnerDataOnClassAndSkillLevel(transaction, learner, learnerAttempts);
+        await transaction.commit();
+        logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: learner data aggregated`);
+      } catch (e) {
+        await transaction.rollback();
+        throw e;
+      } finally {
+        //@ts-expect-error no typings
+        AppDataSource.connectionManager.releaseConnection(transaction.connection);
+      }
+    } else {
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: skipped learner data aggregation`);
+    }
   }
 
   const learnerBoardId = _.get(learner, ['board_id']);
