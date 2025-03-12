@@ -39,4 +39,5 @@ export interface IConfiguration {
   translate_api_url: string;
   TENANT_ID: any;
   BOARD_ID: any;
+  redisUrl: string;
 }
