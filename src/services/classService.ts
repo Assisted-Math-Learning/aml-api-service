@@ -97,7 +97,12 @@ class ClassService {
     const finalLimit = limit || DEFAULT_LIMIT;
     const finalOffset = offset || 0;
 
-    const { rows, count } = await classMaster.findAndCountAll({ where: whereClause, limit: finalLimit, offset: finalOffset });
+    const { rows, count } = await classMaster.findAndCountAll({
+      where: whereClause,
+      limit: finalLimit,
+      offset: finalOffset,
+      order: [['sequence', 'ASC']],
+    });
 
     return {
       classes: rows,
