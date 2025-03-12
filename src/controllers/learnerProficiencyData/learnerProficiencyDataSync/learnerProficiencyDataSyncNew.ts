@@ -95,8 +95,8 @@ const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
     attemptNumber = learnerJourney.attempt_number + 1;
   }
 
-  const questionLevelBulkCreateData = [];
-  const questionLevelBulkUpdateData = [];
+  const questionLevelBulkCreateData: any[] = [];
+  const questionLevelBulkUpdateData: any[] = [];
 
   const queryData = questions_data.map((datum: any) => ({
     learnerId: learner_id,
@@ -213,115 +213,100 @@ const learnerProficiencyDataSyncNew = async (req: Request, res: Response) => {
   /**
    * DATA ACCUMULATION FOR QUESTION SET LEVEL DATA ENDS HERE
    */
-
-  logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} transaction started`);
-  const transaction = await AppDataSource.transaction();
-  const transactionStartTime = Date.now();
-  logger.info(`msgid: ${msgid} transactionStartTime: ${transactionStartTime}`);
-
   try {
-    logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: creating question level data`);
-    const newData = await bulkCreateLearnerProficiencyQuestionLevelData(transaction, questionLevelBulkCreateData);
-    logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question level data created`);
+    await AppDataSource.transaction(async (transaction) => {
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} transaction started`);
+      const transactionStartTime = Date.now();
+      logger.info(`msgid: ${msgid} transactionStartTime: ${transactionStartTime}`);
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: creating question level data`);
+      const newData = await bulkCreateLearnerProficiencyQuestionLevelData(transaction, questionLevelBulkCreateData);
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question level data created`);
 
-    if (questionLevelBulkUpdateData.length) {
-      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: updating question level data`);
-      await updateLearnerProficiencyQuestionLevelData(transaction, questionLevelBulkUpdateData);
-      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question level data updated`);
-    }
-
-    for (const datum of newData) {
-      newLearnerAttempts[datum.dataValues.id] = datum.dataValues;
-    }
-
-    /**
-     * Updating question set level data in the following block
-     */
-    logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: updating question set level data`);
-
-    if (totalQuestionsCount === completedQuestionIds.length && totalQuestionsCount > 0) {
-      const avgScore = calculateAverageScoreForQuestionSet(allAttemptedQuestionsOfThisQuestionSet);
-      const subSkillScores = calculateSubSkillScoresForQuestionSet(allAttemptedQuestionsOfThisQuestionSet);
-      await createLearnerProficiencyQuestionSetLevelData(transaction, {
-        identifier: uuid.v4(),
-        learner_id,
-        question_set_id: questionSet.identifier,
-        taxonomy: questionSet.taxonomy,
-        sub_skills: subSkillScores,
-        score: avgScore,
-        created_by: learner_id,
-        attempt_number: attemptNumber,
-      });
-    }
-    logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question set level data updated`);
-
-    /**
-     * Updating learner journey
-     */
-    logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: updating learner journey`);
-    const start_time = _.get(questionSetTimestampMap, [questionSet.identifier, 'start_time']);
-    const end_time = _.get(questionSetTimestampMap, [questionSet.identifier, 'end_time']);
-    const journeyStatus = totalQuestionsCount === completedQuestionIds.length ? LearnerJourneyStatus.COMPLETED : LearnerJourneyStatus.IN_PROGRESS;
-    if (learnerJourney && learnerJourney.status === LearnerJourneyStatus.IN_PROGRESS) {
-      const payload: any = {
-        status: journeyStatus,
-        completed_question_ids: completedQuestionIds,
-        updated_by: learner_id,
-        end_time: journeyStatus === LearnerJourneyStatus.IN_PROGRESS ? null : learnerJourney.end_time,
-      };
-      if (start_time) {
-        payload['start_time'] = start_time;
+      if (questionLevelBulkUpdateData.length) {
+        logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: updating question level data`);
+        await updateLearnerProficiencyQuestionLevelData(transaction, questionLevelBulkUpdateData);
+        logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question level data updated`);
       }
-      if (end_time) {
-        payload['end_time'] = end_time;
-      }
-      await updateLearnerJourney(transaction, learnerJourney.identifier, payload);
-    } else {
-      const payload: any = {
-        identifier: uuid.v4(),
-        learner_id,
-        question_set_id: questionSet.identifier,
-        status: journeyStatus,
-        completed_question_ids: completedQuestionIds,
-        created_by: learner_id,
-        attempt_number: attemptNumber,
-      };
-      if (start_time) {
-        payload['start_time'] = start_time;
-      }
-      if (end_time) {
-        payload['end_time'] = end_time;
-      }
-      await createLearnerJourney(transaction, payload);
-    }
 
-    logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: learner journey updated`);
+      for (const datum of newData) {
+        newLearnerAttempts[datum.dataValues.id] = datum.dataValues;
+      }
 
-    logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: COMMITING TRANSACTION`);
-    await transaction.commit();
-    logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: COMMIT TRANSACTION DONE`);
-    const transactionEndTime = Date.now();
-    logger.info(`transactionEndTime: ${transactionEndTime}`);
-    logger.info(`transaction ran for: ${transactionEndTime - transactionStartTime}`);
+      /**
+       * Updating question set level data in the following block
+       */
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: updating question set level data`);
+
+      if (totalQuestionsCount === completedQuestionIds.length && totalQuestionsCount > 0) {
+        const avgScore = calculateAverageScoreForQuestionSet(allAttemptedQuestionsOfThisQuestionSet);
+        const subSkillScores = calculateSubSkillScoresForQuestionSet(allAttemptedQuestionsOfThisQuestionSet);
+        await createLearnerProficiencyQuestionSetLevelData(transaction, {
+          identifier: uuid.v4(),
+          learner_id,
+          question_set_id: questionSet.identifier,
+          taxonomy: questionSet.taxonomy,
+          sub_skills: subSkillScores,
+          score: avgScore,
+          created_by: learner_id,
+          attempt_number: attemptNumber,
+        });
+      }
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: question set level data updated`);
+
+      /**
+       * Updating learner journey
+       */
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: updating learner journey`);
+      const start_time = _.get(questionSetTimestampMap, [questionSet.identifier, 'start_time']);
+      const end_time = _.get(questionSetTimestampMap, [questionSet.identifier, 'end_time']);
+      const journeyStatus = totalQuestionsCount === completedQuestionIds.length ? LearnerJourneyStatus.COMPLETED : LearnerJourneyStatus.IN_PROGRESS;
+      if (learnerJourney && learnerJourney.status === LearnerJourneyStatus.IN_PROGRESS) {
+        const payload: any = {
+          status: journeyStatus,
+          completed_question_ids: completedQuestionIds,
+          updated_by: learner_id,
+          end_time: journeyStatus === LearnerJourneyStatus.IN_PROGRESS ? null : learnerJourney.end_time,
+        };
+        if (start_time) {
+          payload['start_time'] = start_time;
+        }
+        if (end_time) {
+          payload['end_time'] = end_time;
+        }
+        await updateLearnerJourney(transaction, learnerJourney.identifier, payload);
+      } else {
+        const payload: any = {
+          identifier: uuid.v4(),
+          learner_id,
+          question_set_id: questionSet.identifier,
+          status: journeyStatus,
+          completed_question_ids: completedQuestionIds,
+          created_by: learner_id,
+          attempt_number: attemptNumber,
+        };
+        if (start_time) {
+          payload['start_time'] = start_time;
+        }
+        if (end_time) {
+          payload['end_time'] = end_time;
+        }
+        await createLearnerJourney(transaction, payload);
+      }
+
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: learner journey updated`);
+
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: COMMITING TRANSACTION`);
+      await transaction.commit();
+      logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: COMMIT TRANSACTION DONE`);
+      const transactionEndTime = Date.now();
+      logger.info(`transactionEndTime: ${transactionEndTime}`);
+      logger.info(`transaction ran for: ${transactionEndTime - transactionStartTime}`);
+    });
   } catch (e: any) {
-    logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: ROLLING BACK TRANSACTION`);
-    // @ts-expect-error no typings
-    if (transaction.finished !== 'commit') {
-      await transaction.rollback();
-    }
-    // await transaction.rollback();
     logger.info(`[learnerProficiencyDataSync] msgid: ${msgid} timestamp: ${moment().format('DD-MM-YYYY hh:mm:ss')} action: ROLLBACK TRANSACTION DONE`);
-    const transactionEndTime = Date.now();
-    logger.info(`msgid: ${msgid} transactionEndTime: ${transactionEndTime}`);
-    logger.info(`msgid: ${msgid} transaction ran for: ${transactionStartTime - transactionEndTime}`);
     apiLog.error_body = JSON.stringify(Object.entries(e));
     await apiLog.save();
     throw e;
-  } finally {
-    //@ts-expect-error no typings
-    AppDataSource.connectionManager.releaseConnection(transaction.connection);
-    // @ts-expect-error no typings
-    await transaction.cleanup();
   }
 
   const { learnerJourney: latestLearnerJourney } = await readLearnerJourney(learner_id);
