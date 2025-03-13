@@ -9,24 +9,25 @@ import csrf from 'csurf';
 import { learnerAuth } from '../middlewares/learnerAuth';
 import ttsRouter from './entities/ttsRouter';
 import classRouter from './entities/classRouter';
+import { RedisStore } from 'connect-redis';
+import Redis from 'ioredis';
+import logger from '../utils/logger';
 
 export const portalRouter = express.Router();
 
-// ✅ Initialize Redis Session Store
-import { RedisStore } from 'connect-redis';
-import { createClient } from 'redis';
-import logger from '../utils/logger';
-
 // ✅ Create Redis client
-const redisClient = createClient({ url: appConfiguration.redisUrl });
-redisClient.connect().catch((err) => {
-  logger.error(`[portalRouter] Redis connection error: ${err}`);
-});
+const redisClient = new Redis(appConfiguration.redisUrl, { keyPrefix: `aml_portal_${appConfiguration.applicationEnv}:` });
+redisClient
+  .on('connect', () => {
+    logger.info(`[portalRouter] Redis connection successful`);
+  })
+  .on('error', (err: any) => {
+    logger.error(`[portalRouter] Redis connection error: ${err}`);
+  });
 
 // ✅ Create Redis store
 const redisStore = new RedisStore({
   client: redisClient,
-  prefix: 'aml_portal:',
 });
 
 portalRouter.use(
