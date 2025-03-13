@@ -23,7 +23,7 @@ export const createLearnerJourney = async (transaction: any, req: Optional<any, 
 
 export const updateLearnerJourney = async (transaction: any, identifier: string, req: UpdateLearnerJourney): Promise<any> => {
   const whereClause: Record<string, any> = { identifier };
-  const [, affectedRows] = await LearnerJourney.update(req, { where: whereClause, transaction, returning: true });
+const [, affectedRows] = await LearnerJourney.update(req, { where: whereClause, transaction, returning: true });
   const updatedLearnerJourney = affectedRows[0];
   const filterString = `learner_id:${updatedLearnerJourney.learner_id},question_set_id:${updatedLearnerJourney.question_set_id}`;
   const hash = cryptFactory.md5(filterString);

@@ -47,8 +47,6 @@ const appConfiguration: IConfiguration = {
     TELANGANA: get(envVars, 'TELANGANA_BOARD_ID', '9b50a7e7-fdec-4fd7-bf63-84b3e62e334g'),
   },
   redisUrl: get(envVars, 'AML_REDIS_URL', 'redis://localhost:6379'),
-  CRYPT_KEY: get(envVars, 'AML_CRYPT_KEY', 'your-secret-key'),
-  CRYPT_IV: get(envVars, 'AML_CRYPT_IV', 'your-secret-iv'),
 };
 
 export default appConfiguration;
