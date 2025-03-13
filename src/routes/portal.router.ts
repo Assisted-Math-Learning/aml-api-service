@@ -16,7 +16,7 @@ import logger from '../utils/logger';
 export const portalRouter = express.Router();
 
 // ✅ Create Redis client
-const redisClient = new Redis(appConfiguration.redisUrl, { keyPrefix: `aml_portal_${appConfiguration.applicationEnv}:` });
+const redisClient = new Redis(appConfiguration.redisUrl);
 redisClient
   .on('connect', () => {
     logger.info(`[portalRouter] Redis connection successful`);
@@ -28,6 +28,7 @@ redisClient
 // ✅ Create Redis store
 const redisStore = new RedisStore({
   client: redisClient,
+  prefix: `aml_portal_${appConfiguration.applicationEnv}:`,
 });
 
 portalRouter.use(
