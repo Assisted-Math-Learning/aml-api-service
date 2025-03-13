@@ -25,7 +25,7 @@ const AppDataSource = new Sequelize({
         password: password,
         database: name,
       },
-    ]
+    ],
   },
   models: [path.join(__dirname, 'models', '*.ts')],
   logging: false,
