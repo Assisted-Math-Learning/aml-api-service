@@ -9,6 +9,7 @@ export class classMaster extends Model {
   declare description: { [key: string]: string } | null;
   declare status: 'draft' | 'live';
   declare is_active: boolean;
+  declare sequence: number;
   declare created_by: string;
   declare updated_by: string | null;
 }
@@ -43,6 +44,11 @@ classMaster.init(
     is_active: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
+    },
+    sequence: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
     },
     created_by: {
       type: DataTypes.STRING,
