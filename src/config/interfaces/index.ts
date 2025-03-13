@@ -40,4 +40,6 @@ export interface IConfiguration {
   TENANT_ID: any;
   BOARD_ID: any;
   redisUrl: string;
+  CRYPT_KEY: string;
+  CRYPT_IV: string;
 }

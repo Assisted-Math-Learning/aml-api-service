@@ -3,6 +3,16 @@ import { Content } from '../models/content';
 import { Status } from '../enums/status';
 import _ from 'lodash';
 import { DEFAULT_LIMIT } from '../constants/constants';
+import { cryptFactory } from './factories/cryptFactory';
+import { redisService } from './integrations/redisService';
+
+const REDIS_CONSTANTS = {
+  CONTENT_BY_IDENTIFIERS_MAP_KEY_PREFIX: 'content_by_identifiers_map_key_',
+};
+
+const _getContentByIdentifiersMapKey = (hash: string) => {
+  return `${REDIS_CONSTANTS.CONTENT_BY_IDENTIFIERS_MAP_KEY_PREFIX}${hash}`;
+};
 
 // Get a media Content by ID
 export const getContentMediaById = async (getObject: { contentId: number; mediaIds: string[] }) => {
@@ -45,16 +55,25 @@ export const getContentById = async (id: string, additionalConditions: object = 
 // Get a multiple Contents by IDs
 export const getContentByIds = async (ids: string[]): Promise<any> => {
   // Combine base conditions with additional conditions
+  const sortedIds = ids.sort();
+  const hash = cryptFactory.md5(sortedIds.join(','));
+  let contentDetails = await redisService.getObject<Content[]>(_getContentByIdentifiersMapKey(hash));
+  if (contentDetails) {
+    return contentDetails;
+  }
   const conditions = {
     identifier: ids,
   };
 
-  const contentDetails = await Content.findAll({
+  contentDetails = await Content.findAll({
     where: conditions,
     attributes: { exclude: ['id'] },
+    raw: true,
   });
 
-  return contentDetails.map((c) => c.dataValues);
+  await redisService.setEntity(_getContentByIdentifiersMapKey(hash), contentDetails);
+
+  return contentDetails;
 };
 
 // Publish content by id

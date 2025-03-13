@@ -1,8 +1,17 @@
 import { Op, Optional } from 'sequelize';
 import { AudioMaster } from '../models/audioMaster';
 import { moveFileFromS3 } from './awsService';
+import { cryptFactory } from './factories/cryptFactory';
+import { redisService } from './integrations/redisService';
 
 class AudioService {
+  private readonly REDIS_CONSTANTS = {
+    AUDIO_RECORDS_LIST_MAP_PREFIX: 'audio_records_list_map_',
+  };
+
+  private _getAudioRecordsListMapKey(hash: string) {
+    return `${this.REDIS_CONSTANTS.AUDIO_RECORDS_LIST_MAP_PREFIX}${hash}`;
+  }
   static getInstance() {
     return new AudioService();
   }
@@ -34,11 +43,19 @@ class AudioService {
   }
 
   async getAudioRecordsList(ids: string[]) {
-    return AudioMaster.findAll({
+    const sortedIds = ids.sort();
+    const hash = cryptFactory.md5(sortedIds.join(','));
+    let audioRecords = await redisService.getObject<AudioMaster[]>(this._getAudioRecordsListMapKey(hash));
+    if (audioRecords) {
+      return audioRecords;
+    }
+    audioRecords = await AudioMaster.findAll({
       where: { identifier: { [Op.in]: ids } },
       attributes: { exclude: ['id'] },
       raw: true,
     });
+    await redisService.setEntity(this._getAudioRecordsListMapKey(hash), audioRecords);
+    return audioRecords;
   }
 
   async makeAudioPermanent(audio: any) {

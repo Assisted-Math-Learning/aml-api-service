@@ -1,33 +1,82 @@
 import { Op } from 'sequelize';
 import { Learner } from '../models/learner';
 import _ from 'lodash';
+import { redisService } from './integrations/redisService';
+import { cryptFactory } from './factories/cryptFactory';
 
 class LearnerService {
+  private readonly REDIS_CONSTANTS = {
+    LEARNER_ENT_KEY: 'learner_ent',
+    LEARNER_LIST_MAP_PREFIX: 'learner_list_map_',
+  };
+
+  private _getLearnerEntKey(identifier: string) {
+    return `${this.REDIS_CONSTANTS.LEARNER_ENT_KEY}:${identifier}`;
+  }
+
+  private _getLearnerListMapKey(filterHash: string) {
+    return `${this.REDIS_CONSTANTS.LEARNER_LIST_MAP_PREFIX}${filterHash}`;
+  }
+
   static getInstance() {
     return new LearnerService();
   }
 
   async create(data: { identifier: string; username: string; password: string; tenant_id: string; board_id: string; class_id: string; created_by: string; preferred_language: string }) {
-    return Learner.create(data, { raw: true });
+    const learner = await Learner.create(data, { raw: true });
+
+    const filterString1 = `username:${learner.username}`;
+    const filterString2 = `username:${learner.username},tenant_id:${learner.tenant_id}`;
+
+    const hash1 = cryptFactory.md5(filterString1);
+    const hash2 = cryptFactory.md5(filterString2);
+
+    await redisService.setEntity(this._getLearnerEntKey(learner.identifier), learner);
+    await redisService.setEntity(this._getLearnerEntKey(hash1), learner);
+    await redisService.setEntity(this._getLearnerEntKey(hash2), learner);
+
+    await redisService.removeKeysWithPrefix(this.REDIS_CONSTANTS.LEARNER_LIST_MAP_PREFIX);
+
+    return learner;
   }
 
   async getLearnerByUserName(username: string, raw = false) {
-    return Learner.findOne({
+    const filterString = `username:${username}`;
+    const hash = cryptFactory.md5(filterString);
+    let learner = await redisService.getObject<Learner>(this._getLearnerEntKey(hash));
+    if (learner) {
+      return learner;
+    }
+    learner = await Learner.findOne({
       where: {
         username,
       },
       raw,
     });
+
+    await redisService.setEntity(this._getLearnerEntKey(username), learner);
+
+    return learner;
   }
 
   async getLearnerByUserNameAndTenantId(username: string, tenant_id: string) {
-    return Learner.findOne({
+    const filterString = `username:${username},tenant_id:${tenant_id}`;
+    const hash = cryptFactory.md5(filterString);
+    let learner = await redisService.getObject<Learner>(this._getLearnerEntKey(hash));
+    if (learner) {
+      return learner;
+    }
+    learner = await Learner.findOne({
       where: {
         username,
         tenant_id,
       },
       raw: true,
     });
+
+    await redisService.setEntity(this._getLearnerEntKey(hash), learner);
+
+    return learner;
   }
 
   async getLearnersByUserNamesAndTenantId(usernames: string[], tenantId: string) {
@@ -40,11 +89,19 @@ class LearnerService {
   }
 
   async getLearnerByIdentifier(identifier: string): Promise<Learner | null> {
-    return Learner.findOne({
+    let learner = await redisService.getObject<Learner>(this._getLearnerEntKey(identifier));
+    if (learner) {
+      return learner;
+    }
+    learner = await Learner.findOne({
       where: {
         identifier,
       },
     });
+
+    await redisService.setEntity(this._getLearnerEntKey(identifier), learner);
+
+    return learner;
   }
 
   async listLearners(): Promise<Learner[]> {

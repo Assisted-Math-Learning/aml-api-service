@@ -1,6 +1,14 @@
 import { QuestionSetQuestionMapping } from '../models/questionSetQuestionMapping';
+import { redisService } from './integrations/redisService';
 
 class QuestionSetQuestionMappingService {
+  private readonly REDIS_CONSTANTS = {
+    QUESTION_SET_QUESTION_MAPPING_LIST_MAP_PREFIX: 'question_set_question_mapping_list_map_',
+  };
+
+  private _getQuestionSetQuestionMappingListMapKey(questionSetId: string) {
+    return `${this.REDIS_CONSTANTS.QUESTION_SET_QUESTION_MAPPING_LIST_MAP_PREFIX}${questionSetId}`;
+  }
   static getInstance() {
     return new QuestionSetQuestionMappingService();
   }
@@ -55,10 +63,16 @@ class QuestionSetQuestionMappingService {
   }
 
   async getEntriesForQuestionSetId(questionSetId: string) {
-    return QuestionSetQuestionMapping.findAll({
+    let questionMappings = await redisService.getObject<QuestionSetQuestionMapping[]>(this._getQuestionSetQuestionMappingListMapKey(questionSetId));
+    if (questionMappings) {
+      return questionMappings;
+    }
+    questionMappings = await QuestionSetQuestionMapping.findAll({
       where: { question_set_id: questionSetId },
       raw: true,
     });
+    await redisService.setEntity(this._getQuestionSetQuestionMappingListMapKey(questionSetId), questionMappings);
+    return questionMappings;
   }
 
   async updateById(id: number, body: any) {

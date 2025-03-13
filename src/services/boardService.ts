@@ -4,8 +4,22 @@ import { BoardMaster } from '../models/boardMaster';
 import _ from 'lodash';
 import { DEFAULT_LIMIT } from '../constants/constants';
 import { Sequelize } from 'sequelize-typescript';
+import { redisService } from './integrations/redisService';
 
 class BoardService {
+  private readonly REDIS_CONSTANTS = {
+    BOARD_ENT_KEY: 'board_ent',
+    BOARD_LIST_MAP_PREFIX: 'board_list_map_',
+  };
+
+  private _getBoardEntKey(identifier: string) {
+    return `${this.REDIS_CONSTANTS.BOARD_ENT_KEY}:${identifier}`;
+  }
+
+  private _getBoardListMapKey(filterHash: string) {
+    return `${this.REDIS_CONSTANTS.BOARD_LIST_MAP_PREFIX}${filterHash}`;
+  }
+
   static getInstance() {
     return new BoardService();
   }
@@ -16,10 +30,17 @@ class BoardService {
   }
 
   async getBoardByIdentifier(identifier: string) {
-    return BoardMaster.findOne({
+    let boardEntity = await redisService.getObject<BoardMaster>(this._getBoardEntKey(identifier));
+    if (boardEntity) {
+      return boardEntity;
+    }
+    boardEntity = await BoardMaster.findOne({
       where: { identifier: identifier, status: Status.LIVE, is_active: true },
       raw: true,
     });
+
+    await redisService.setEntity(this._getBoardEntKey(identifier), boardEntity);
+    return boardEntity;
   }
 
   async getBoardsByIdentifiers(identifiers: string[]) {

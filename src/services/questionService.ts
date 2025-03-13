@@ -5,8 +5,17 @@ import { Status } from '../enums/status';
 import { DEFAULT_LIMIT } from '../constants/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { questionSetQuestionMappingService } from './questionSetQuestionMappingService';
+import { cryptFactory } from './factories/cryptFactory';
+import { redisService } from './integrations/redisService';
 
 class QuestionService {
+  private readonly REDIS_CONSTANTS = {
+    QUESTIONS_BY_IDENTIFIERS_MAP_KEY_PREFIX: 'questions_by_identifiers_map_key_',
+  };
+
+  private _getQuestionsByIdentifiersMapKey(hash: string) {
+    return `${this.REDIS_CONSTANTS.QUESTIONS_BY_IDENTIFIERS_MAP_KEY_PREFIX}${hash}`;
+  }
   static getInstance() {
     return new QuestionService();
   }
@@ -228,7 +237,13 @@ class QuestionService {
   }
 
   async getQuestionsByIdentifiers(identifiers: string[]) {
-    return Question.findAll({
+    const sortedIds = identifiers.sort();
+    const hash = cryptFactory.md5(sortedIds.join(','));
+    let questions = await redisService.getObject<Question[]>(this._getQuestionsByIdentifiersMapKey(hash));
+    if (questions) {
+      return questions;
+    }
+    questions = await Question.findAll({
       where: {
         identifier: {
           [Op.in]: identifiers,
@@ -237,6 +252,8 @@ class QuestionService {
       attributes: { exclude: ['id'] },
       raw: true,
     });
+    await redisService.setEntity(this._getQuestionsByIdentifiersMapKey(hash), questions);
+    return questions;
   }
 
   async checkQuestionsExist(questionIdentifiers: string[]): Promise<{ exists: boolean; foundQuestions?: any[] }> {

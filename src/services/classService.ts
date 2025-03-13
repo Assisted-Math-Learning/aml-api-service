@@ -5,8 +5,22 @@ import { amlError } from '../types/amlError';
 import { Op } from 'sequelize';
 import { DEFAULT_LIMIT } from '../constants/constants';
 import { Sequelize } from 'sequelize-typescript';
+import { redisService } from './integrations/redisService';
 
 class ClassService {
+  private readonly REDIS_CONSTANTS = {
+    CLASS_ENT_KEY: 'class_ent',
+    CLASS_LIST_MAP_PREFIX: 'class_list_map_',
+  };
+
+  private _getClassEntKey(identifier: string) {
+    return `${this.REDIS_CONSTANTS.CLASS_ENT_KEY}:${identifier}`;
+  }
+
+  private _getClassListMapKey(filterHash: string) {
+    return `${this.REDIS_CONSTANTS.CLASS_LIST_MAP_PREFIX}${filterHash}`;
+  }
+
   static getInstance() {
     return new ClassService();
   }
@@ -37,11 +51,19 @@ class ClassService {
 
   // Get class by identifier
   async getClassById(class_id: string) {
-    return classMaster.findOne({
+    let classEntity = await redisService.getObject<classMaster>(this._getClassEntKey(class_id));
+    if (classEntity) {
+      return classEntity;
+    }
+    classEntity = await classMaster.findOne({
       where: { identifier: class_id, is_active: true, status: Status.LIVE },
       attributes: { exclude: ['id'] },
       raw: true,
     });
+
+    await redisService.setEntity(this._getClassEntKey(class_id), classEntity);
+
+    return classEntity;
   }
 
   async checkClassNameExists(classNames: { [key: string]: string }) {

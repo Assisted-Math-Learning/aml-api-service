@@ -4,8 +4,22 @@ import { UpdateTenant } from '../types/tenantModel';
 import _ from 'lodash';
 import { Status } from '../enums/status';
 import { DEFAULT_LIMIT } from '../constants/constants';
+import { redisService } from './integrations/redisService';
 
 class TenantService {
+  private readonly REDIS_CONSTANTS = {
+    TENANT_ENT_KEY: 'tenant_ent',
+    TENANT_LIST_MAP_PREFIX: 'tenant_list_map_',
+  };
+
+  private _getTenantEntKey(identifier: string) {
+    return `${this.REDIS_CONSTANTS.TENANT_ENT_KEY}:${identifier}`;
+  }
+
+  private _getTenantListMapKey(filterHash: string) {
+    return `${this.REDIS_CONSTANTS.TENANT_LIST_MAP_PREFIX}${filterHash}`;
+  }
+
   static getInstance() {
     return new TenantService();
   }
@@ -23,11 +37,19 @@ class TenantService {
 
   //get tenant
   async getTenant(tenant_id: string) {
-    return Tenant.findOne({
+    let tenant = await redisService.getObject<Tenant>(this._getTenantEntKey(tenant_id));
+    if (tenant) {
+      return tenant;
+    }
+    tenant = await Tenant.findOne({
       where: { identifier: tenant_id, is_active: true, status: Status.LIVE },
       attributes: { exclude: ['id'] },
       raw: true,
     });
+
+    await redisService.setEntity(this._getTenantEntKey(tenant_id), tenant);
+
+    return tenant;
   }
 
   //filter tenants

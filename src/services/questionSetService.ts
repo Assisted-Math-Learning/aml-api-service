@@ -5,8 +5,18 @@ import _ from 'lodash';
 import { QuestionSetPurposeType } from '../enums/questionSetPurposeType';
 import { Sequelize } from 'sequelize-typescript';
 import { DEFAULT_LIMIT } from '../constants/constants';
+import { cryptFactory } from './factories/cryptFactory';
+import { redisService } from './integrations/redisService';
 
 class QuestionSetService {
+  private readonly REDIS_CONSTANTS = {
+    QUESTION_SET_ENT_KEY_PREFIX: 'question_set_ent_key_',
+  };
+
+  private _getQuestionSetEntKey(hash: string) {
+    return `${this.REDIS_CONSTANTS.QUESTION_SET_ENT_KEY_PREFIX}${hash}`;
+  }
+
   static getInstance() {
     return new QuestionSetService();
   }
@@ -30,11 +40,24 @@ class QuestionSetService {
       ...additionalConditions, // Spread additional conditions here
     };
 
-    return QuestionSet.findOne({
+    const filterString = `identifier:${id},${Object.entries(additionalConditions)
+      .map(([key, value]) => `${key}:${value}`)
+      .join(',')}`;
+    const hash = cryptFactory.md5(filterString);
+    let questionSet = await redisService.getObject<QuestionSet>(this._getQuestionSetEntKey(hash));
+    if (questionSet) {
+      return questionSet;
+    }
+
+    questionSet = await QuestionSet.findOne({
       where: conditions,
       attributes: { exclude: ['id'] },
       raw: true,
     });
+
+    await redisService.setEntity(this._getQuestionSetEntKey(hash), questionSet);
+
+    return questionSet;
   }
 
   async createQuestionSetData(req: Optional<any, string> | undefined) {

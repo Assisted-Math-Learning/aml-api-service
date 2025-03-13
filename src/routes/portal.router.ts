@@ -4,31 +4,19 @@ import { learnerAuthRouter } from './learnerAuth.route';
 import { learnerRouter } from './entities/learnerRouter';
 import express from 'express';
 import session from 'express-session';
-import { appConfiguration } from '../config';
+import { appConfiguration, redis } from '../config';
 import csrf from 'csurf';
 import { learnerAuth } from '../middlewares/learnerAuth';
 import ttsRouter from './entities/ttsRouter';
 import classRouter from './entities/classRouter';
 import { RedisStore } from 'connect-redis';
-import Redis from 'ioredis';
-import logger from '../utils/logger';
 
 export const portalRouter = express.Router();
 
-// ✅ Create Redis client
-const redisClient = new Redis(appConfiguration.redisUrl);
-redisClient
-  .on('connect', () => {
-    logger.info(`[portalRouter] Redis connection successful`);
-  })
-  .on('error', (err: any) => {
-    logger.error(`[portalRouter] Redis connection error: ${err}`);
-  });
-
 // ✅ Create Redis store
 const redisStore = new RedisStore({
-  client: redisClient,
-  prefix: `aml_portal_${appConfiguration.applicationEnv}:`,
+  client: redis,
+  prefix: `learner_sessions:`,
 });
 
 portalRouter.use(
